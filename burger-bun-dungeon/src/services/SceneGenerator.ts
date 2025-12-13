@@ -1,5 +1,6 @@
 import type { Scene, GameState, IngredientsData } from '../types/game'
 import { SynergyCalculator } from './SynergyCalculator'
+import { EndingFactory } from './EndingFactory'
 import { TOTAL_UNIQUE_SILENCE_MESSAGES } from '../constants/gameConstants'
 
 export class SceneGenerator {
@@ -106,79 +107,24 @@ export class SceneGenerator {
     gameState: GameState,
     ingredients: IngredientsData
   ): Scene {
-    const lingeredInAllSilences = gameState.seenSilenceMessages.length >= TOTAL_UNIQUE_SILENCE_MESSAGES
+    const lingeredInAllSilences =
+      gameState.seenSilenceMessages.length >= TOTAL_UNIQUE_SILENCE_MESSAGES
+    const hasAvocado = gameState.bunIngredients.includes('avocado')
 
-    let text = "You have become:\n\n"
-    text += "🍞 Bun\n"
-
-    let baseScore = 0
-    gameState.bunIngredients.forEach(ingredientId => {
-      const ingredient = ingredients[ingredientId]
-      text += `${ingredient.name}        ${ingredient.points >= 0 ? '+' : ''}${ingredient.points}\n`
-      baseScore += ingredient.points
-    })
-
-    text += "\n"
-
-    // Calculate synergies
-    const { score: synergyScore, messages: synergyMessages } =
-      SynergyCalculator.calculateSynergyScore(gameState.bunIngredients, ingredients)
-
-    if (synergyMessages.length > 0) {
-      text += "Reflections:\n"
-      text += synergyMessages.join('\n') + "\n\n"
-    }
-
-    text += `Base score:     ${baseScore}\n`
-    text += `Synergies:      ${synergyScore >= 0 ? '+' : ''}${synergyScore}\n`
-    text += `Total:          ${baseScore + synergyScore}\n\n`
-
+    // Route to appropriate ending based on game state
     if (lingeredInAllSilences) {
-      const hasAvocado = gameState.bunIngredients.includes('avocado')
-      if (hasAvocado) {
-        text += "A hand reaches towards you.\n\nBut then... it pulls back.\n\nYou hear loud footsteps overhead.\n\n\"Ew.\"\n\nThe hand retreats. You are spared.\n\nYou remain whole, untouched, free."
-      } else {
-        text += "A hand reaches towards you.\n\nYou are now whole.\n\nBut at what cost?\n\n🧈"
-      }
-    } else {
-      text += "You are not what you were meant to be.\nBut you are something."
+      return hasAvocado
+        ? EndingFactory.generateGoodSilentEnding(gameState, ingredients)
+        : EndingFactory.generateBadSilentEnding(gameState, ingredients)
     }
 
-    return {
-      text,
-      choices: [
-        { label: 'Restart', restart: true }
-      ]
-    }
+    return EndingFactory.generateDefaultEnding(gameState, ingredients)
   }
 
   static generateNotARealBurgerEnding(
     gameState: GameState,
     ingredients: IngredientsData
   ): Scene {
-    let text = "You gather yourself together, but something is wrong.\n\n"
-    text += "Without a meat patty, you are not a real burger.\n\n"
-    text += "You are incomplete. You are nothing.\n\n"
-    text += "---\n\n"
-    text += "You have:\n\n"
-    text += "🍞 Bun\n"
-
-    gameState.bunIngredients.forEach(ingredientId => {
-      const ingredient = ingredients[ingredientId]
-      text += `${ingredient.name}        +0\n`
-    })
-
-    text += "\n"
-    text += `Base score:     0\n`
-    text += `Synergies:      +0\n`
-    text += `Total:          0\n\n`
-    text += "You are nothing without the meat."
-
-    return {
-      text,
-      choices: [
-        { label: 'Restart', restart: true }
-      ]
-    }
+    return EndingFactory.generateNotARealBurgerEnding(gameState, ingredients)
   }
 }
