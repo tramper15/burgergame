@@ -1,6 +1,7 @@
 export const SCENE_IDS = {
   START: 'kitchen_counter',
   REFLECT: 'REFLECT',
+  LINGER_SILENCE: 'LINGER_SILENCE',
   ENDING: 'ENDING'
 } as const
 

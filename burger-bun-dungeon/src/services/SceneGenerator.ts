@@ -42,6 +42,50 @@ export class SceneGenerator {
     }
   }
 
+  static generateSilenceScene(
+    gameState: GameState,
+    _ingredients: IngredientsData // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): Scene {
+    const sadTexts = [
+      "You sit in the quiet.\n\nThe weight of what you carry feels heavy. Each ingredient—a choice you made, a piece of yourself you picked up along the way.",
+      "Silence wraps around you.\n\nYou think about the empty shelf where the cheese was. The forgotten lettuce. All the things left behind in dark places.",
+      "You linger here, unmoving.\n\nWhat does it mean to be complete? What does it mean to be whole? You don't know if you'll ever know.",
+      "The stillness is overwhelming.\n\nYou are more than bread now, but less than what you imagined. Somewhere between empty and full.",
+      "You close your eyes—or you would, if you had eyes.\n\nIn the darkness behind the darkness, you feel the cold of the freezer, the dust under the table, the shadows behind the couch."
+    ]
+
+    let text = ""
+
+    if (gameState.bunIngredients.length === 0) {
+      text = "You sit in silence.\n\nYou are just bread. Two halves pressed together with nothing between.\n\nThe emptiness echoes.\n\nYou wonder if you were always meant to be this hollow."
+    } else {
+      // Pick a random sad reflection
+      const randomIndex = Math.floor(Math.random() * sadTexts.length)
+      text = sadTexts[randomIndex]
+
+      text += "\n\n"
+
+      // List what you carry, but make it melancholic
+      if (gameState.bunIngredients.length === 1) {
+        text += "You carry only one thing. It feels lonely."
+      } else if (gameState.bunIngredients.length <= 3) {
+        text += "You carry so little. Is it enough? Will it ever be?"
+      } else {
+        text += "You carry so much. Does any of it matter?"
+      }
+    }
+
+    return {
+      text,
+      choices: [
+        {
+          label: 'Return',
+          next: gameState.visitedScenes[gameState.visitedScenes.length - 2] || 'kitchen_counter'
+        }
+      ]
+    }
+  }
+
   static generateEndingScene(
     gameState: GameState,
     ingredients: IngredientsData

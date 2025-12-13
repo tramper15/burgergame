@@ -15,6 +15,18 @@ export class ChoiceProcessor {
     setSelectedChoice(-1)
   }
 
+  static processSilence(
+    setGameState: (updater: (prev: GameState) => GameState) => void,
+    setSelectedChoice: (value: number) => void
+  ): void {
+    setGameState(prev => ({
+      ...prev,
+      currentSceneId: SCENE_IDS.LINGER_SILENCE,
+      visitedScenes: [...prev.visitedScenes, SCENE_IDS.LINGER_SILENCE]
+    }))
+    setSelectedChoice(-1)
+  }
+
   static processEnding(
     setGameState: (updater: (prev: GameState) => GameState) => void,
     setSelectedChoice: (value: number) => void
@@ -94,6 +106,12 @@ export class ChoiceProcessor {
     // Handle reflection
     if (choice.reflect) {
       this.processReflection(setGameState, setSelectedChoice)
+      return
+    }
+
+    // Handle silence
+    if (choice.silence) {
+      this.processSilence(setGameState, setSelectedChoice)
       return
     }
 

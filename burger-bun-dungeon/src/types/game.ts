@@ -13,6 +13,7 @@ export interface Choice {
   next?: string
   take?: string
   reflect?: boolean
+  silence?: boolean
   end?: boolean
 }
 

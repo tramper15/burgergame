@@ -29,6 +29,11 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
       return SceneGenerator.generateReflectionScene(gameState, ingredients)
     }
 
+    // Check if we need to generate a silence scene
+    if (gameState.currentSceneId === SCENE_IDS.LINGER_SILENCE) {
+      return SceneGenerator.generateSilenceScene(gameState, ingredients)
+    }
+
     // Check if we need to generate an ending scene
     if (gameState.currentSceneId === SCENE_IDS.ENDING) {
       return SceneGenerator.generateEndingScene(gameState, ingredients)
