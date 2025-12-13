@@ -211,7 +211,7 @@
     ]
   },
   "hallway": {
-    "text": "A long hallway. The walls are bare. You hear nothing. Ahead you see a living room. Behind you is the kitchen. On the floor, you notice a meat patty.",
+    "text": "A long hallway. The walls are bare. You hear nothing. Ahead you see a living room. Behind you is the kitchen. You notice a door to a bathroom. On the floor, you notice a meat patty.",
     "ingredient": "meat_patty",
     "choices": [
       {
@@ -222,6 +222,10 @@
       {
         "label": "Continue to the living room",
         "next": "living_room"
+      },
+      {
+        "label": "Enter the bathroom",
+        "next": "bathroom"
       },
       {
         "label": "Go back to the kitchen",
@@ -242,11 +246,15 @@
     ]
   },
   "hallway_after": {
-    "text": "A long hallway. The walls are bare. You hear nothing. The meat patty is gone. Ahead you see a living room. Behind you is the kitchen.",
+    "text": "A long hallway. The walls are bare. You hear nothing. The meat patty is gone. Ahead you see a living room. Behind you is the kitchen. You notice a door to a bathroom.",
     "choices": [
       {
         "label": "Continue to the living room",
         "next": "living_room"
+      },
+      {
+        "label": "Enter the bathroom",
+        "next": "bathroom"
       },
       {
         "label": "Go back to the kitchen",
@@ -556,6 +564,54 @@
       {
         "label": "Go back upstairs",
         "next": "pantry_after"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
+      }
+    ]
+  },
+  "bathroom": {
+    "text": "The bathroom is small and dim. A single light flickers overhead. The sink drips slowly. You see a glass on the counter, half-filled with water. The water looks... questionable.",
+    "ingredient": "questionable_water",
+    "choices": [
+      {
+        "label": "Take the questionable water",
+        "take": "questionable_water",
+        "next": "bathroom_after"
+      },
+      {
+        "label": "Return to the hallway",
+        "next": "hallway_after"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
+      }
+    ]
+  },
+  "bathroom_after": {
+    "text": "The bathroom is small and dim. The glass is gone now. Only the dripping sink remains.",
+    "choices": [
+      {
+        "label": "Return to the hallway",
+        "next": "hallway_after"
       },
       {
         "label": "Reflect on your Ingredients",

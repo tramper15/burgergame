@@ -5,8 +5,8 @@
   height: 100%;
   background: linear-gradient(135deg, #FFE5B4 0%, #FFDAB9 50%, #FFE4E1 100%);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 2rem;
   font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', cursive, sans-serif;
   position: relative;

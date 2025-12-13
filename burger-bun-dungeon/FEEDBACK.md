@@ -41,3 +41,12 @@
 **Status:** Included
 
 **Implementation:** Added meat patty ingredient to hallway scene as a neutral ingredient (no synergy bonuses/penalties). If player reaches the ending without collecting the meat patty, they are sent to a special "not_a_real_burger" ending that shows all their collected ingredients with 0 points each, 0 base score, 0 synergies, and 0 total. The message reads "You gather yourself together, but something is wrong. Without a meat patty, you are not a real burger. You are incomplete. You are nothing."
+
+---
+
+### From James
+**Feedback:** "It would be funny to die of dysentery somewhere along the way"
+
+**Status:** Included
+
+**Implementation:** Added bathroom off hallway with questionable water ingredient. If player takes the water and completes the game, they get a dysentery death ending with Oregon Trail reference: "You have died of dysentery. You should have caulked the wagon and floated it across." Questionable water has -5 points and negative synergy with all other ingredients.

@@ -151,4 +151,42 @@ export class EndingFactory {
       choices: [{ label: 'Restart', restart: true }]
     }
   }
+
+  /**
+   * Dysentery ending - player took the questionable water
+   * Oregon Trail reference
+   */
+  static generateDysenteryEnding(
+    gameState: GameState,
+    ingredients: IngredientsData
+  ): Scene {
+    const text = new EndingBuilder()
+      .addNarrative(
+        "You gather yourself together.\n\n" +
+        "But something is wrong.\n\n" +
+        "The water... it was a mistake.\n\n" +
+        "You feel yourself coming apart.\n\n" +
+        "---\n\n" +
+        "You have:\n"
+      )
+      .addBunHeader()
+      .addIngredientList(gameState.bunIngredients, ingredients, false)
+      .addScoreSummary(gameState.bunIngredients, ingredients, {
+        base: 0,
+        synergy: 0,
+        total: 0
+      })
+      .addNarrative(
+        "You have died of dysentery.\n\n" +
+        "You should have caulked the wagon and floated it across.\n\n" +
+        "Perhaps some paths were not meant to be taken.\n\n" +
+        "Perhaps some water was not meant to be drunk."
+      )
+      .build()
+
+    return {
+      text,
+      choices: [{ label: 'Restart', restart: true }]
+    }
+  }
 }

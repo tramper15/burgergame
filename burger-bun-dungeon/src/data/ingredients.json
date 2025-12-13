@@ -5,12 +5,13 @@
     "onAdd": "The cheese settles on you. It is cold, then warm.",
     "points": 2,
     "likes": ["bacon", "tomato"],
-    "dislikes": ["avocado"],
+    "dislikes": ["avocado", "questionable_water"],
     "reactions": {
       "bacon": "The cheese thinks of the bacon. They are old friends.",
       "avocado": "The cheese does not like the avocado.",
       "lettuce": "The cheese acknowledges the lettuce without feeling.",
-      "tomato": "The tomato and cheese are content."
+      "tomato": "The tomato and cheese are content.",
+      "questionable_water": "The cheese recoils from the water."
     }
   },
   "bacon": {
@@ -19,10 +20,11 @@
     "onAdd": "You take the bacon. It does not bend. It becomes part of you.",
     "points": 1,
     "likes": ["cheese"],
-    "dislikes": [],
+    "dislikes": ["questionable_water"],
     "reactions": {
       "cheese": "The bacon remembers the cheese.",
-      "lettuce": "The bacon and lettuce say nothing to each other."
+      "lettuce": "The bacon and lettuce say nothing to each other.",
+      "questionable_water": "The bacon becomes limp and grey."
     }
   },
   "lettuce": {
@@ -31,12 +33,13 @@
     "onAdd": "The lettuce settles lightly. It barely weighs anything.",
     "points": 1,
     "likes": ["tomato", "avocado"],
-    "dislikes": [],
+    "dislikes": ["questionable_water"],
     "reactions": {
       "tomato": "The lettuce and tomato feel natural together.",
       "avocado": "The avocado feels at home with the lettuce.",
       "bacon": "The bacon and lettuce say nothing to each other.",
-      "cheese": "The cheese acknowledges the lettuce without feeling."
+      "cheese": "The cheese acknowledges the lettuce without feeling.",
+      "questionable_water": "The lettuce turns brown and slimy."
     }
   },
   "tomato": {
@@ -45,11 +48,12 @@
     "onAdd": "The tomato sits on you. You feel its moisture.",
     "points": 2,
     "likes": ["lettuce", "cheese", "avocado"],
-    "dislikes": [],
+    "dislikes": ["questionable_water"],
     "reactions": {
       "lettuce": "The lettuce and tomato feel natural together.",
       "cheese": "The tomato and cheese are content.",
-      "avocado": "The avocado and tomato recognize each other."
+      "avocado": "The avocado and tomato recognize each other.",
+      "questionable_water": "The tomato becomes mushy and rotten."
     }
   },
   "avocado": {
@@ -58,11 +62,12 @@
     "onAdd": "The avocado spreads across you gently.",
     "points": 3,
     "likes": ["tomato", "lettuce"],
-    "dislikes": ["cheese"],
+    "dislikes": ["cheese", "questionable_water"],
     "reactions": {
       "cheese": "The avocado pulls away from the cheese.",
       "tomato": "The avocado and tomato recognize each other.",
-      "lettuce": "The avocado feels at home with the lettuce."
+      "lettuce": "The avocado feels at home with the lettuce.",
+      "questionable_water": "The avocado oxidizes into something black."
     }
   },
   "pickle": {
@@ -71,11 +76,12 @@
     "onAdd": "The pickle settles on you. You taste vinegar in your mind.",
     "points": 1,
     "likes": ["cheese"],
-    "dislikes": ["avocado", "tomato"],
+    "dislikes": ["avocado", "tomato", "questionable_water"],
     "reactions": {
       "cheese": "The pickle and cheese are familiar.",
       "avocado": "The pickle does not belong with the avocado.",
-      "tomato": "The pickle feels wrong next to the tomato."
+      "tomato": "The pickle feels wrong next to the tomato.",
+      "questionable_water": "The pickle becomes bloated and tasteless."
     }
   },
   "onion": {
@@ -84,10 +90,11 @@
     "onAdd": "The onion joins you. It is strong and certain.",
     "points": 1,
     "likes": ["tomato", "lettuce"],
-    "dislikes": [],
+    "dislikes": ["questionable_water"],
     "reactions": {
       "tomato": "The onion and tomato are old companions.",
-      "lettuce": "The onion settles among the lettuce."
+      "lettuce": "The onion settles among the lettuce.",
+      "questionable_water": "The onion loses its sharpness and becomes sad."
     }
   },
   "special_sauce": {
@@ -96,7 +103,7 @@
     "onAdd": "The sauce spreads across everything. It changes you.",
     "points": 5,
     "likes": ["cheese", "bacon", "lettuce", "tomato", "onion", "pickle"],
-    "dislikes": ["avocado"],
+    "dislikes": ["avocado", "questionable_water"],
     "reactions": {
       "cheese": "The sauce embraces the cheese.",
       "bacon": "The sauce knows the bacon well.",
@@ -104,7 +111,8 @@
       "tomato": "The sauce mingles with the tomato.",
       "onion": "The sauce and onion combine.",
       "pickle": "The sauce enhances the pickle.",
-      "avocado": "The sauce does not understand the avocado."
+      "avocado": "The sauce does not understand the avocado.",
+      "questionable_water": "The sauce curdles and separates."
     }
   },
   "meat_patty": {
@@ -113,7 +121,28 @@
     "onAdd": "The meat patty becomes part of you. You feel whole. You are real.",
     "points": 10,
     "likes": [],
-    "dislikes": [],
-    "reactions": {}
+    "dislikes": ["questionable_water"],
+    "reactions": {
+      "questionable_water": "The meat patty becomes grey. You feel sick."
+    }
+  },
+  "questionable_water": {
+    "name": "Questionable Water",
+    "description": "Water from the bathroom sink. It has been sitting here for some time.",
+    "onAdd": "The water seeps into you. You feel... uneasy. Something is not right.",
+    "points": -5,
+    "likes": [],
+    "dislikes": ["cheese", "bacon", "lettuce", "tomato", "avocado", "pickle", "onion", "special_sauce", "meat_patty"],
+    "reactions": {
+      "cheese": "The water contaminates the cheese.",
+      "bacon": "The water makes the bacon soggy and wrong.",
+      "lettuce": "The water wilts the lettuce into something unrecognizable.",
+      "tomato": "The water and tomato create something foul.",
+      "avocado": "The water turns the avocado brown and bitter.",
+      "pickle": "The water dilutes the pickle into nothingness.",
+      "onion": "The water makes the onion weep for real.",
+      "special_sauce": "The water ruins everything the sauce tried to be.",
+      "meat_patty": "The water seeps into the meat. This is not food anymore."
+    }
   }
 }

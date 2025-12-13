@@ -112,6 +112,12 @@ export class SceneGenerator {
       return EndingFactory.generateEmptyBurgerEnding(gameState, ingredients)
     }
 
+    // Check for dysentery (after empty check)
+    const hasQuestionableWater = gameState.bunIngredients.includes('questionable_water')
+    if (hasQuestionableWater) {
+      return EndingFactory.generateDysenteryEnding(gameState, ingredients)
+    }
+
     // Check for no meat patty
     const hasMeatPatty = gameState.bunIngredients.includes('meat_patty')
     if (!hasMeatPatty) {
