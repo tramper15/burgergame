@@ -45,7 +45,7 @@ export class SceneGenerator {
 
   static generateSilenceScene(
     gameState: GameState,
-    _ingredients: IngredientsData, // eslint-disable-line @typescript-eslint/no-unused-vars
+    _ingredients: IngredientsData,
     messageIndex?: number
   ): Scene {
     const sadTexts = [
@@ -114,7 +114,7 @@ export class SceneGenerator {
     let baseScore = 0
     gameState.bunIngredients.forEach(ingredientId => {
       const ingredient = ingredients[ingredientId]
-      text += `${ingredient.name}        +${ingredient.points}\n`
+      text += `${ingredient.name}        ${ingredient.points >= 0 ? '+' : ''}${ingredient.points}\n`
       baseScore += ingredient.points
     })
 

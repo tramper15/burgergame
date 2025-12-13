@@ -68,7 +68,7 @@ export class SynergyCalculator {
             synergyMessages[synergyMessages.length - 1] += `     +${SYNERGY_POINTS.LIKE}`
           } else if (ing1.dislikes.includes(ing2Id)) {
             synergyScore += SYNERGY_POINTS.DISLIKE
-            synergyMessages[synergyMessages.length - 1] += `     ${SYNERGY_POINTS.DISLIKE}`
+            synergyMessages[synergyMessages.length - 1] += `     ${SYNERGY_POINTS.DISLIKE >= 0 ? '+' : ''}${SYNERGY_POINTS.DISLIKE}`
           }
         }
       }
