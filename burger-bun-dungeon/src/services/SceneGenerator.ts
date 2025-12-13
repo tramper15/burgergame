@@ -147,7 +147,7 @@ export class SceneGenerator {
     return {
       text,
       choices: [
-        { label: 'Start Over', next: 'kitchen_counter' }
+        { label: 'Restart', restart: true }
       ]
     }
   }

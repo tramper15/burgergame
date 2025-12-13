@@ -63,12 +63,6 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
   const handleChoiceChange = (index: number) => {
     setSelectedChoice(index)
 
-    // Check for restart option (value -2)
-    if (index === -2) {
-      handleRestart()
-      return
-    }
-
     // Auto-submit when a valid choice is selected
     if (index >= 0) {
       const choice = availableChoices[index]
@@ -83,16 +77,6 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
     ChoiceProcessor.processChoice(choice, gameState, ingredients, setGameState, setSelectedChoice)
   }
 
-  const handleRestart = () => {
-    setGameState({
-      currentSceneId: SCENE_IDS.START,
-      bunIngredients: [],
-      visitedScenes: [SCENE_IDS.START],
-      seenSilenceMessages: []
-    })
-    setSelectedChoice(NO_CHOICE_SELECTED)
-  }
-
   // Get the layout component
   const LayoutComponent = layouts[layout]
 
@@ -103,7 +87,6 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
       selectedChoice={selectedChoice}
       onChoiceChange={handleChoiceChange}
       onSubmit={handleSubmit}
-      onRestart={handleRestart}
     />
   )
 }

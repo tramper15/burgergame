@@ -27,7 +27,6 @@ const ModernMinimalLayout = ({
               {choice.label}
             </option>
           ))}
-          <option value="-2">🔄 Restart Game</option>
         </select>
       </div>
     </div>

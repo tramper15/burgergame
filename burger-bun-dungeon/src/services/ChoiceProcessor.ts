@@ -43,6 +43,19 @@ export class ChoiceProcessor {
     setSelectedChoice(-1)
   }
 
+  static processRestart(
+    setGameState: (updater: (prev: GameState) => GameState) => void,
+    setSelectedChoice: (value: number) => void
+  ): void {
+    setGameState(() => ({
+      currentSceneId: SCENE_IDS.START,
+      bunIngredients: [],
+      visitedScenes: [SCENE_IDS.START],
+      seenSilenceMessages: []
+    }))
+    setSelectedChoice(-1)
+  }
+
   static processEnding(
     setGameState: (updater: (prev: GameState) => GameState) => void,
     setSelectedChoice: (value: number) => void
@@ -87,23 +100,10 @@ export class ChoiceProcessor {
 
   static processNavigation(
     choice: Choice,
-    gameState: GameState,
     setGameState: (updater: (prev: GameState) => GameState) => void,
     setSelectedChoice: (value: number) => void
   ): void {
     if (!choice.next) return
-
-    // Check if we're starting over (from ending screen)
-    if (gameState.currentSceneId === SCENE_IDS.ENDING && choice.next === SCENE_IDS.START) {
-      setGameState(() => ({
-        currentSceneId: SCENE_IDS.START,
-        bunIngredients: [],
-        visitedScenes: [SCENE_IDS.START],
-        seenSilenceMessages: []
-      }))
-      setSelectedChoice(-1)
-      return
-    }
 
     setGameState(prev => ({
       ...prev,
@@ -132,6 +132,12 @@ export class ChoiceProcessor {
       return
     }
 
+    // Handle restart
+    if (choice.restart) {
+      this.processRestart(setGameState, setSelectedChoice)
+      return
+    }
+
     // Handle ending
     if (choice.end) {
       this.processEnding(setGameState, setSelectedChoice)
@@ -146,7 +152,7 @@ export class ChoiceProcessor {
 
     // Handle normal navigation
     if (choice.next) {
-      this.processNavigation(choice, gameState, setGameState, setSelectedChoice)
+      this.processNavigation(choice, setGameState, setSelectedChoice)
       return
     }
   }

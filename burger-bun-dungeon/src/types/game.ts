@@ -14,6 +14,7 @@ export interface Choice {
   take?: string
   reflect?: boolean
   silence?: boolean
+  restart?: boolean
   end?: boolean
 }
 

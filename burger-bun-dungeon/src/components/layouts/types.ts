@@ -6,5 +6,4 @@ export interface LayoutProps {
   selectedChoice: number
   onChoiceChange: (index: number) => void
   onSubmit: () => void
-  onRestart: () => void
 }
