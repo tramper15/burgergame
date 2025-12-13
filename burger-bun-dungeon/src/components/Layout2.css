@@ -1,0 +1,102 @@
+/* Layout 2: Modern Minimalist Style - Clean and elegant */
+
+.game-container.layout2 {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #f5f5f0 0%, #e8e8e0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica', sans-serif;
+}
+
+.layout2 .minimalist-wrapper {
+  max-width: 600px;
+  width: 100%;
+  background: white;
+  border-radius: 0;
+  padding: 4rem 3rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  border-left: 8px solid #d4a574;
+}
+
+.layout2 .minimal-title {
+  font-size: 2rem;
+  font-weight: 300;
+  color: #3e2723;
+  margin: 0 0 3rem 0;
+  text-align: left;
+  letter-spacing: -0.5px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 1rem;
+}
+
+.layout2 .minimal-story {
+  margin-bottom: 3rem;
+}
+
+.layout2 .minimal-story p {
+  font-size: 1.1rem;
+  line-height: 1.9;
+  color: #4a4a4a;
+  margin: 0;
+  font-weight: 300;
+  text-align: left;
+}
+
+.layout2 .minimal-choices {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.layout2 .minimal-select {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 0;
+  background: #fafafa;
+  color: #3e2723;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%233e2723' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 3rem;
+}
+
+.layout2 .minimal-select:hover {
+  border-color: #d4a574;
+  background-color: white;
+}
+
+.layout2 .minimal-select:focus {
+  outline: none;
+  border-color: #d4a574;
+  background-color: white;
+}
+
+.layout2 .minimal-button {
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
+  background: #d4a574;
+  color: white;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 300;
+  min-width: 60px;
+}
+
+.layout2 .minimal-button:hover:not(:disabled) {
+  background: #c49563;
+}
+
+.layout2 .minimal-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
