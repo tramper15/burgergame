@@ -121,11 +121,44 @@
       {
         "label": "Take the bacon",
         "take": "bacon",
-        "next": "kitchen_floor"
+        "next": "freezer_after"
       },
       {
-        "label": "Leave it",
-        "next": "kitchen_floor"
+        "label": "Leave the freezer",
+        "next": "fridge_interior_after"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
+      }
+    ]
+  },
+  "freezer_after": {
+    "text": "The freezer is very cold. Ice crystals form in the air. The space where the bacon was is now empty.",
+    "choices": [
+      {
+        "label": "Leave the freezer",
+        "next": "fridge_interior_after"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
       }
     ]
   },
@@ -136,11 +169,44 @@
       {
         "label": "Take the lettuce",
         "take": "lettuce",
+        "next": "under_table_after"
+      },
+      {
+        "label": "Return to the kitchen floor",
         "next": "kitchen_floor"
       },
       {
-        "label": "Leave it in the dust",
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
+      }
+    ]
+  },
+  "under_table_after": {
+    "text": "Under the table it is dark and dusty. The lettuce is gone now. Only dust remains.",
+    "choices": [
+      {
+        "label": "Return to the kitchen floor",
         "next": "kitchen_floor"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
       }
     ]
   },
@@ -209,11 +275,44 @@
       {
         "label": "Take the tomato",
         "take": "tomato",
+        "next": "behind_couch_after"
+      },
+      {
+        "label": "Return to the living room",
         "next": "living_room"
       },
       {
-        "label": "Leave it in the shadow",
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
+      }
+    ]
+  },
+  "behind_couch_after": {
+    "text": "Behind the couch, in shadow. The tomato is gone. Only darkness remains.",
+    "choices": [
+      {
+        "label": "Return to the living room",
         "next": "living_room"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
       }
     ]
   },
@@ -224,11 +323,44 @@
       {
         "label": "Take the avocado",
         "take": "avocado",
+        "next": "window_sill_after"
+      },
+      {
+        "label": "Return to the living room",
         "next": "living_room"
       },
       {
-        "label": "Leave it in the light",
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
+      }
+    ]
+  },
+  "window_sill_after": {
+    "text": "The window sill is bathed in pale light. The avocado is gone. Only light remains.",
+    "choices": [
+      {
+        "label": "Return to the living room",
         "next": "living_room"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
       }
     ]
   },
@@ -242,8 +374,24 @@
         "next": "pantry_after"
       },
       {
-        "label": "Leave it",
-        "next": "pantry_after"
+        "label": "Go down the stairs",
+        "next": "basement"
+      },
+      {
+        "label": "Leave the pantry",
+        "next": "living_room"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
       }
     ]
   },
@@ -278,21 +426,97 @@
       {
         "label": "Take the onion",
         "take": "onion",
-        "next": "basement_after"
+        "next": "basement_after_onion"
       },
       {
         "label": "Take the special sauce",
         "take": "special_sauce",
-        "next": "basement_after"
+        "next": "basement_after_sauce"
       },
       {
-        "label": "Take neither",
-        "next": "basement_after"
+        "label": "Go through the door at the far end",
+        "next": "final_room"
+      },
+      {
+        "label": "Go back upstairs",
+        "next": "pantry_after"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
       }
     ]
   },
-  "basement_after": {
-    "text": "You have explored the basement. There is a door at the far end. It feels final.",
+  "basement_after_onion": {
+    "text": "The basement is cold and dark. The onion is gone. The small jar of special sauce remains. There is a door at the far end. It feels final.",
+    "choices": [
+      {
+        "label": "Take the special sauce",
+        "take": "special_sauce",
+        "next": "basement_after_both"
+      },
+      {
+        "label": "Go through the door",
+        "next": "final_room"
+      },
+      {
+        "label": "Go back upstairs",
+        "next": "pantry_after"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
+      }
+    ]
+  },
+  "basement_after_sauce": {
+    "text": "The basement is cold and dark. The special sauce is gone. The onion remains. There is a door at the far end. It feels final.",
+    "choices": [
+      {
+        "label": "Take the onion",
+        "take": "onion",
+        "next": "basement_after_both"
+      },
+      {
+        "label": "Go through the door",
+        "next": "final_room"
+      },
+      {
+        "label": "Go back upstairs",
+        "next": "pantry_after"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
+      }
+    ]
+  },
+  "basement_after_both": {
+    "text": "The basement is cold and dark. Both items are gone. There is a door at the far end. It feels final.",
     "choices": [
       {
         "label": "Go through the door",
