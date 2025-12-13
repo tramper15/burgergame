@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import BurgerGame from './components/BurgerGame'
+import type { LayoutType } from './components/layouts'
 import './App.css'
 
 function App() {
-  const [currentLayout, setCurrentLayout] = useState<'layout1' | 'layout2' | 'layout3'>('layout1')
+  const [currentLayout, setCurrentLayout] = useState<LayoutType>('layout1')
 
   return (
     <div className="app">
