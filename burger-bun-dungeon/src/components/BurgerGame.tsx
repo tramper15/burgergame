@@ -160,6 +160,20 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
     }
   }
 
+  // Filter out choices for ingredients already picked
+  const getAvailableChoices = (): Choice[] => {
+    return currentScene.choices.filter(choice => {
+      // If choice takes an ingredient, check if we already have it
+      if (choice.take) {
+        return !gameState.bunIngredients.includes(choice.take)
+      }
+      // Keep all non-ingredient choices
+      return true
+    })
+  }
+
+  const availableChoices = getAvailableChoices()
+
   const handleChoiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedChoice(parseInt(e.target.value))
   }
@@ -167,8 +181,17 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
   const handleSubmit = () => {
     if (selectedChoice < 0) return
 
-    const choice = currentScene.choices[selectedChoice]
+    const choice = availableChoices[selectedChoice]
     processChoice(choice)
+  }
+
+  const handleRestart = () => {
+    setGameState({
+      currentSceneId: 'kitchen_counter',
+      bunIngredients: [],
+      visitedScenes: ['kitchen_counter']
+    })
+    setSelectedChoice(-1)
   }
 
   function processChoice(choice: Choice) {
@@ -264,7 +287,7 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
               onChange={handleChoiceChange}
             >
               <option value="-1">-- Choose your path --</option>
-              {currentScene.choices.map((choice, index) => (
+              {availableChoices.map((choice, index) => (
                 <option key={index} value={index}>
                   {choice.label}
                 </option>
@@ -276,6 +299,12 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
               disabled={selectedChoice < 0}
             >
               Continue
+            </button>
+            <button
+              className="restart-button"
+              onClick={handleRestart}
+            >
+              🔄 Restart Game
             </button>
           </div>
         </div>
@@ -301,7 +330,7 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
               onChange={handleChoiceChange}
             >
               <option value="-1">Select an action...</option>
-              {currentScene.choices.map((choice, index) => (
+              {availableChoices.map((choice, index) => (
                 <option key={index} value={index}>
                   {choice.label}
                 </option>
@@ -315,6 +344,13 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
               →
             </button>
           </div>
+          <button
+            className="restart-button"
+            onClick={handleRestart}
+            style={{ marginTop: '1rem' }}
+          >
+            🔄 Restart Game
+          </button>
         </div>
       </div>
     )
@@ -345,7 +381,7 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
               onChange={handleChoiceChange}
             >
               <option value="-1">🤔 What should I do?</option>
-              {currentScene.choices.map((choice, index) => (
+              {availableChoices.map((choice, index) => (
                 <option key={index} value={index}>
                   {choice.label}
                 </option>
@@ -357,6 +393,12 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
               disabled={selectedChoice < 0}
             >
               Let's Go! 🚀
+            </button>
+            <button
+              className="restart-button"
+              onClick={handleRestart}
+            >
+              🔄 Restart Game
             </button>
           </div>
         </div>

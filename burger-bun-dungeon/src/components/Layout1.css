@@ -134,3 +134,24 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.layout1 .restart-button {
+  padding: 1rem 2rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+  background: #FFA500;
+  color: #8B0000;
+  border: 4px solid #8B4513;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Georgia', serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.layout1 .restart-button:hover {
+  background: #FF8C00;
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
