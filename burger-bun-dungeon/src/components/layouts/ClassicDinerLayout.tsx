@@ -1,5 +1,5 @@
 import type { LayoutProps } from './types'
-import '../Layout1.css'
+import '../css/ClassicDiner.css'
 
 const ClassicDinerLayout = ({
   sceneText,

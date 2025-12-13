@@ -1,5 +1,5 @@
 import type { LayoutProps } from './types'
-import '../Layout2.css'
+import '../css/ModernMinimal.css'
 
 const ModernMinimalLayout = ({
   sceneText,

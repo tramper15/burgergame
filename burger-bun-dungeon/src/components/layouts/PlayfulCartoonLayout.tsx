@@ -1,5 +1,5 @@
 import type { LayoutProps } from './types'
-import '../Layout3.css'
+import '../css/PlayfulCartoon.css'
 
 const PlayfulCartoonLayout = ({
   sceneText,
