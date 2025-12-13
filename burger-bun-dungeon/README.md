@@ -1,73 +1,108 @@
-# React + TypeScript + Vite
+# 🍔 The Buns Journey
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A narrative-driven text adventure game where you play as a burger bun exploring a kitchen, collecting ingredients, and discovering your purpose. Built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+## About the Game
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The Buns Journey is an existential text adventure that combines whimsy with introspection. As a sentient burger bun, you'll navigate through various kitchen locations, gather ingredients, and reflect on your journey toward completeness.
 
-## React Compiler
+### Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Multiple Endings**: Your choices and ingredients determine different narrative outcomes
+- **Synergy System**: Ingredients interact in meaningful ways, creating unique flavor combinations and story beats
+- **Reflective Moments**: Pause to contemplate your journey through silence and introspection
+- **Three Visual Themes**: Switch between Classic Diner, Modern Minimal, and Playful Cartoon layouts
+- **Rich Narrative**: Explore kitchen locations from the counter to beneath the couch
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js (v16 or higher recommended)
+- npm or yarn
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# Clone the repository
+git clone <repository-url>
+
+# Navigate to the project directory
+cd burger-bun-dungeon
+
+# Install dependencies
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Running the Game
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+# Start development server
+npm run dev
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Run linter
+npm run lint
 ```
+
+## Project Structure
+
+```
+burger-bun-dungeon/
+├── src/
+│   ├── components/
+│   │   ├── css/                    # Layout stylesheets
+│   │   │   ├── ClassicDiner.css
+│   │   │   ├── ModernMinimal.css
+│   │   │   └── PlayfulCartoon.css
+│   │   ├── layouts/                # Layout components
+│   │   │   ├── ClassicDinerLayout.tsx
+│   │   │   ├── ModernMinimalLayout.tsx
+│   │   │   └── PlayfulCartoonLayout.tsx
+│   │   ├── BurgerGame.tsx          # Main game component
+│   │   └── ToastProvider.tsx       # Toast notification system
+│   ├── services/
+│   │   ├── SceneGenerator.ts       # Scene generation logic
+│   │   ├── SynergyCalculator.ts    # Ingredient synergy system
+│   │   └── EndingFactory.ts        # Ending narratives
+│   ├── scenes/                     # Game scenes and locations
+│   ├── ingredients/                # Ingredient definitions
+│   ├── constants/                  # Game constants
+│   └── types/                      # TypeScript type definitions
+└── docs/                           # Documentation
+```
+
+## Gameplay
+
+1. **Explore**: Navigate through different kitchen locations
+2. **Collect**: Gather ingredients for your burger
+3. **Reflect**: Use silence and introspection to understand your journey
+4. **Complete**: Reach one of multiple endings based on your choices
+
+## Tech Stack
+
+- **React 19**: UI framework
+- **TypeScript**: Type-safe development
+- **Vite**: Fast build tool and dev server
+- **ESLint**: Code quality and consistency
+
+## Development
+
+The game uses a modular architecture with:
+- **Scene System**: Dynamically generated scenes based on game state
+- **State Management**: React hooks for game state
+- **Layout System**: Pluggable UI themes
+- **Service Layer**: Business logic separated from UI
+
+## License
+
+This project is private and not currently licensed for public use.
+
+## Acknowledgments
+
+Built with curiosity and a love for narrative games.
