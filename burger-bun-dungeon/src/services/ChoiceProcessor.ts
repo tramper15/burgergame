@@ -72,7 +72,8 @@ export class ChoiceProcessor {
     gameState: GameState,
     ingredients: IngredientsData,
     setGameState: (updater: (prev: GameState) => GameState) => void,
-    setSelectedChoice: (value: number) => void
+    setSelectedChoice: (value: number) => void,
+    showToast: (message: string) => void
   ): void {
     if (!choice.take) return
 
@@ -87,7 +88,7 @@ export class ChoiceProcessor {
     )
 
     // Show ingredient added message
-    alert(ingredientAddedText + synergyText)
+    showToast(ingredientAddedText + synergyText)
 
     setGameState(prev => ({
       ...prev,
@@ -118,7 +119,8 @@ export class ChoiceProcessor {
     gameState: GameState,
     ingredients: IngredientsData,
     setGameState: (updater: (prev: GameState) => GameState) => void,
-    setSelectedChoice: (value: number) => void
+    setSelectedChoice: (value: number) => void,
+    showToast: (message: string) => void
   ): void {
     // Handle reflection
     if (choice.reflect) {
@@ -146,7 +148,7 @@ export class ChoiceProcessor {
 
     // Handle taking ingredient
     if (choice.take) {
-      this.processIngredientPickup(choice, gameState, ingredients, setGameState, setSelectedChoice)
+      this.processIngredientPickup(choice, gameState, ingredients, setGameState, setSelectedChoice, showToast)
       return
     }
 

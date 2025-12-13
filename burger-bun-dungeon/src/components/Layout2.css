@@ -18,7 +18,7 @@
   width: 100%;
   background: white;
   border-radius: 0;
-  padding: 4rem 3rem;
+  padding: 2rem 3rem;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
   border-left: 8px solid #d4a574;
 }
@@ -27,7 +27,7 @@
   font-size: 2rem;
   font-weight: 300;
   color: #3e2723;
-  margin: 0 0 3rem 0;
+  margin: 0 0 2rem 0;
   text-align: left;
   letter-spacing: -0.5px;
   border-bottom: 1px solid #e0e0e0;
@@ -35,7 +35,7 @@
 }
 
 .layout2 .minimal-story {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 .layout2 .minimal-story p {

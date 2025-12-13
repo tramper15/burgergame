@@ -6,6 +6,7 @@ import { layouts, type LayoutType } from './layouts'
 import { SceneGenerator } from '../services/SceneGenerator'
 import { ChoiceProcessor } from '../services/ChoiceProcessor'
 import { SCENE_IDS, NO_CHOICE_SELECTED } from '../constants/gameConstants'
+import { useToast } from './ToastProvider'
 
 const scenes = scenesData as ScenesData
 const ingredients = ingredientsData as IngredientsData
@@ -15,6 +16,7 @@ interface BurgerGameProps {
 }
 
 const BurgerGame = ({ layout }: BurgerGameProps) => {
+  const { showToast } = useToast()
   const [gameState, setGameState] = useState<GameState>({
     currentSceneId: SCENE_IDS.START,
     bunIngredients: [],
@@ -66,7 +68,7 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
     // Auto-submit when a valid choice is selected
     if (index >= 0) {
       const choice = availableChoices[index]
-      ChoiceProcessor.processChoice(choice, gameState, ingredients, setGameState, setSelectedChoice)
+      ChoiceProcessor.processChoice(choice, gameState, ingredients, setGameState, setSelectedChoice, showToast)
     }
   }
 
@@ -74,7 +76,7 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
     if (selectedChoice < 0) return
 
     const choice = availableChoices[selectedChoice]
-    ChoiceProcessor.processChoice(choice, gameState, ingredients, setGameState, setSelectedChoice)
+    ChoiceProcessor.processChoice(choice, gameState, ingredients, setGameState, setSelectedChoice, showToast)
   }
 
   // Get the layout component
