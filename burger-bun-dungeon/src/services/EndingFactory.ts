@@ -114,4 +114,41 @@ export class EndingFactory {
       choices: [{ label: 'Restart', restart: true }]
     }
   }
+
+  /**
+   * Empty burger ending - player has no ingredients at all
+   * The ultimate hollow ending
+   */
+  static generateEmptyBurgerEnding(
+    gameState: GameState,
+    ingredients: IngredientsData
+  ): Scene {
+    const text = new EndingBuilder()
+      .addNarrative(
+        "You are complete.\n\n" +
+        "Two buns pressed together.\n\n" +
+        "Empty.\n\n" +
+        "Nothing between.\n\n" +
+        "---\n\n" +
+        "You have:\n"
+      )
+      .addBunHeader()
+      .addScoreSummary(gameState.bunIngredients, ingredients, {
+        base: 0,
+        synergy: 0,
+        total: 0
+      })
+      .addNarrative(
+        "Some journeys are not about what you gather.\n\n" +
+        "Some journeys are about what you leave behind.\n\n" +
+        "You are whole in your emptiness.\n\n" +
+        "You are perfectly, beautifully hollow."
+      )
+      .build()
+
+    return {
+      text,
+      choices: [{ label: 'Restart', restart: true }]
+    }
+  }
 }

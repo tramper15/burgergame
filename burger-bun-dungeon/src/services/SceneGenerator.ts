@@ -107,6 +107,17 @@ export class SceneGenerator {
     gameState: GameState,
     ingredients: IngredientsData
   ): Scene {
+    // Check for empty burger first
+    if (gameState.bunIngredients.length === 0) {
+      return EndingFactory.generateEmptyBurgerEnding(gameState, ingredients)
+    }
+
+    // Check for no meat patty
+    const hasMeatPatty = gameState.bunIngredients.includes('meat_patty')
+    if (!hasMeatPatty) {
+      return EndingFactory.generateNotARealBurgerEnding(gameState, ingredients)
+    }
+
     const lingeredInAllSilences =
       gameState.seenSilenceMessages.length >= TOTAL_UNIQUE_SILENCE_MESSAGES
     const hasAvocado = gameState.bunIngredients.includes('avocado')
@@ -119,12 +130,5 @@ export class SceneGenerator {
     }
 
     return EndingFactory.generateDefaultEnding(gameState, ingredients)
-  }
-
-  static generateNotARealBurgerEnding(
-    gameState: GameState,
-    ingredients: IngredientsData
-  ): Scene {
-    return EndingFactory.generateNotARealBurgerEnding(gameState, ingredients)
   }
 }

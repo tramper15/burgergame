@@ -42,11 +42,6 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
       return SceneGenerator.generateEndingScene(gameState, ingredients)
     }
 
-    // Check if we need to generate a "not a real burger" ending scene
-    if (gameState.currentSceneId === SCENE_IDS.NOT_A_REAL_BURGER_ENDING) {
-      return SceneGenerator.generateNotARealBurgerEnding(gameState, ingredients)
-    }
-
     // Return static scene from JSON
     return scenes[gameState.currentSceneId]
   }

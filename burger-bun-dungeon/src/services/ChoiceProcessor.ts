@@ -57,16 +57,13 @@ export class ChoiceProcessor {
   }
 
   static processEnding(
-    gameState: GameState,
+    _gameState: GameState,
     setGameState: (updater: (prev: GameState) => GameState) => void,
     setSelectedChoice: (value: number) => void
   ): void {
-    // Check if player has meat patty
-    const hasMeatPatty = gameState.bunIngredients.includes('meat_patty')
-
     setGameState(prev => ({
       ...prev,
-      currentSceneId: hasMeatPatty ? SCENE_IDS.ENDING : SCENE_IDS.NOT_A_REAL_BURGER_ENDING
+      currentSceneId: SCENE_IDS.ENDING
     }))
     setSelectedChoice(-1)
   }
