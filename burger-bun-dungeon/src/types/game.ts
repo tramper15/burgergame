@@ -30,4 +30,5 @@ export interface GameState {
   currentSceneId: string
   bunIngredients: string[]
   visitedScenes: string[]
+  seenSilenceMessages: number[]
 }

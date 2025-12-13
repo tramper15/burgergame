@@ -1,5 +1,6 @@
 import type { Scene, GameState, IngredientsData } from '../types/game'
 import { SynergyCalculator } from './SynergyCalculator'
+import { TOTAL_UNIQUE_SILENCE_MESSAGES } from '../constants/gameConstants'
 
 export class SceneGenerator {
   static generateReflectionScene(
@@ -44,7 +45,8 @@ export class SceneGenerator {
 
   static generateSilenceScene(
     gameState: GameState,
-    _ingredients: IngredientsData // eslint-disable-line @typescript-eslint/no-unused-vars
+    _ingredients: IngredientsData, // eslint-disable-line @typescript-eslint/no-unused-vars
+    messageIndex?: number
   ): Scene {
     const sadTexts = [
       "You sit in the quiet.\n\nThe weight of what you carry feels heavy. Each ingredient—a choice you made, a piece of yourself you picked up along the way.",
@@ -59,9 +61,23 @@ export class SceneGenerator {
     if (gameState.bunIngredients.length === 0) {
       text = "You sit in silence.\n\nYou are just bread. Two halves pressed together with nothing between.\n\nThe emptiness echoes.\n\nYou wonder if you were always meant to be this hollow."
     } else {
-      // Pick a random sad reflection
-      const randomIndex = Math.floor(Math.random() * sadTexts.length)
-      text = sadTexts[randomIndex]
+      // Pick a random sad reflection that hasn't been seen yet if possible
+      let selectedIndex: number
+      if (messageIndex !== undefined) {
+        selectedIndex = messageIndex
+      } else {
+        const unseenMessages = sadTexts
+          .map((_, i) => i)
+          .filter(i => !gameState.seenSilenceMessages.includes(i))
+
+        if (unseenMessages.length > 0) {
+          selectedIndex = unseenMessages[Math.floor(Math.random() * unseenMessages.length)]
+        } else {
+          selectedIndex = Math.floor(Math.random() * sadTexts.length)
+        }
+      }
+
+      text = sadTexts[selectedIndex]
 
       text += "\n\n"
 
@@ -90,6 +106,8 @@ export class SceneGenerator {
     gameState: GameState,
     ingredients: IngredientsData
   ): Scene {
+    const lingeredInAllSilences = gameState.seenSilenceMessages.length >= TOTAL_UNIQUE_SILENCE_MESSAGES
+
     let text = "You have become:\n\n"
     text += "🍞 Bun\n"
 
@@ -114,7 +132,12 @@ export class SceneGenerator {
     text += `Base score:     ${baseScore}\n`
     text += `Synergies:      ${synergyScore >= 0 ? '+' : ''}${synergyScore}\n`
     text += `Total:          ${baseScore + synergyScore}\n\n`
-    text += "You are not what you were meant to be.\nBut you are something."
+
+    if (lingeredInAllSilences) {
+      text += "A hand reaches towards you.\n\nYou are now whole.\n\nBut at what cost?\n\n🧈"
+    } else {
+      text += "You are not what you were meant to be.\nBut you are something."
+    }
 
     return {
       text,

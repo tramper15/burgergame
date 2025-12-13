@@ -11,3 +11,5 @@ export const SYNERGY_POINTS = {
   LIKE: 2,
   DISLIKE: -2
 } as const
+
+export const TOTAL_UNIQUE_SILENCE_MESSAGES = 5

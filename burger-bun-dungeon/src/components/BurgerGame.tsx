@@ -18,7 +18,8 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
   const [gameState, setGameState] = useState<GameState>({
     currentSceneId: SCENE_IDS.START,
     bunIngredients: [],
-    visitedScenes: [SCENE_IDS.START]
+    visitedScenes: [SCENE_IDS.START],
+    seenSilenceMessages: []
   })
   const [selectedChoice, setSelectedChoice] = useState<number>(NO_CHOICE_SELECTED)
 
@@ -86,7 +87,8 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
     setGameState({
       currentSceneId: SCENE_IDS.START,
       bunIngredients: [],
-      visitedScenes: [SCENE_IDS.START]
+      visitedScenes: [SCENE_IDS.START],
+      seenSilenceMessages: []
     })
     setSelectedChoice(NO_CHOICE_SELECTED)
   }

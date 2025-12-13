@@ -16,13 +16,29 @@ export class ChoiceProcessor {
   }
 
   static processSilence(
+    gameState: GameState,
     setGameState: (updater: (prev: GameState) => GameState) => void,
     setSelectedChoice: (value: number) => void
   ): void {
+    // Determine which message to show (prioritize unseen ones)
+    const totalMessages = 5
+    const unseenMessages = Array.from({ length: totalMessages }, (_, i) => i)
+      .filter(i => !gameState.seenSilenceMessages.includes(i))
+
+    let messageIndex: number
+    if (unseenMessages.length > 0) {
+      messageIndex = unseenMessages[Math.floor(Math.random() * unseenMessages.length)]
+    } else {
+      messageIndex = Math.floor(Math.random() * totalMessages)
+    }
+
     setGameState(prev => ({
       ...prev,
       currentSceneId: SCENE_IDS.LINGER_SILENCE,
-      visitedScenes: [...prev.visitedScenes, SCENE_IDS.LINGER_SILENCE]
+      visitedScenes: [...prev.visitedScenes, SCENE_IDS.LINGER_SILENCE],
+      seenSilenceMessages: prev.seenSilenceMessages.includes(messageIndex)
+        ? prev.seenSilenceMessages
+        : [...prev.seenSilenceMessages, messageIndex]
     }))
     setSelectedChoice(-1)
   }
@@ -82,7 +98,8 @@ export class ChoiceProcessor {
       setGameState(() => ({
         currentSceneId: SCENE_IDS.START,
         bunIngredients: [],
-        visitedScenes: [SCENE_IDS.START]
+        visitedScenes: [SCENE_IDS.START],
+        seenSilenceMessages: []
       }))
       setSelectedChoice(-1)
       return
@@ -111,7 +128,7 @@ export class ChoiceProcessor {
 
     // Handle silence
     if (choice.silence) {
-      this.processSilence(setGameState, setSelectedChoice)
+      this.processSilence(gameState, setGameState, setSelectedChoice)
       return
     }
 
