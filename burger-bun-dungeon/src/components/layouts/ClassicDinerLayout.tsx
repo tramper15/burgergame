@@ -5,9 +5,7 @@ const ClassicDinerLayout = ({
   sceneText,
   availableChoices,
   selectedChoice,
-  onChoiceChange,
-  onSubmit,
-  onRestart
+  onChoiceChange
 }: LayoutProps) => {
   return (
     <div className="game-container layout1">
@@ -33,20 +31,8 @@ const ClassicDinerLayout = ({
                 {choice.label}
               </option>
             ))}
+            <option value="-2">🔄 Restart Game</option>
           </select>
-          <button
-            className="submit-button"
-            onClick={onSubmit}
-            disabled={selectedChoice < 0}
-          >
-            Continue
-          </button>
-          <button
-            className="restart-button"
-            onClick={onRestart}
-          >
-            🔄 Restart Game
-          </button>
         </div>
       </div>
     </div>

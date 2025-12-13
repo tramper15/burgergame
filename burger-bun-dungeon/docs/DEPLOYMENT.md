@@ -37,7 +37,7 @@ cd ..
 3. Under "Uploads", click "Upload files"
 4. Upload `burger-bun-dungeon.zip`
 5. Check "This file will be played in the browser" ✅
-6. Set viewport size (recommended: 800x600 or Fullscreen)
+6. **Set viewport size to 1280x800** (recommended) or choose from alternatives below
 7. Click "Save"
 
 ## Detailed Steps
@@ -92,14 +92,31 @@ Open http://localhost:4173 and verify:
 #### Embed Settings
 
 **Viewport Dimensions:**
-- **Recommended:** 800x600 (fits most screens)
-- **Alternative:** 1024x768 (more spacious)
-- **Fullscreen:** Allows player to maximize
+
+The game is optimized with a fixed viewport to prevent scrolling and overflow issues in itch.io's iframe.
+
+- **Recommended:** **1280x800** - Optimal for reading text with wider content areas (900px)
+- **Alternative:** 1024x768 - Classic 4:3 ratio, more compact
+- **Not Recommended:** 1024x640 - Too short, requires scrolling
+- **Fullscreen:** Allows player to maximize (but may cause scaling issues)
+
+**Why 1280x800:**
+- Content areas are 900px wide with proper padding
+- No vertical scrolling needed for most scenes
+- 16:10 aspect ratio fits modern displays
+- All text sizes (1.1-3rem) are comfortable to read
+- Layout switcher buttons fit without overlapping
+
+**Technical Details:**
+- Game uses `overflow: hidden` at the root level
+- Fixed height prevents viewport height issues
+- Internal scrolling in layouts if content is too tall
+- Works properly in itch.io iframe
 
 **Frame Options:**
 - ✅ Automatically start on page load
 - ✅ Enable fullscreen button
-- ✅ Mobile friendly (game works on mobile)
+- ⚠️ Mobile friendly (viewport is fixed, may require zooming on small screens)
 
 **Advanced Options:**
 - Orientation: Landscape (recommended) or Portrait
@@ -131,10 +148,9 @@ Explore a mysterious house and collect ingredients to discover what you will bec
 - 3 visual themes to choose from
 
 ## Controls
-- Select choices from dropdown menu
-- Click "Continue" to proceed
-- Use the theme switcher to change visual styles
-- Restart anytime to try different paths
+- Select choices from dropdown menu (auto-advances on selection)
+- Use the theme switcher (bottom right) to change visual styles
+- Click "Restart Game" to try different paths
 
 ## Credits
 Made with React + TypeScript

@@ -1,7 +1,8 @@
 /* Layout 3: Playful Cartoon Style - Fun and vibrant */
 
 .game-container.layout3 {
-  min-height: 100vh;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(135deg, #FFE5B4 0%, #FFDAB9 50%, #FFE4E1 100%);
   display: flex;
   align-items: center;
@@ -9,7 +10,8 @@
   padding: 2rem;
   font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', cursive, sans-serif;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .game-container.layout3::before {
@@ -31,7 +33,7 @@
 }
 
 .layout3 .cartoon-wrapper {
-  max-width: 650px;
+  max-width: 900px;
   width: 100%;
 }
 
@@ -164,63 +166,4 @@
 .layout3 .cartoon-select:focus {
   outline: none;
   background: #FFFACD;
-}
-
-.layout3 .cartoon-button {
-  padding: 1.2rem 2rem;
-  font-size: 1.3rem;
-  font-weight: bold;
-  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
-  color: white;
-  border: 4px solid #333;
-  border-radius: 15px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
-}
-
-.layout3 .cartoon-button:hover:not(:disabled) {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%);
-}
-
-.layout3 .cartoon-button:active:not(:disabled) {
-  transform: translate(0, 0);
-  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
-}
-
-.layout3 .cartoon-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.layout3 .restart-button {
-  padding: 1.2rem 2rem;
-  font-size: 1.3rem;
-  font-weight: bold;
-  background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
-  color: white;
-  border: 4px solid #333;
-  border-radius: 15px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
-}
-
-.layout3 .restart-button:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #FF8C00 0%, #FFA500 100%);
-}
-
-.layout3 .restart-button:active {
-  transform: translate(0, 0);
-  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
 }

@@ -110,11 +110,16 @@ interface LayoutProps {
   sceneText: string
   availableChoices: Choice[]
   selectedChoice: number
-  onChoiceChange: (index: number) => void
-  onSubmit: () => void
+  onChoiceChange: (index: number) => void  // Auto-submits on valid selection
+  onSubmit: () => void                      // Legacy, kept for compatibility
   onRestart: () => void
 }
 ```
+
+**UI Behavior:**
+- Selecting a choice from the dropdown automatically advances the game (no submit button needed)
+- Submit buttons have been removed from all layouts for streamlined UX
+- Only restart button remains visible to players
 
 ### Service Layer
 
@@ -196,6 +201,26 @@ export default defineConfig({
 - `base: './'` - Works in itch.io's iframe
 - `sourcemap: false` - Smaller upload size
 - `inlineDynamicImports: true` - Single JS file (no chunk loading issues)
+
+### Viewport Configuration
+
+The game uses a fixed viewport (1280x800) to ensure consistent display in itch.io's iframe:
+
+**index.html:**
+- Meta viewport prevents scaling: `maximum-scale=1.0, user-scalable=no`
+- Fixed html/body sizing with `overflow: hidden`
+
+**CSS Strategy:**
+- All containers use `height: 100%` instead of `min-height: 100vh`
+- Root level has `overflow: hidden` to prevent page scrolling
+- Layout containers have `overflow-y: auto` for internal scrolling
+- Content max-width increased to 900px to utilize horizontal space
+
+**Why Fixed Viewport:**
+- Prevents variable height issues in itch.io iframe
+- Ensures consistent experience across browsers
+- No unwanted scrollbars or overflow
+- Content stays within visible area
 
 ### Build Output
 

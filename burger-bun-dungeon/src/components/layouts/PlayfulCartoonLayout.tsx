@@ -5,9 +5,7 @@ const PlayfulCartoonLayout = ({
   sceneText,
   availableChoices,
   selectedChoice,
-  onChoiceChange,
-  onSubmit,
-  onRestart
+  onChoiceChange
 }: LayoutProps) => {
   return (
     <div className="game-container layout3">
@@ -38,20 +36,8 @@ const PlayfulCartoonLayout = ({
                   {choice.label}
                 </option>
               ))}
+              <option value="-2">🔄 Restart Game</option>
             </select>
-            <button
-              className="cartoon-button"
-              onClick={onSubmit}
-              disabled={selectedChoice < 0}
-            >
-              Let's Go! 🚀
-            </button>
-            <button
-              className="restart-button"
-              onClick={onRestart}
-            >
-              🔄 Restart Game
-            </button>
           </div>
         </div>
       </div>

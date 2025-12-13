@@ -56,6 +56,18 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
 
   const handleChoiceChange = (index: number) => {
     setSelectedChoice(index)
+
+    // Check for restart option (value -2)
+    if (index === -2) {
+      handleRestart()
+      return
+    }
+
+    // Auto-submit when a valid choice is selected
+    if (index >= 0) {
+      const choice = availableChoices[index]
+      ChoiceProcessor.processChoice(choice, gameState, ingredients, setGameState, setSelectedChoice)
+    }
   }
 
   const handleSubmit = () => {
