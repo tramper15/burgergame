@@ -12,7 +12,7 @@ const PlayfulCartoonLayout = ({
       <div className="cartoon-wrapper">
         <div className="cartoon-header">
           <div className="burger-emoji">🍔</div>
-          <h1 className="cartoon-title">Burger Bun Dungeon!</h1>
+          <h1 className="cartoon-title">The Buns Journey!</h1>
           <div className="burger-emoji">🍔</div>
         </div>
 

@@ -10,7 +10,7 @@ const ModernMinimalLayout = ({
   return (
     <div className="game-container layout2">
       <div className="minimalist-wrapper">
-        <h1 className="minimal-title">Burger Bun Dungeon</h1>
+        <h1 className="minimal-title">The Buns Journey</h1>
 
         <div className="minimal-story">
           <p style={{ whiteSpace: 'pre-wrap' }}>{sceneText}</p>

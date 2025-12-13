@@ -10,7 +10,7 @@ const ClassicDinerLayout = ({
   return (
     <div className="game-container layout1">
       <div className="game-header">
-        <h1 className="game-title">🍔 Burger Bun Dungeon 🍔</h1>
+        <h1 className="game-title">🍔 The Buns Journey 🍔</h1>
       </div>
 
       <div className="game-content">
