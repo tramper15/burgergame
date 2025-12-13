@@ -8,7 +8,7 @@
     "dislikes": ["avocado"],
     "reactions": {
       "bacon": "The cheese thinks of the bacon. They are old friends.",
-      "avocado": "The cheese does not like this.",
+      "avocado": "The cheese does not like the avocado.",
       "lettuce": "The cheese acknowledges the lettuce without feeling.",
       "tomato": "The tomato and cheese are content."
     }
@@ -60,7 +60,7 @@
     "likes": ["tomato", "lettuce"],
     "dislikes": ["cheese"],
     "reactions": {
-      "cheese": "The avocado pulls away slightly.",
+      "cheese": "The avocado pulls away from the cheese.",
       "tomato": "The avocado and tomato recognize each other.",
       "lettuce": "The avocado feels at home with the lettuce."
     }
@@ -74,7 +74,7 @@
     "dislikes": ["avocado", "tomato"],
     "reactions": {
       "cheese": "The pickle and cheese are familiar.",
-      "avocado": "The pickle does not belong here.",
+      "avocado": "The pickle does not belong with the avocado.",
       "tomato": "The pickle feels wrong next to the tomato."
     }
   },
