@@ -24,14 +24,14 @@ This document shows the complete layout of the dungeon and how scenes connect.
             |         |
             v         v
       LIVING ROOM  FRIDGE INTERIOR
-         /    \      (cheese)
-        /      \        |
-  [Couch] [Pantry]  [Take/Leave]
-     /         \        |
-    v           v       v
-BEHIND      PANTRY   FRIDGE AFTER
-COUCH      (pickle)      |
-(tomato)       |     [Freezer]
+       /    |   \      (cheese)
+      /     |    \        |
+[Couch] [Window] [Pantry] [Take/Leave]
+   /       |       \        |
+  v        v        v       v
+BEHIND  WINDOW    PANTRY  FRIDGE AFTER
+COUCH    SILL    (pickle)     |
+(tomato) (avocado)  |     [Freezer]
                |         |
           [Take/Leave]   v
                |      FREEZER
@@ -116,8 +116,8 @@ COUCH      (pickle)      |
 - Special: Connector
 
 **living_room**
-- Description: Empty room with couch and pantry door
-- Exits: behind_couch, pantry, hallway
+- Description: Empty room with couch, window sill, and pantry door
+- Exits: behind_couch, window_sill, pantry, hallway
 - Ingredient: None
 - Special: Hub for this area
 
@@ -125,6 +125,12 @@ COUCH      (pickle)      |
 - Description: Shadow behind couch
 - Exits: living_room
 - Ingredient: **tomato**
+- Special: Dead end with ingredient
+
+**window_sill**
+- Description: Window sill bathed in pale light
+- Exits: living_room
+- Ingredient: **avocado**
 - Special: Dead end with ingredient
 
 ### Pantry & Basement
@@ -171,24 +177,26 @@ COUCH      (pickle)      |
 2. **Bacon** - freezer
 3. **Lettuce** - under_table
 4. **Tomato** - behind_couch
-5. **Pickle** - pantry
-6. **Onion** - basement (choice 1)
-7. **Special Sauce** - basement (choice 2)
+5. **Avocado** - window_sill
+6. **Pickle** - pantry
+7. **Onion** - basement (choice 1)
+8. **Special Sauce** - basement (choice 2)
 
 ## Critical Paths
 
 ### Minimum Path (No ingredients)
 kitchen_counter → kitchen_floor → hallway → living_room → pantry → pantry_after → basement → basement_after → final_room → ENDING
 
-### Maximum Ingredients (6 items)
+### Maximum Ingredients (7 items)
 1. Start at kitchen_counter
 2. kitchen_floor → under_table (get lettuce)
 3. kitchen_floor → fridge_exterior → fridge_interior (get cheese)
 4. fridge_interior_after → freezer (get bacon)
 5. kitchen_floor → hallway → living_room → behind_couch (get tomato)
-6. living_room → pantry (get pickle)
-7. pantry_after → basement (get onion OR special_sauce)
-8. basement_after → final_room → ENDING
+6. living_room → window_sill (get avocado)
+7. living_room → pantry (get pickle)
+8. pantry_after → basement (get onion OR special_sauce)
+9. basement_after → final_room → ENDING
 
 ### Special Feature: Reflection
 At any scene with "Reflect on your Ingredients" choice:

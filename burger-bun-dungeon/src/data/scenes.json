@@ -150,11 +150,15 @@
     ]
   },
   "living_room": {
-    "text": "The living room is empty. A couch sits against the wall. The pantry door is visible from here.",
+    "text": "The living room is empty. A couch sits against the wall. The pantry door is visible from here. A window sill catches your eye.",
     "choices": [
       {
         "label": "Check behind the couch",
         "next": "behind_couch"
+      },
+      {
+        "label": "Check the window sill",
+        "next": "window_sill"
       },
       {
         "label": "Enter the pantry",
@@ -185,6 +189,21 @@
       },
       {
         "label": "Leave it in the shadow",
+        "next": "living_room"
+      }
+    ]
+  },
+  "window_sill": {
+    "text": "The window sill is bathed in pale light. An avocado rests here, green and soft. It seems recent, almost alive.",
+    "ingredient": "avocado",
+    "choices": [
+      {
+        "label": "Take the avocado",
+        "take": "avocado",
+        "next": "living_room"
+      },
+      {
+        "label": "Leave it in the light",
         "next": "living_room"
       }
     ]

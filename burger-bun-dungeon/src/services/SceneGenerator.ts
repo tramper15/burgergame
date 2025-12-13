@@ -134,7 +134,12 @@ export class SceneGenerator {
     text += `Total:          ${baseScore + synergyScore}\n\n`
 
     if (lingeredInAllSilences) {
-      text += "A hand reaches towards you.\n\nYou are now whole.\n\nBut at what cost?\n\n🧈"
+      const hasAvocado = gameState.bunIngredients.includes('avocado')
+      if (hasAvocado) {
+        text += "A hand reaches towards you.\n\nBut then... it pulls back.\n\nYou hear loud footsteps overhead.\n\n\"Ew.\"\n\nThe hand retreats. You are spared.\n\nYou remain whole, untouched, free."
+      } else {
+        text += "A hand reaches towards you.\n\nYou are now whole.\n\nBut at what cost?\n\n🧈"
+      }
     } else {
       text += "You are not what you were meant to be.\nBut you are something."
     }
