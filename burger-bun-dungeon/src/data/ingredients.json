@@ -1,0 +1,110 @@
+{
+  "cheese": {
+    "name": "Cheese",
+    "description": "A slice of orange cheese. It feels eternal.",
+    "onAdd": "The cheese settles on you. It is cold, then warm.",
+    "points": 2,
+    "likes": ["bacon", "tomato"],
+    "dislikes": ["avocado"],
+    "reactions": {
+      "bacon": "The cheese thinks of the bacon. They are old friends.",
+      "avocado": "The cheese does not like this.",
+      "lettuce": "The cheese acknowledges the lettuce without feeling.",
+      "tomato": "The tomato and cheese are content."
+    }
+  },
+  "bacon": {
+    "name": "Bacon",
+    "description": "Three strips, cold and stiff.",
+    "onAdd": "You take the bacon. It does not bend. It becomes part of you.",
+    "points": 1,
+    "likes": ["cheese"],
+    "dislikes": [],
+    "reactions": {
+      "cheese": "The bacon remembers the cheese.",
+      "lettuce": "The bacon and lettuce say nothing to each other."
+    }
+  },
+  "lettuce": {
+    "name": "Lettuce",
+    "description": "Green leaves, crisp and cold.",
+    "onAdd": "The lettuce settles lightly. It barely weighs anything.",
+    "points": 1,
+    "likes": ["tomato", "avocado"],
+    "dislikes": [],
+    "reactions": {
+      "tomato": "The lettuce and tomato feel natural together.",
+      "avocado": "The avocado feels at home with the lettuce.",
+      "bacon": "The bacon and lettuce say nothing to each other.",
+      "cheese": "The cheese acknowledges the lettuce without feeling."
+    }
+  },
+  "tomato": {
+    "name": "Tomato",
+    "description": "A slice of red tomato. It is wet and soft.",
+    "onAdd": "The tomato sits on you. You feel its moisture.",
+    "points": 2,
+    "likes": ["lettuce", "cheese", "avocado"],
+    "dislikes": [],
+    "reactions": {
+      "lettuce": "The lettuce and tomato feel natural together.",
+      "cheese": "The tomato and cheese are content.",
+      "avocado": "The avocado and tomato recognize each other."
+    }
+  },
+  "avocado": {
+    "name": "Avocado",
+    "description": "Green and soft. It seems recent.",
+    "onAdd": "The avocado spreads across you gently.",
+    "points": 3,
+    "likes": ["tomato", "lettuce"],
+    "dislikes": ["cheese"],
+    "reactions": {
+      "cheese": "The avocado pulls away slightly.",
+      "tomato": "The avocado and tomato recognize each other.",
+      "lettuce": "The avocado feels at home with the lettuce."
+    }
+  },
+  "pickle": {
+    "name": "Pickle",
+    "description": "A pickle slice. It smells sharp.",
+    "onAdd": "The pickle settles on you. You taste vinegar in your mind.",
+    "points": 1,
+    "likes": ["cheese"],
+    "dislikes": ["avocado", "tomato"],
+    "reactions": {
+      "cheese": "The pickle and cheese are familiar.",
+      "avocado": "The pickle does not belong here.",
+      "tomato": "The pickle feels wrong next to the tomato."
+    }
+  },
+  "onion": {
+    "name": "Onion",
+    "description": "Thin rings of white onion. They are sharp.",
+    "onAdd": "The onion joins you. It is strong and certain.",
+    "points": 1,
+    "likes": ["tomato", "lettuce"],
+    "dislikes": [],
+    "reactions": {
+      "tomato": "The onion and tomato are old companions.",
+      "lettuce": "The onion settles among the lettuce."
+    }
+  },
+  "special_sauce": {
+    "name": "Special Sauce",
+    "description": "A mysterious sauce. You don't know what it is.",
+    "onAdd": "The sauce spreads across everything. It changes you.",
+    "points": 5,
+    "likes": ["cheese", "bacon", "lettuce", "tomato", "onion", "pickle"],
+    "dislikes": ["avocado"],
+    "reactions": {
+      "cheese": "The sauce embraces the cheese.",
+      "bacon": "The sauce knows the bacon well.",
+      "lettuce": "The sauce spreads among the lettuce.",
+      "tomato": "The sauce mingles with the tomato.",
+      "onion": "The sauce and onion combine.",
+      "pickle": "The sauce enhances the pickle.",
+      "avocado": "The sauce does not understand the avocado."
+    }
+  }
+}

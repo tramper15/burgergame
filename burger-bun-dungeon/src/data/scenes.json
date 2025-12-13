@@ -1,0 +1,245 @@
+{
+  "kitchen_counter": {
+    "text": "You are a bun. Just a bun. You're alone on a counter in a kitchen. You feel as if you're missing parts of yourself. Someone has taken your ingredients, and now you are really alone. Should you go look for them?",
+    "choices": [
+      {
+        "label": "Get off the plate and look around",
+        "next": "kitchen_floor"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      }
+    ]
+  },
+  "kitchen_floor": {
+    "text": "The floor is vast. The tiles are cold and far apart. You see a hallway ahead and the refrigerator looming like a white tower.",
+    "choices": [
+      {
+        "label": "Go to the hallway",
+        "next": "hallway"
+      },
+      {
+        "label": "Approach the refrigerator",
+        "next": "fridge_exterior"
+      },
+      {
+        "label": "Check under the table",
+        "next": "under_table"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      }
+    ]
+  },
+  "fridge_exterior": {
+    "text": "The refrigerator is tall and white. The door is slightly open. Cold air leaks out. You could go inside, or you could go back.",
+    "choices": [
+      {
+        "label": "Enter the refrigerator",
+        "next": "fridge_interior"
+      },
+      {
+        "label": "Go back to the kitchen floor",
+        "next": "kitchen_floor"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      }
+    ]
+  },
+  "fridge_interior": {
+    "text": "Inside the refrigerator, the light is cold and white. A piece of cheese sits on the shelf. It does not speak.",
+    "ingredient": "cheese",
+    "choices": [
+      {
+        "label": "Take the cheese",
+        "take": "cheese",
+        "next": "fridge_interior_after"
+      },
+      {
+        "label": "Leave it alone",
+        "next": "fridge_interior_after"
+      }
+    ]
+  },
+  "fridge_interior_after": {
+    "text": "The shelf where the cheese was is now bare. You can see the back of the refrigerator. There's a door to the freezer.",
+    "choices": [
+      {
+        "label": "Open the freezer",
+        "next": "freezer"
+      },
+      {
+        "label": "Leave the refrigerator",
+        "next": "kitchen_floor"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      }
+    ]
+  },
+  "freezer": {
+    "text": "The freezer is very cold. Ice crystals form in the air. You see bacon, frozen solid.",
+    "ingredient": "bacon",
+    "choices": [
+      {
+        "label": "Take the bacon",
+        "take": "bacon",
+        "next": "kitchen_floor"
+      },
+      {
+        "label": "Leave it",
+        "next": "kitchen_floor"
+      }
+    ]
+  },
+  "under_table": {
+    "text": "Under the table it is dark and dusty. You find lettuce here. It has fallen and been forgotten.",
+    "ingredient": "lettuce",
+    "choices": [
+      {
+        "label": "Take the lettuce",
+        "take": "lettuce",
+        "next": "kitchen_floor"
+      },
+      {
+        "label": "Leave it in the dust",
+        "next": "kitchen_floor"
+      }
+    ]
+  },
+  "hallway": {
+    "text": "A long hallway. The walls are bare. You hear nothing. Ahead you see a living room. Behind you is the kitchen.",
+    "choices": [
+      {
+        "label": "Continue to the living room",
+        "next": "living_room"
+      },
+      {
+        "label": "Go back to the kitchen",
+        "next": "kitchen_floor"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      }
+    ]
+  },
+  "living_room": {
+    "text": "The living room is empty. A couch sits against the wall. The pantry door is visible from here.",
+    "choices": [
+      {
+        "label": "Check behind the couch",
+        "next": "behind_couch"
+      },
+      {
+        "label": "Enter the pantry",
+        "next": "pantry"
+      },
+      {
+        "label": "Return to hallway",
+        "next": "hallway"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      }
+    ]
+  },
+  "behind_couch": {
+    "text": "Behind the couch, in shadow, you find a tomato slice. How did it get here?",
+    "ingredient": "tomato",
+    "choices": [
+      {
+        "label": "Take the tomato",
+        "take": "tomato",
+        "next": "living_room"
+      },
+      {
+        "label": "Leave it in the shadow",
+        "next": "living_room"
+      }
+    ]
+  },
+  "pantry": {
+    "text": "The pantry is dark and smells old. You see jars and cans. On a low shelf, you find pickle slices in a jar.",
+    "ingredient": "pickle",
+    "choices": [
+      {
+        "label": "Take the pickle",
+        "take": "pickle",
+        "next": "pantry_after"
+      },
+      {
+        "label": "Leave it",
+        "next": "pantry_after"
+      }
+    ]
+  },
+  "pantry_after": {
+    "text": "At the back of the pantry, you see stairs going down into darkness.",
+    "choices": [
+      {
+        "label": "Go down the stairs",
+        "next": "basement"
+      },
+      {
+        "label": "Leave the pantry",
+        "next": "living_room"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      }
+    ]
+  },
+  "basement": {
+    "text": "The basement is cold and dark. You find two things here: an onion and a small jar of special sauce. Something tells you that you should choose carefully.",
+    "choices": [
+      {
+        "label": "Take the onion",
+        "take": "onion",
+        "next": "basement_after"
+      },
+      {
+        "label": "Take the special sauce",
+        "take": "special_sauce",
+        "next": "basement_after"
+      },
+      {
+        "label": "Take neither",
+        "next": "basement_after"
+      }
+    ]
+  },
+  "basement_after": {
+    "text": "You have explored the basement. There is a door at the far end. It feels final.",
+    "choices": [
+      {
+        "label": "Go through the door",
+        "next": "final_room"
+      },
+      {
+        "label": "Go back upstairs",
+        "next": "pantry_after"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      }
+    ]
+  },
+  "final_room": {
+    "text": "You are in a small room. There is nothing here but you. This is the end of the house. This is where you become.",
+    "choices": [
+      {
+        "label": "You are complete",
+        "end": true
+      }
+    ]
+  }
+}
