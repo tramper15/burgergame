@@ -106,5 +106,14 @@
       "pickle": "The sauce enhances the pickle.",
       "avocado": "The sauce does not understand the avocado."
     }
+  },
+  "meat_patty": {
+    "name": "Meat Patty",
+    "description": "A meat patty. Without it, you are nothing.",
+    "onAdd": "The meat patty becomes part of you. You feel whole. You are real.",
+    "points": 10,
+    "likes": [],
+    "dislikes": [],
+    "reactions": {}
   }
 }

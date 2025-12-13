@@ -151,4 +151,34 @@ export class SceneGenerator {
       ]
     }
   }
+
+  static generateNotARealBurgerEnding(
+    gameState: GameState,
+    ingredients: IngredientsData
+  ): Scene {
+    let text = "You gather yourself together, but something is wrong.\n\n"
+    text += "Without a meat patty, you are not a real burger.\n\n"
+    text += "You are incomplete. You are nothing.\n\n"
+    text += "---\n\n"
+    text += "You have:\n\n"
+    text += "🍞 Bun\n"
+
+    gameState.bunIngredients.forEach(ingredientId => {
+      const ingredient = ingredients[ingredientId]
+      text += `${ingredient.name}        +0\n`
+    })
+
+    text += "\n"
+    text += `Base score:     0\n`
+    text += `Synergies:      +0\n`
+    text += `Total:          0\n\n`
+    text += "You are nothing without the meat."
+
+    return {
+      text,
+      choices: [
+        { label: 'Restart', restart: true }
+      ]
+    }
+  }
 }

@@ -211,7 +211,38 @@
     ]
   },
   "hallway": {
-    "text": "A long hallway. The walls are bare. You hear nothing. Ahead you see a living room. Behind you is the kitchen.",
+    "text": "A long hallway. The walls are bare. You hear nothing. Ahead you see a living room. Behind you is the kitchen. On the floor, you notice a meat patty.",
+    "ingredient": "meat_patty",
+    "choices": [
+      {
+        "label": "Take the meat patty",
+        "take": "meat_patty",
+        "next": "hallway_after"
+      },
+      {
+        "label": "Continue to the living room",
+        "next": "living_room"
+      },
+      {
+        "label": "Go back to the kitchen",
+        "next": "kitchen_floor"
+      },
+      {
+        "label": "Reflect on your Ingredients",
+        "reflect": true
+      },
+      {
+        "label": "Linger in Silence",
+        "silence": true
+      },
+      {
+        "label": "Restart",
+        "restart": true
+      }
+    ]
+  },
+  "hallway_after": {
+    "text": "A long hallway. The walls are bare. You hear nothing. The meat patty is gone. Ahead you see a living room. Behind you is the kitchen.",
     "choices": [
       {
         "label": "Continue to the living room",

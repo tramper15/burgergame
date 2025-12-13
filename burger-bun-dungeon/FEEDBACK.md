@@ -32,3 +32,12 @@
 **Status:** Included
 
 **Implementation:** Added avocado to window_sill room in living_room. If player has avocado and triggers secret ending (lingered in all silences), the hand pulls back with "Ew" reaction overhead, resulting in a good ending where the player remains whole and free.
+
+---
+
+### From Katie
+**Feedback:** "No meat Patty Scene - All ends go to your not a real buger if you don't ahve a meat patty"
+
+**Status:** Included
+
+**Implementation:** Added meat patty ingredient to hallway scene as a neutral ingredient (no synergy bonuses/penalties). If player reaches the ending without collecting the meat patty, they are sent to a special "not_a_real_burger" ending that shows all their collected ingredients with 0 points each, 0 base score, 0 synergies, and 0 total. The message reads "You gather yourself together, but something is wrong. Without a meat patty, you are not a real burger. You are incomplete. You are nothing."

@@ -2,7 +2,8 @@ export const SCENE_IDS = {
   START: 'kitchen_counter',
   REFLECT: 'REFLECT',
   LINGER_SILENCE: 'LINGER_SILENCE',
-  ENDING: 'ENDING'
+  ENDING: 'ENDING',
+  NOT_A_REAL_BURGER_ENDING: 'NOT_A_REAL_BURGER_ENDING'
 } as const
 
 export const NO_CHOICE_SELECTED = -1
