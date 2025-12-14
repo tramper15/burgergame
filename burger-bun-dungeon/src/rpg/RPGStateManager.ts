@@ -43,6 +43,7 @@ export class RPGStateManager {
 
       // World Progress
       currentLocation: 'garbage_can_start',
+      visitedLocations: ['garbage_can_start'],
       checkpoints: ['garbage_can_start'],
       defeatedBosses: [],
 
@@ -222,12 +223,17 @@ export class RPGStateManager {
   }
 
   /**
-   * Changes current location
+   * Changes current location and marks it as visited
    */
   static changeLocation(state: RPGState, locationId: string): RPGState {
+    const visitedLocations = state.visitedLocations.includes(locationId)
+      ? state.visitedLocations
+      : [...state.visitedLocations, locationId]
+
     return {
       ...state,
-      currentLocation: locationId
+      currentLocation: locationId,
+      visitedLocations
     }
   }
 

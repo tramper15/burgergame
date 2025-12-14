@@ -15,6 +15,7 @@ function AppContent() {
   const [currentSceneId, setCurrentSceneId] = useState<string>(SCENE_IDS.START)
   const [resetGameFn, setResetGameFn] = useState<(() => void) | null>(null)
   const [gameMode, setGameMode] = useState<GameMode>('adventure')
+  const [act1Ingredients, setAct1Ingredients] = useState<string[]>([])
   const { progress } = useAchievements()
 
   // Show clear button only on first and last screens
@@ -65,11 +66,18 @@ function AppContent() {
       </div>
 
       {gameMode === 'adventure' ? (
-        <BurgerGame layout={currentLayout} onSceneChange={setCurrentSceneId} onResetGame={handleRegisterResetFn} />
+        <BurgerGame
+          layout={currentLayout}
+          onSceneChange={setCurrentSceneId}
+          onResetGame={handleRegisterResetFn}
+          onStartTrashOdyssey={handleStartTrashOdyssey}
+          trashOdysseyUnlocked={progress.trashOdysseyUnlocked}
+          onGameEnd={setAct1Ingredients}
+        />
       ) : gameMode === 'rpg' ? (
         <RPGGame
           layout={currentLayout}
-          ingredientsFromAct1={['avocado']} // TODO: Get from completed Act 1 game
+          ingredientsFromAct1={act1Ingredients}
           onBackToMenu={() => setGameMode('adventure')}
         />
       ) : null}

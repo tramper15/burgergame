@@ -17,9 +17,12 @@ interface BurgerGameProps {
   layout: LayoutType
   onSceneChange?: (sceneId: string) => void
   onResetGame?: (resetFn: () => void) => void
+  onStartTrashOdyssey?: () => void
+  trashOdysseyUnlocked?: boolean
+  onGameEnd?: (ingredients: string[]) => void
 }
 
-const BurgerGame = ({ layout, onSceneChange, onResetGame }: BurgerGameProps) => {
+const BurgerGame = ({ layout, onSceneChange, onResetGame, onStartTrashOdyssey, trashOdysseyUnlocked, onGameEnd }: BurgerGameProps) => {
   const { showToast } = useToast()
   const { progress, unlockAchievement } = useAchievements()
   const [gameState, setGameState] = useState<GameState>({
@@ -97,6 +100,11 @@ const BurgerGame = ({ layout, onSceneChange, onResetGame }: BurgerGameProps) => 
           }, index * 500) // 500ms between each toast
         }
       })
+
+      // Report ingredients to parent for RPG mode
+      if (onGameEnd) {
+        onGameEnd(gameState.bunIngredients)
+      }
     }
 
     // Reset flag when leaving ending screen
@@ -104,7 +112,7 @@ const BurgerGame = ({ layout, onSceneChange, onResetGame }: BurgerGameProps) => 
       achievementsChecked.current = false
       setCurrentEndingType(null)
     }
-  }, [gameState.currentSceneId, currentEndingType, unlockAchievement, showToast])
+  }, [gameState.currentSceneId, currentEndingType, unlockAchievement, showToast, onGameEnd, gameState.bunIngredients])
 
   // Filter out choices for ingredients already picked
   const getAvailableChoices = (): Choice[] => {
@@ -147,6 +155,9 @@ const BurgerGame = ({ layout, onSceneChange, onResetGame }: BurgerGameProps) => 
       selectedChoice={selectedChoice}
       onChoiceChange={handleChoiceChange}
       onSubmit={handleSubmit}
+      isEndingScreen={gameState.currentSceneId === SCENE_IDS.ENDING}
+      trashOdysseyUnlocked={trashOdysseyUnlocked}
+      onStartTrashOdyssey={onStartTrashOdyssey}
     />
   )
 }

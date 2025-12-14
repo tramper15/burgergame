@@ -6,7 +6,10 @@ const ModernMinimalLayout = ({
   sceneText,
   availableChoices,
   selectedChoice,
-  onChoiceChange
+  onChoiceChange,
+  isEndingScreen,
+  trashOdysseyUnlocked,
+  onStartTrashOdyssey
 }: LayoutProps) => {
   const selectId = useId()
 
@@ -37,6 +40,27 @@ const ModernMinimalLayout = ({
                 </option>
               ))}
             </select>
+
+            {isEndingScreen && trashOdysseyUnlocked && onStartTrashOdyssey && (
+              <button
+                className="trash-odyssey-btn"
+                onClick={onStartTrashOdyssey}
+                style={{
+                  marginTop: '20px',
+                  padding: '12px 24px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  backgroundColor: '#d97706',
+                  color: 'white',
+                  border: '2px solid #92400e',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  width: '100%'
+                }}
+              >
+                ⚔️ Start Trash Odyssey (Act 2)
+              </button>
+            )}
           </div>
         </div>
       </div>

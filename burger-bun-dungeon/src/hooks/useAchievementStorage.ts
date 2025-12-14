@@ -15,7 +15,19 @@ export function useAchievementStorage() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
-        return JSON.parse(stored)
+        const parsed = JSON.parse(stored)
+        // Merge with default progress to ensure all fields exist
+        const merged = {
+          ...DEFAULT_PROGRESS,
+          ...parsed
+        }
+
+        // Migration: If ending_good_silent is unlocked but trashOdysseyUnlocked is not set, fix it
+        if (merged.unlockedAchievements.includes('ending_good_silent') && !merged.trashOdysseyUnlocked) {
+          merged.trashOdysseyUnlocked = true
+        }
+
+        return merged
       }
     } catch (error) {
       console.error('Failed to load achievement progress:', error)

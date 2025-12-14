@@ -6,4 +6,7 @@ export interface LayoutProps {
   selectedChoice: number
   onChoiceChange: (index: number) => void
   onSubmit: () => void
+  isEndingScreen?: boolean
+  trashOdysseyUnlocked?: boolean
+  onStartTrashOdyssey?: () => void
 }

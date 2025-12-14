@@ -23,21 +23,21 @@
 - [x] F1.4: Create mode switcher (Adventure vs RPG)
 - [x] F1.5: Build basic combat state management
 
-### **Phase 2: Core Combat**
-- [ ] F2.1: Implement turn-based combat system
-- [ ] F2.2: Create `BattleSceneGenerator` (generates combat text)
-- [ ] F2.3: Build `CombatProcessor` (handles attack/defend/item logic)
-- [ ] F2.4: Add damage calculation system (ATK - DEF + RNG)
-- [ ] F2.5: Create 3 basic enemies (Slime Mold, Grease Glob, Angry Ant)
-- [ ] F2.6: Implement victory/defeat screens
-- [ ] F2.7: Add XP rewards and level-up system
+### **Phase 2: Core Combat** ✅ COMPLETE
+- [x] F2.1: Implement turn-based combat system
+- [x] F2.2: Create `BattleSceneGenerator` (generates combat text)
+- [x] F2.3: Build `CombatProcessor` (handles attack/defend/item logic)
+- [x] F2.4: Add damage calculation system (ATK - DEF + RNG)
+- [x] F2.5: Create 3 basic enemies (Slime Mold, Grease Glob, Angry Ant)
+- [x] F2.6: Implement victory/defeat screens
+- [x] F2.7: Add XP rewards and level-up system
 
-### **Phase 3: World Navigation**
-- [ ] F3.1: Create location scenes (7-8 trash world locations)
-- [ ] F3.2: Build location navigation system
-- [ ] F3.3: Implement random encounter triggers
-- [ ] F3.4: Add checkpoint/save system (crumpled receipts)
-- [ ] F3.5: Create location transition text
+### **Phase 3: World Navigation** ✅ COMPLETE
+- [x] F3.1: Create location scenes (7-8 trash world locations)
+- [x] F3.2: Build location navigation system
+- [x] F3.3: Implement random encounter triggers
+- [x] F3.4: Add checkpoint/save system (crumpled receipts)
+- [x] F3.5: Create location transition text
 
 ### **Phase 4: Inventory & Items**
 - [ ] F4.1: Build inventory system (10 item slots)

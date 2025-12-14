@@ -80,6 +80,7 @@ export interface RPGState {
 
   // World Progress
   currentLocation: string
+  visitedLocations: string[]
   checkpoints: string[]
   defeatedBosses: string[]
 

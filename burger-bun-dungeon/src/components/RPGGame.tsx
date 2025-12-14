@@ -32,6 +32,7 @@ export default function RPGGame({ layout, ingredientsFromAct1, onBackToMenu }: R
   const [combatPhase, setCombatPhase] = useState<CombatPhase>('exploration')
   const [combatLog, setCombatLog] = useState<CombatAction[]>([])
   const [lastEnemyName, setLastEnemyName] = useState<string>('')
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null) // For random encounters
   const [victoryData, setVictoryData] = useState<{
     enemyName: string
     xpGained: number
@@ -91,13 +92,48 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
 `
 
   // Use the scene text from JSON
-  const sceneText = rpgState.currentLocation === 'garbage_can_start'
-    ? openingCutsceneText
-    : currentSceneData?.description || 'Location not found'
+  // Show first visit text if this is the first time, otherwise show regular description
+  const isFirstVisit = !rpgState.visitedLocations.includes(rpgState.currentLocation)
+  let sceneText = 'Location not found'
 
-  const availableChoices = currentSceneData?.choices || [
+  if (rpgState.currentLocation === 'garbage_can_start') {
+    sceneText = openingCutsceneText
+  } else if (currentSceneData) {
+    // Check if current location is a checkpoint
+    const isCheckpoint = currentSceneData.type === 'checkpoint' || currentSceneData.type === 'safe'
+    const checkpointMarker = isCheckpoint ? ' [CHECKPOINT]' : ''
+
+    // Show first visit text if available and this is the first visit
+    if (isFirstVisit && currentSceneData.firstVisit) {
+      sceneText = `${currentSceneData.name}${checkpointMarker}\n\n${currentSceneData.firstVisit}\n\n---\n\nLevel: ${rpgState.level} | HP: ${rpgState.hp}/${rpgState.maxHp}\nATK: ${rpgState.stats.atk} | DEF: ${rpgState.stats.def} | SPD: ${rpgState.stats.spd}\nCurrency: ${rpgState.currency} Crumbs`
+    } else {
+      sceneText = `${currentSceneData.name}${checkpointMarker}\n\n${currentSceneData.description}\n\n---\n\nLevel: ${rpgState.level} | HP: ${rpgState.hp}/${rpgState.maxHp}\nATK: ${rpgState.stats.atk} | DEF: ${rpgState.stats.def} | SPD: ${rpgState.stats.spd}\nCurrency: ${rpgState.currency} Crumbs`
+    }
+  }
+
+  // Filter out boss battles if the boss has already been defeated
+  let availableChoices = currentSceneData?.choices || [
     { label: '← Back to Main Menu' }
   ]
+
+  if (currentSceneData) {
+    availableChoices = availableChoices.filter((choice: any) => {
+      // If this choice requires a boss to be defeated, check if it is
+      if (choice.requiresBossDefeated) {
+        return rpgState.defeatedBosses.includes(choice.requiresBossDefeated)
+      }
+
+      // If this choice leads to a boss battle, check if boss is defeated
+      if (choice.next) {
+        const nextScene = rpgScenes[choice.next]
+        if (nextScene && nextScene.type === 'boss_battle' && nextScene.boss) {
+          // Don't show the boss fight option if already defeated
+          return !rpgState.defeatedBosses.includes(nextScene.boss)
+        }
+      }
+      return true
+    })
+  }
 
   // Start combat with a specific enemy
   const startCombat = (enemyId: string) => {
@@ -131,7 +167,22 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
       const endResult = CombatProcessor.endCombat(result.newState, true)
       const leveledUp = endResult.newState.level > oldLevel
 
-      setRpgState(endResult.newState)
+      // Check if we defeated a boss and need to progress to next location
+      const currentScene = rpgScenes[rpgState.currentLocation]
+      let nextStateAfterVictory = endResult.newState
+
+      if (currentScene && currentScene.type === 'boss_battle' && currentScene.onVictory) {
+        // Boss defeated - mark it and prepare to navigate to victory location
+        const bossId = currentScene.boss
+        nextStateAfterVictory = {
+          ...endResult.newState,
+          defeatedBosses: endResult.newState.defeatedBosses.includes(bossId)
+            ? endResult.newState.defeatedBosses
+            : [...endResult.newState.defeatedBosses, bossId]
+        }
+      }
+
+      setRpgState(nextStateAfterVictory)
       setVictoryData({
         enemyName,
         xpGained: endResult.xpGained,
@@ -142,8 +193,10 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
       })
       setCombatPhase('victory')
     } else if (result.outcome === 'defeat') {
+      setPendingNavigation(null) // Clear pending navigation on defeat
       setCombatPhase('defeat')
     } else if (result.outcome === 'fled') {
+      setPendingNavigation(null) // Clear pending navigation on flee
       const endResult = CombatProcessor.endCombat(result.newState, false)
       setRpgState(endResult.newState)
       setCombatPhase('fled')
@@ -165,12 +218,87 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
       const enemyId = choice.enemyId || 'slime_mold'
       startCombat(enemyId)
     } else if (choice.next) {
-      // Will implement navigation in Phase 3
-      alert(`Navigation to ${choice.next} coming in Phase 3!`)
+      // Navigate to new location
+      const nextLocation = choice.next
+      const nextSceneData = rpgScenes[nextLocation]
+
+      if (!nextSceneData) {
+        console.error(`Location ${nextLocation} not found`)
+        return
+      }
+
+      // Check if this is a boss battle location
+      if (nextSceneData.type === 'boss_battle') {
+        // Navigate to boss battle location first, then start combat
+        setRpgState(prev => RPGStateManager.changeLocation(prev, nextLocation))
+        setSelectedChoice(-1)
+
+        // Set pending navigation to where we go after beating the boss
+        if (nextSceneData.onVictory) {
+          console.log('Boss battle! Setting pending navigation to victory location:', nextSceneData.onVictory)
+          setPendingNavigation(nextSceneData.onVictory)
+        }
+
+        // Automatically start the boss fight
+        const bossId = nextSceneData.boss
+        if (bossId) {
+          startCombat(bossId)
+        }
+      } else {
+        // Check for random encounters
+        const shouldTriggerEncounter = checkRandomEncounter(nextSceneData)
+
+        if (shouldTriggerEncounter) {
+          // Trigger random encounter BEFORE navigating to location
+          const enemyId = selectRandomEnemy(nextSceneData.encounterTable)
+          if (enemyId) {
+            // Store where we want to go after this fight
+            console.log('Random encounter triggered! Setting pending navigation to:', nextLocation)
+            setPendingNavigation(nextLocation)
+            startCombat(enemyId)
+            return
+          }
+        }
+
+        // Navigate to location and mark as visited
+        setRpgState(prev => RPGStateManager.changeLocation(prev, nextLocation))
+        setSelectedChoice(-1)
+      }
+    } else if (choice.action === 'rest') {
+      // Rest at checkpoint - heal to full HP and save checkpoint
+      setRpgState(prev => RPGStateManager.addCheckpoint(
+        { ...prev, hp: prev.maxHp },
+        prev.currentLocation
+      ))
+      setSelectedChoice(-1)
     } else if (choice.action) {
-      // Will implement actions in Phase 4-6
+      // Will implement other actions in Phase 4-6
       alert(`Action ${choice.action} coming in later phases!`)
     }
+  }
+
+  // Check if a random encounter should trigger (30% chance in combat zones)
+  const checkRandomEncounter = (sceneData: any): boolean => {
+    if (sceneData.type !== 'combat') return false
+    if (!sceneData.encounterTable || sceneData.encounterTable.length === 0) return false
+    return Math.random() < 0.3 // 30% encounter rate
+  }
+
+  // Select a random enemy from the encounter table based on weights
+  const selectRandomEnemy = (encounterTable: any[]): string | null => {
+    if (!encounterTable || encounterTable.length === 0) return null
+
+    const totalWeight = encounterTable.reduce((sum, entry) => sum + entry.weight, 0)
+    let random = Math.random() * totalWeight
+
+    for (const entry of encounterTable) {
+      random -= entry.weight
+      if (random <= 0) {
+        return entry.enemyId
+      }
+    }
+
+    return encounterTable[0].enemyId // Fallback
   }
 
   const handleSubmit = () => {
@@ -210,6 +338,22 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
       { label: '→ Continue', action: 'continue' }
     ]
     onChoiceChange = () => {
+      console.log('Victory continue clicked:', {
+        currentLocation: rpgState.currentLocation,
+        hasPendingNav: !!pendingNavigation,
+        pendingNav: pendingNavigation,
+        defeatedBosses: rpgState.defeatedBosses
+      })
+
+      // Check if we just defeated a boss by looking at defeated bosses list
+      // If we defeated a boss, use pending navigation (which was set during boss battle setup)
+      if (pendingNavigation) {
+        // Navigate to the pending location (either after random encounter or boss battle)
+        console.log('Navigating to pending location:', pendingNavigation)
+        setRpgState(prev => RPGStateManager.changeLocation(prev, pendingNavigation))
+        setPendingNavigation(null)
+      }
+
       setCombatPhase('exploration')
       setVictoryData(null)
       setCombatLog([])
@@ -226,13 +370,17 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
     onChoiceChange = (index: number) => {
       setSelectedChoice(index)
       if (index === 0) {
-        // Respawn - restore HP to max
-        setRpgState({
-          ...rpgState,
-          hp: rpgState.maxHp,
-          inCombat: false,
-          currentEnemy: undefined
-        })
+        // Respawn at last checkpoint - restore HP to max and return to last checkpoint
+        const lastCheckpoint = rpgState.checkpoints[rpgState.checkpoints.length - 1] || 'garbage_can_start'
+        setRpgState(prev => RPGStateManager.changeLocation(
+          {
+            ...prev,
+            hp: prev.maxHp,
+            inCombat: false,
+            currentEnemy: undefined
+          },
+          lastCheckpoint
+        ))
         setCombatPhase('exploration')
         setCombatLog([])
       } else {

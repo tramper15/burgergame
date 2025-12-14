@@ -6,6 +6,10 @@
     "firstVisit": "You tumble through darkness and land with a wet SPLAT. The garbage can. Your new reality. But you won't stay here forever.",
     "choices": [
       {
+        "label": "→ Rest and heal (saves game)",
+        "action": "rest"
+      },
+      {
         "label": "⚔️ Fight a Slime Mold (TEST)",
         "action": "fight",
         "enemyId": "slime_mold"
@@ -107,6 +111,11 @@
         "next": "boss_spoiled_milk"
       },
       {
+        "label": "→ Continue to Trash Bag Depths",
+        "next": "trash_bag_depths",
+        "requiresBossDefeated": "spoiled_milk"
+      },
+      {
         "label": "← Return to prepare",
         "next": "napkin_plains"
       }
@@ -193,6 +202,11 @@
       {
         "label": "→ Challenge the Raccoon King (BOSS FIGHT)",
         "next": "boss_raccoon_king"
+      },
+      {
+        "label": "→ Continue to Shed Entrance",
+        "next": "shed_entrance",
+        "requiresBossDefeated": "raccoon_king"
       },
       {
         "label": "← Prepare for battle",
