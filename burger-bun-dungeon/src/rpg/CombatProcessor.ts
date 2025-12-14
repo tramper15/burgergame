@@ -2,6 +2,7 @@ import type { RPGState, Enemy } from '../types/game'
 import { InventoryManager } from './InventoryManager'
 import { RPGStateManager } from './RPGStateManager'
 import { COMBAT, PROGRESSION } from './RPGConstants'
+import { SpecialAbilities } from './SpecialAbilities'
 
 export interface CombatAction {
   actor: 'player' | 'enemy'
@@ -171,6 +172,21 @@ export class CombatProcessor {
       }
     }
 
+    // Check for evasion
+    if (SpecialAbilities.checkEvasion(state.currentEnemy)) {
+      return {
+        newState: state,
+        actions: [
+          {
+            actor: 'player',
+            action: 'attack',
+            damage: 0,
+            message: `You attack the ${state.currentEnemy.name}, but it dodges!`
+          }
+        ]
+      }
+    }
+
     const damage = this.calculateDamage(
       { atk: state.stats.atk, def: 0 },
       { atk: 0, def: state.currentEnemy.def },
@@ -179,7 +195,7 @@ export class CombatProcessor {
 
     const newEnemyHp = Math.max(0, state.currentEnemy.hp - damage)
 
-    const newState: RPGState = {
+    let newState: RPGState = {
       ...state,
       currentEnemy: {
         ...state.currentEnemy,
@@ -195,6 +211,18 @@ export class CombatProcessor {
         message: `You attack the ${state.currentEnemy.name} for ${damage} damage!`
       }
     ]
+
+    // Check for boss phase transitions after damage
+    if (newState.currentEnemy) {
+      const phaseResult = SpecialAbilities.updateBossPhase(newState.currentEnemy)
+      if (phaseResult.phaseChanged && phaseResult.phaseMessage) {
+        actions.push({
+          actor: 'enemy',
+          action: 'attack',
+          message: `⚠️ ${phaseResult.phaseMessage}`
+        })
+      }
+    }
 
     return { newState, actions }
   }
@@ -352,10 +380,17 @@ export class CombatProcessor {
       }
     }
 
+    // Increment turn counter for interval-based abilities
+    if (state.currentEnemy.turnCounter !== undefined) {
+      state.currentEnemy.turnCounter += 1
+    } else {
+      state.currentEnemy.turnCounter = 1
+    }
+
     const enemyAction = this.determineEnemyAction(state.currentEnemy)
 
     if (enemyAction === 'defend') {
-      // Enemy defends (future implementation for defensive enemies)
+      // Enemy defends
       return {
         newState: state,
         actions: [
@@ -368,28 +403,75 @@ export class CombatProcessor {
       }
     }
 
-    // Enemy attacks
-    const damage = this.calculateDamage(
+    // Calculate base damage
+    let baseDamage = this.calculateDamage(
       { atk: state.currentEnemy.atk, def: 0 },
       { atk: 0, def: state.stats.def },
       state.playerDefending
     )
 
-    const newPlayerHp = Math.max(0, state.hp - damage)
+    let actions: CombatAction[] = []
+    let finalDamage = baseDamage
+    let currentState = state
 
-    const newState: RPGState = {
-      ...state,
-      hp: newPlayerHp
-    }
+    // Process special abilities
+    if (state.currentEnemy.special) {
+      const specialResult = SpecialAbilities.processSpecialAbility(
+        state,
+        state.currentEnemy,
+        baseDamage
+      )
 
-    const actions: CombatAction[] = [
-      {
+      actions.push(...specialResult.actions)
+      finalDamage = specialResult.modifiedDamage
+
+      // Handle item stealing
+      if (specialResult.stolenItemIndex !== undefined) {
+        const itemToRemove = state.inventory[specialResult.stolenItemIndex]
+        if (itemToRemove) {
+          const removeResult = InventoryManager.removeItem(
+            state,
+            itemToRemove.id,
+            1
+          )
+          if (removeResult.success) {
+            currentState = removeResult.newState
+          }
+        }
+      }
+    } else {
+      // Normal attack without special ability
+      actions.push({
         actor: 'enemy',
         action: 'attack',
-        damage,
-        message: `The ${state.currentEnemy.name} attacks you for ${damage} damage!`
-      }
-    ]
+        damage: finalDamage,
+        message: `The ${state.currentEnemy.name} attacks you for ${finalDamage} damage!`
+      })
+    }
+
+    // Check for frenzy (attacks twice per turn)
+    const isFrenzy = state.currentEnemy.special?.type === 'frenzy'
+    if (isFrenzy) {
+      const secondAttackDamage = this.calculateDamage(
+        { atk: state.currentEnemy.atk, def: 0 },
+        { atk: 0, def: state.stats.def },
+        state.playerDefending
+      )
+      finalDamage += secondAttackDamage
+      actions.push({
+        actor: 'enemy',
+        action: 'attack',
+        damage: secondAttackDamage,
+        message: `The ${state.currentEnemy.name} attacks AGAIN! ${secondAttackDamage} damage!`
+      })
+    }
+
+    const newPlayerHp = Math.max(0, currentState.hp - finalDamage)
+
+    const newState: RPGState = {
+      ...currentState,
+      hp: newPlayerHp
+    }
 
     return { newState, actions }
   }
@@ -449,7 +531,17 @@ export class CombatProcessor {
       spd: enemyData.spd,
       xpReward: enemyData.xpReward,
       lootTable: enemyData.lootTable || [],
-      aiPattern: enemyData.aiPattern
+      aiPattern: enemyData.aiPattern,
+      // Boss-specific data
+      special: enemyData.special,
+      isBoss: enemyData.isBoss,
+      isSecretBoss: enemyData.isSecretBoss,
+      phases: enemyData.phases,
+      currentPhase: 0,
+      turnCounter: 0,
+      charging: false,
+      poisonTurns: 0,
+      constrictTurns: 0
     }
 
     return {

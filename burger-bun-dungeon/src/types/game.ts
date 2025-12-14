@@ -106,6 +106,15 @@ export interface Enemy {
   xpReward: number
   lootTable: LootDrop[]
   aiPattern: 'aggressive' | 'defensive' | 'random'
+  special?: any // Special abilities data from enemy JSON
+  isBoss?: boolean
+  isSecretBoss?: boolean
+  phases?: any[] // For multi-phase bosses like Hungry Dog
+  currentPhase?: number // Track current phase
+  turnCounter?: number // For abilities that trigger every N turns
+  charging?: boolean // For charge-up abilities like Pounce
+  poisonTurns?: number // For poison effects
+  constrictTurns?: number // For constrict effects
 }
 
 export interface InventoryItem {

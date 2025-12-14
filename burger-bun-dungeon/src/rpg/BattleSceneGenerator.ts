@@ -148,7 +148,40 @@ Sometimes survival is more important than victory.
     }
 
     const enemy = state.currentEnemy
+    const enemyData = enemy as any // Access raw enemy data for boss flags
 
+    // Check if this is a boss with custom intro
+    const isBoss = enemyData.isBoss === true
+    const isSecretBoss = enemyData.isSecretBoss === true
+    const bossIntro = enemyData.bossIntro
+
+    // Generate boss-specific intro cutscenes from JSON data
+    if (isBoss && bossIntro && Array.isArray(bossIntro)) {
+      const encounterType = isSecretBoss
+        ? '!!!  SECRET BOSS ENCOUNTER  !!!'
+        : isBoss && enemy.level < 5
+        ? '!!!  MINI-BOSS ENCOUNTER  !!!'
+        : '!!!  BOSS ENCOUNTER  !!!'
+
+      const introText = bossIntro.join('\n')
+
+      return `═══════════════════════════════════════════
+${encounterType}
+═══════════════════════════════════════════
+
+${introText}
+
+${enemy.description}
+
+Level ${enemy.level} | HP: ${enemy.maxHp}
+ATK: ${enemy.atk} | DEF: ${enemy.def} | SPD: ${enemy.spd}
+
+${isSecretBoss ? '' : 'The boss battle begins!'}
+
+═══════════════════════════════════════════`
+    }
+
+    // Regular enemy encounter
     return `═══════════════════════════════════════════
 ENEMY ENCOUNTER!
 ═══════════════════════════════════════════

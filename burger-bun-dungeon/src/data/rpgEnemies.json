@@ -312,10 +312,26 @@
     ],
     "aiPattern": "aggressive",
     "isBoss": true,
+    "bossIntro": [
+      "The yogurt container trembles.",
+      "",
+      "A horrible smell wafts out.",
+      "",
+      "Sour. Rotten. Wrong.",
+      "",
+      "Then it emerges.",
+      "",
+      "SPOILED MILK.",
+      "",
+      "A curdled, lumpy mass that should not be alive.",
+      "",
+      "But it is. And it's furious."
+    ],
     "special": {
       "type": "splash_damage",
       "damage": 10,
-      "cannotDefend": true
+      "cannotDefend": true,
+      "chance": 0.3
     }
   },
 
@@ -337,6 +353,21 @@
     ],
     "aiPattern": "aggressive",
     "isBoss": true,
+    "bossIntro": [
+      "A small figure sits on a throne of trash.",
+      "",
+      "Bottle caps. Plastic wrappers. Discarded toys.",
+      "",
+      "A crown made from a soda bottle cap gleams on its head.",
+      "",
+      "The RACCOON KING.",
+      "",
+      "It stands. Twice your height. Ten times your strength.",
+      "",
+      "\"Another fool seeks passage to the shed,\" it chitters.",
+      "",
+      "\"You'll have to go through ME.\""
+    ],
     "special": {
       "type": "summon_minions",
       "summonId": "crumb_swarm",
@@ -360,6 +391,25 @@
     "aiPattern": "aggressive",
     "isBoss": true,
     "isSecretBoss": true,
+    "bossIntro": [
+      "A massive shadow blocks the doorway.",
+      "",
+      "You hear breathing. Heavy. Eager.",
+      "",
+      "Then you see it.",
+      "",
+      "Golden fur. Wagging tail. Teeth the size of your entire body.",
+      "",
+      "THE HUNGRY DOG.",
+      "",
+      "It looks at you. Not with malice. Just... hunger.",
+      "",
+      "You are burger-sized.",
+      "",
+      "This is very, very bad.",
+      "",
+      "There is no running from this."
+    ],
     "phases": [
       {
         "healthThreshold": 1.0,
@@ -368,6 +418,7 @@
       {
         "healthThreshold": 0.5,
         "aiPattern": "aggressive",
+        "phaseMessage": "The dog snarls! Its attacks become more vicious!",
         "special": {
           "type": "bite",
           "damageMultiplier": 2
@@ -376,6 +427,7 @@
       {
         "healthThreshold": 0.25,
         "aiPattern": "aggressive",
+        "phaseMessage": "The dog enters a desperate frenzy! It attacks TWICE per turn!",
         "special": {
           "type": "frenzy",
           "attacksPerTurn": 2
