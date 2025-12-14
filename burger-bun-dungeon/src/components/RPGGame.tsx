@@ -5,6 +5,7 @@ import { RPGStateManager } from '../rpg/RPGStateManager'
 import { CombatProcessor, type CombatAction } from '../rpg/CombatProcessor'
 import { BattleSceneGenerator } from '../rpg/BattleSceneGenerator'
 import { InventoryManager } from '../rpg/InventoryManager'
+import { ShopProcessor } from '../rpg/ShopProcessor'
 import { layouts } from './layouts'
 import rpgScenesData from '../data/rpgScenes.json'
 import rpgEnemiesData from '../data/rpgEnemies.json'
@@ -18,7 +19,7 @@ interface RPGGameProps {
   onBackToMenu: () => void
 }
 
-type CombatPhase = 'exploration' | 'combat' | 'item_menu' | 'inventory_view' | 'victory' | 'defeat' | 'fled'
+type CombatPhase = 'exploration' | 'combat' | 'item_menu' | 'inventory_view' | 'victory' | 'defeat' | 'fled' | 'shop_buy' | 'shop_sell'
 
 /**
  * RPGGame - Main component for Trash Odyssey (Act 2) RPG mode
@@ -42,6 +43,7 @@ export default function RPGGame({ layout, ingredientsFromAct1, onBackToMenu }: R
     leveledUp: boolean
     newLevel?: number
   } | null>(null)
+  const [shopMessage, setShopMessage] = useState<string>('')
 
   const LayoutComponent = layouts[layout]
 
@@ -307,8 +309,13 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
         prev.currentLocation
       ))
       setSelectedChoice(-1)
+    } else if (choice.action === 'open_shop') {
+      // Open shop interface
+      setCombatPhase('shop_buy')
+      setShopMessage('')
+      setSelectedChoice(-1)
     } else if (choice.action) {
-      // Will implement other actions in Phase 4-6
+      // Will implement other actions in later phases
       alert(`Action ${choice.action} coming in later phases!`)
     }
   }
@@ -518,6 +525,120 @@ XP: ${rpgState.xp}/${rpgState.maxXp}
       setCombatLog([])
       setSelectedChoice(-1)
       setLastEnemyName('')
+    }
+  } else if (combatPhase === 'shop_buy') {
+    // Shop Buy Interface
+    const shopLocation = 'trash_bag_depths'
+    const availableItems = ShopProcessor.getAvailableItemsForPlayer(shopLocation, rpgState.currency)
+
+    displayText = `═══════════════════════════════════════════
+COCKROACH MERCHANT'S SHOP
+═══════════════════════════════════════════
+
+"Hehehe, welcome, welcome! You look hungry, yes?
+I have finest goods in all trash can!"
+
+Your Crumbs: ${rpgState.currency}
+
+--- AVAILABLE ITEMS ---
+
+${availableItems.map((shopItem, idx) => {
+  const affordSymbol = shopItem.canAfford ? '✓' : '✗'
+  return `${idx + 1}. ${shopItem.item.name} - ${shopItem.item.shopPrice} Crumbs ${affordSymbol}
+   ${shopItem.item.description}`
+}).join('\n\n')}
+
+${shopMessage ? `\n${shopMessage}\n` : ''}`
+
+    displayChoices = [
+      ...availableItems.map(shopItem => ({
+        label: `Buy ${shopItem.item.name} (${shopItem.item.shopPrice} Crumbs)`,
+        itemId: shopItem.item.id,
+        canAfford: shopItem.canAfford
+      })),
+      { label: '→ Sell Items', action: 'switch_to_sell' },
+      { label: '← Leave Shop', action: 'leave_shop' }
+    ]
+
+    onChoiceChange = (index: number) => {
+      setSelectedChoice(index)
+      const choice = displayChoices[index]
+
+      if (choice.action === 'leave_shop') {
+        setCombatPhase('exploration')
+        setShopMessage('')
+        setSelectedChoice(-1)
+      } else if (choice.action === 'switch_to_sell') {
+        setCombatPhase('shop_sell')
+        setShopMessage('')
+        setSelectedChoice(-1)
+      } else if (choice.itemId) {
+        // Try to buy the item
+        const result = ShopProcessor.buyItem(rpgState, choice.itemId, shopLocation)
+        if (result.success) {
+          setRpgState(result.newState)
+          setShopMessage(`✓ ${result.message}`)
+        } else {
+          setShopMessage(`✗ ${result.message}`)
+        }
+        setSelectedChoice(-1)
+      }
+    }
+  } else if (combatPhase === 'shop_sell') {
+    // Shop Sell Interface
+    const sellableItems = ShopProcessor.getSellableItems(rpgState)
+
+    displayText = `═══════════════════════════════════════════
+COCKROACH MERCHANT'S SHOP - SELL ITEMS
+═══════════════════════════════════════════
+
+"You want to sell? Let me see what you have!"
+
+Your Crumbs: ${rpgState.currency}
+
+--- YOUR SELLABLE ITEMS ---
+
+${sellableItems.length > 0
+  ? sellableItems.map((sellItem, idx) => {
+      return `${idx + 1}. ${sellItem.item.name} x${sellItem.quantity} - ${sellItem.sellPrice} Crumbs each
+   ${sellItem.item.description}`
+    }).join('\n\n')
+  : 'You have nothing to sell!'}
+
+${shopMessage ? `\n${shopMessage}\n` : ''}`
+
+    displayChoices = [
+      ...sellableItems.map(sellItem => ({
+        label: `Sell ${sellItem.item.name} (${sellItem.sellPrice} Crumbs)`,
+        itemId: sellItem.item.id
+      })),
+      { label: '→ Buy Items', action: 'switch_to_buy' },
+      { label: '← Leave Shop', action: 'leave_shop' }
+    ]
+
+    onChoiceChange = (index: number) => {
+      setSelectedChoice(index)
+      const choice = displayChoices[index]
+
+      if (choice.action === 'leave_shop') {
+        setCombatPhase('exploration')
+        setShopMessage('')
+        setSelectedChoice(-1)
+      } else if (choice.action === 'switch_to_buy') {
+        setCombatPhase('shop_buy')
+        setShopMessage('')
+        setSelectedChoice(-1)
+      } else if (choice.itemId) {
+        // Try to sell the item
+        const result = ShopProcessor.sellItem(rpgState, choice.itemId)
+        if (result.success) {
+          setRpgState(result.newState)
+          setShopMessage(`✓ ${result.message}`)
+        } else {
+          setShopMessage(`✗ ${result.message}`)
+        }
+        setSelectedChoice(-1)
+      }
     }
   }
 

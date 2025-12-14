@@ -53,11 +53,11 @@
 - [x] F5.4: Create ingredient power system
 - [x] F5.5: Add currency system (Crumb Currency)
 
-### **Phase 6: Shop & Trading**
-- [ ] F6.1: Create shop interface (text-based menu)
-- [ ] F6.2: Implement Cockroach Merchant character
-- [ ] F6.3: Add buy/sell functionality
-- [ ] F6.4: Create shop inventory and pricing
+### **Phase 6: Shop & Trading** ✅ COMPLETE
+- [x] F6.1: Create shop interface (text-based menu)
+- [x] F6.2: Implement Cockroach Merchant character
+- [x] F6.3: Add buy/sell functionality
+- [x] F6.4: Create shop inventory and pricing
 
 ### **Phase 7: Enemy Roster**
 - [ ] F7.1: Write 10+ enemy types with descriptions
