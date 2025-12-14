@@ -1,7 +1,9 @@
-import type { RPGState, StatBonus } from '../types/game'
+import type { RPGState, StatBonus, Equipment } from '../types/game'
 import ingredientPowersData from '../data/ingredientPowers.json'
+import rpgItemsData from '../data/rpgItems.json'
 
 const ingredientPowers = ingredientPowersData as Record<string, StatBonus & { description: string }>
+const rpgItems = rpgItemsData as Record<string, any>
 
 /**
  * RPGStateManager - Manages RPG state initialization and updates
@@ -35,9 +37,9 @@ export class RPGStateManager {
       // Inventory
       inventory: [],
       equipment: {
-        weapon: null,
-        armor: null,
-        shield: null
+        weapon: this.createStartingEquipment('weapon'),
+        armor: this.createStartingEquipment('armor'),
+        shield: this.createStartingEquipment('shield')
       },
       currency: 0,
 
@@ -263,5 +265,45 @@ export class RPGStateManager {
       ...state,
       defeatedBosses: [...state.defeatedBosses, bossId]
     }
+  }
+
+  /**
+   * Creates starting equipment for a slot
+   */
+  private static createStartingEquipment(slot: 'weapon' | 'armor' | 'shield'): Equipment {
+    const startingIds = {
+      weapon: 'toothpick_shiv',
+      armor: 'exposed_bun',
+      shield: 'no_shield'
+    }
+
+    const itemId = startingIds[slot]
+    const itemDef = this.getItemDefinition(itemId)
+
+    if (!itemDef) {
+      throw new Error(`Starting equipment definition not found for ${slot} (${itemId})`)
+    }
+
+    return {
+      id: itemId,
+      name: itemDef.name,
+      description: itemDef.description,
+      type: 'equipment',
+      slot,
+      stats: itemDef.stats,
+      quantity: 1
+    }
+  }
+
+  /**
+   * Gets item definition from JSON data
+   */
+  private static getItemDefinition(itemId: string): any {
+    for (const category of Object.values(rpgItems)) {
+      if (typeof category === 'object' && category !== null && itemId in category) {
+        return category[itemId]
+      }
+    }
+    return null
   }
 }

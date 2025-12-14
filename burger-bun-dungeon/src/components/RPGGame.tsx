@@ -4,6 +4,7 @@ import type { RPGState } from '../types/game'
 import { RPGStateManager } from '../rpg/RPGStateManager'
 import { CombatProcessor, type CombatAction } from '../rpg/CombatProcessor'
 import { BattleSceneGenerator } from '../rpg/BattleSceneGenerator'
+import { InventoryManager } from '../rpg/InventoryManager'
 import { layouts } from './layouts'
 import rpgScenesData from '../data/rpgScenes.json'
 import rpgEnemiesData from '../data/rpgEnemies.json'
@@ -17,7 +18,7 @@ interface RPGGameProps {
   onBackToMenu: () => void
 }
 
-type CombatPhase = 'exploration' | 'combat' | 'victory' | 'defeat' | 'fled'
+type CombatPhase = 'exploration' | 'combat' | 'item_menu' | 'inventory_view' | 'victory' | 'defeat' | 'fled'
 
 /**
  * RPGGame - Main component for Trash Odyssey (Act 2) RPG mode
@@ -111,6 +112,22 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
     }
   }
 
+  // Add restart option to all scenes
+  const addRestartOption = (choices: any[]) => {
+    return [
+      ...choices,
+      { label: '🔄 Restart Act 2 (Fresh Start)', action: 'restart_act2' }
+    ]
+  }
+
+  // Add inventory/equipment option to all exploration scenes
+  const explorationChoicesWithInventory = (choices: any[]) => {
+    return [
+      { label: '📦 View Inventory & Equipment', action: 'view_inventory' },
+      ...addRestartOption(choices)
+    ]
+  }
+
   // Filter out boss battles if the boss has already been defeated
   let availableChoices = currentSceneData?.choices || [
     { label: '← Back to Main Menu' }
@@ -152,8 +169,15 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
   }
 
   // Handle combat action
-  const handleCombatAction = (action: 'attack' | 'defend' | 'item' | 'flee') => {
-    const result = CombatProcessor.processTurn(rpgState, action)
+  const handleCombatAction = (action: 'attack' | 'defend' | 'item' | 'flee', itemId?: string) => {
+    // If action is 'item' but no itemId, show item menu
+    if (action === 'item' && !itemId) {
+      setCombatPhase('item_menu')
+      setSelectedChoice(-1)
+      return
+    }
+
+    const result = CombatProcessor.processTurn(rpgState, action, itemId)
 
     setRpgState(result.newState)
     setCombatLog(result.actions)
@@ -207,11 +231,23 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
   const handleChoiceChange = (index: number) => {
     setSelectedChoice(index)
 
-    const choice = availableChoices[index]
+    // Get the actual displayed choices (with inventory and restart buttons)
+    const displayedChoices = explorationChoicesWithInventory(availableChoices)
+    const choice = displayedChoices[index]
     if (!choice) return
 
     // Handle different choice types
-    if (choice.label.includes('Back to Main Menu')) {
+    if (choice.action === 'view_inventory') {
+      setCombatPhase('inventory_view')
+      setSelectedChoice(-1) // Clear selection when entering inventory
+    } else if (choice.action === 'restart_act2') {
+      // Restart Act 2 with fresh state
+      if (window.confirm('Are you sure you want to restart Act 2? All progress in Trash Odyssey will be lost.')) {
+        setRpgState(RPGStateManager.createInitialState(ingredientsFromAct1))
+        setCombatPhase('exploration')
+        setSelectedChoice(-1)
+      }
+    } else if (choice.label.includes('Back to Main Menu')) {
       onBackToMenu()
     } else if (choice.action === 'fight') {
       // Start combat
@@ -301,16 +337,64 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
     return encounterTable[0].enemyId // Fallback
   }
 
-  const handleSubmit = () => {
-    // Auto-submit handled in handleChoiceChange for now
-  }
-
   // Determine what to display based on combat phase
   let displayText = sceneText
-  let displayChoices = availableChoices
+  let displayChoices = combatPhase === 'exploration'
+    ? explorationChoicesWithInventory(availableChoices)
+    : availableChoices
   let onChoiceChange = handleChoiceChange
 
-  if (combatPhase === 'combat') {
+  if (combatPhase === 'inventory_view') {
+    // Show inventory and equipment
+    const usableItems = InventoryManager.getUsableConsumables(rpgState)
+    const { weapon, armor, shield } = rpgState.equipment
+
+    displayText = `═══════════════════════════════════════════
+INVENTORY & EQUIPMENT
+═══════════════════════════════════════════
+
+--- EQUIPMENT ---
+Weapon: ${weapon?.name || 'None'} (ATK +${weapon?.stats.atk || 0})
+Armor: ${armor?.name || 'None'} (DEF +${armor?.stats.def || 0})
+Shield: ${shield?.name || 'None'} (DEF +${shield?.stats.def || 0})
+
+--- CONSUMABLES ---
+${usableItems.length > 0
+  ? usableItems.map(item => `${item.name} x${item.quantity} - ${item.description}`).join('\n')
+  : 'No consumable items'}
+
+--- STATS ---
+Level: ${rpgState.level} | HP: ${rpgState.hp}/${rpgState.maxHp}
+ATK: ${rpgState.stats.atk} | DEF: ${rpgState.stats.def} | SPD: ${rpgState.stats.spd}
+Currency: ${rpgState.currency} Crumbs
+XP: ${rpgState.xp}/${rpgState.maxXp}
+`
+
+    displayChoices = [
+      ...usableItems.map(item => ({
+        label: `Use ${item.name} (heal ${item.effect?.healHp || 0} HP)`,
+        itemId: item.id
+      })),
+      { label: '← Back', action: 'back' }
+    ]
+
+    onChoiceChange = (index: number) => {
+      setSelectedChoice(index)
+      const choice = displayChoices[index]
+
+      if (choice.action === 'back') {
+        setCombatPhase('exploration')
+        setSelectedChoice(-1)
+      } else if (choice.itemId) {
+        // Use item outside of combat
+        const useResult = InventoryManager.useConsumable(rpgState, choice.itemId)
+        if (useResult.success) {
+          setRpgState(useResult.newState)
+        }
+        setSelectedChoice(-1)
+      }
+    }
+  } else if (combatPhase === 'combat') {
     // In combat - show battle scene
     displayText = BattleSceneGenerator.generateBattleScene(rpgState, combatLog)
     displayChoices = [
@@ -323,6 +407,42 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
       setSelectedChoice(index)
       const action = ['attack', 'defend', 'item', 'flee'][index] as 'attack' | 'defend' | 'item' | 'flee'
       handleCombatAction(action)
+    }
+  } else if (combatPhase === 'item_menu') {
+    // Item selection menu
+    const usableItems = InventoryManager.getUsableConsumables(rpgState)
+
+    if (usableItems.length === 0) {
+      displayText = BattleSceneGenerator.generateBattleScene(rpgState, combatLog) + '\n\n--- INVENTORY ---\n\nYou have no usable items!'
+      displayChoices = [
+        { label: '← Back to Combat', action: 'back' }
+      ]
+      onChoiceChange = () => {
+        setCombatPhase('combat')
+        setSelectedChoice(-1)
+      }
+    } else {
+      displayText = BattleSceneGenerator.generateBattleScene(rpgState, combatLog) + '\n\n--- INVENTORY ---\n\nSelect an item to use:\n'
+      displayChoices = [
+        ...usableItems.map(item => ({
+          label: `${item.name} (${item.quantity}x) - ${item.description}`,
+          itemId: item.id
+        })),
+        { label: '← Back to Combat', action: 'back' }
+      ]
+      onChoiceChange = (index: number) => {
+        setSelectedChoice(index)
+        const choice = displayChoices[index]
+
+        if (choice.action === 'back') {
+          setCombatPhase('combat')
+          setSelectedChoice(-1)
+        } else if (choice.itemId) {
+          // Use the selected item
+          handleCombatAction('item', choice.itemId)
+          setCombatPhase('combat')
+        }
+      }
     }
   } else if (combatPhase === 'victory' && victoryData) {
     // Victory screen
@@ -398,6 +518,13 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
       setCombatLog([])
       setSelectedChoice(-1)
       setLastEnemyName('')
+    }
+  }
+
+  // handleSubmit now captures the correct onChoiceChange handler after all phase reassignments
+  const handleSubmit = () => {
+    if (selectedChoice >= 0 && onChoiceChange) {
+      onChoiceChange(selectedChoice)
     }
   }
 

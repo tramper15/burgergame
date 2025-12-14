@@ -39,19 +39,19 @@
 - [x] F3.4: Add checkpoint/save system (crumpled receipts)
 - [x] F3.5: Create location transition text
 
-### **Phase 4: Inventory & Items**
-- [ ] F4.1: Build inventory system (10 item slots)
-- [ ] F4.2: Create consumable items (Crumbs, Soda Drop, Moldy Bread)
-- [ ] F4.3: Implement item usage (in combat and out of combat)
-- [ ] F4.4: Add equipment slots (weapon, armor, shield)
-- [ ] F4.5: Create loot drop system
+### **Phase 4: Inventory & Items** ✅ COMPLETE
+- [x] F4.1: Build inventory system (10 item slots)
+- [x] F4.2: Create consumable items (Crumbs, Soda Drop, Moldy Bread)
+- [x] F4.3: Implement item usage (in combat and out of combat)
+- [x] F4.4: Add equipment slots (weapon, armor, shield)
+- [x] F4.5: Create loot drop system
 
-### **Phase 5: Progression Systems**
-- [ ] F5.1: Implement level/XP progression (levels 1-10)
-- [ ] F5.2: Add stat increases on level-up (HP/ATK/DEF/SPD)
-- [ ] F5.3: Convert Act 1 ingredients to abilities/bonuses
-- [ ] F5.4: Create ingredient power system
-- [ ] F5.5: Add currency system (Crumb Currency)
+### **Phase 5: Progression Systems** ✅ COMPLETE
+- [x] F5.1: Implement level/XP progression (levels 1-10)
+- [x] F5.2: Add stat increases on level-up (HP/ATK/DEF/SPD)
+- [x] F5.3: Convert Act 1 ingredients to abilities/bonuses
+- [x] F5.4: Create ingredient power system
+- [x] F5.5: Add currency system (Crumb Currency)
 
 ### **Phase 6: Shop & Trading**
 - [ ] F6.1: Create shop interface (text-based menu)

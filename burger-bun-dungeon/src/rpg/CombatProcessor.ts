@@ -1,11 +1,14 @@
 import type { RPGState, Enemy } from '../types/game'
+import { InventoryManager } from './InventoryManager'
 
 export interface CombatAction {
   actor: 'player' | 'enemy'
-  action: 'attack' | 'defend' | 'item' | 'flee'
-  damage?: number
+  action: 'attack' | 'defend' | 'item' | 'flee' | 'revive'
+  damage?: number        // HP lost (attacks, enemy actions)
+  healAmount?: number    // HP gained (healing items, revives)
   success?: boolean
   message: string
+  autoUsed?: boolean     // True for auto-consumed items (e.g., Moldy Bread revive)
 }
 
 export interface CombatResult {
@@ -25,7 +28,7 @@ export class CombatProcessor {
   static processTurn(
     state: RPGState,
     playerAction: 'attack' | 'defend' | 'item' | 'flee',
-    _itemId?: string
+    itemId?: string
   ): CombatResult {
     if (!state.currentEnemy) {
       return {
@@ -53,12 +56,17 @@ export class CombatProcessor {
         break
 
       case 'item':
-        // TODO: Implement in Phase 4
-        actions.push({
-          actor: 'player',
-          action: 'item',
-          message: 'No items available yet. (Coming in Phase 4)'
-        })
+        if (!itemId) {
+          actions.push({
+            actor: 'player',
+            action: 'item',
+            message: 'No item specified to use!'
+          })
+        } else {
+          const itemResult = this.playerUseItem(currentState, itemId)
+          currentState = itemResult.newState
+          actions.push(...itemResult.actions)
+        }
         break
 
       case 'flee':
@@ -96,10 +104,47 @@ export class CombatProcessor {
 
     // Check if player is defeated
     if (currentState.hp <= 0) {
-      return {
-        newState: currentState,
-        actions,
-        outcome: 'defeat'
+      // Check for Moldy Bread auto-revive
+      const moldyBread = currentState.inventory.find(item => item.id === 'moldy_bread')
+
+      if (moldyBread && moldyBread.quantity > 0) {
+        // Auto-consume Moldy Bread and revive to 50% HP
+        const reviveHp = Math.floor(currentState.maxHp * 0.5)
+        const removeResult = InventoryManager.removeItem(currentState, 'moldy_bread', 1)
+
+        // Check if item removal was successful
+        if (!removeResult.success) {
+          // Failed to remove item - shouldn't happen, but handle gracefully
+          return {
+            newState: currentState,
+            actions,
+            outcome: 'defeat'
+          }
+        }
+
+        // Apply revive
+        currentState = {
+          ...removeResult.newState,
+          hp: reviveHp
+        }
+
+        actions.push({
+          actor: 'player',
+          action: 'revive',
+          healAmount: reviveHp,
+          success: true,
+          autoUsed: true,
+          message: `💀 You were defeated! But Moldy Bread activated, reviving you to ${reviveHp} HP!`
+        })
+
+        // Continue combat instead of ending in defeat
+      } else {
+        // No Moldy Bread - player is defeated
+        return {
+          newState: currentState,
+          actions,
+          outcome: 'defeat'
+        }
       }
     }
 
@@ -173,6 +218,42 @@ export class CombatProcessor {
     ]
 
     return { newState, actions }
+  }
+
+  /**
+   * Player uses an item
+   */
+  static playerUseItem(state: RPGState, itemId: string): {
+    newState: RPGState
+    actions: CombatAction[]
+  } {
+    const useResult = InventoryManager.useConsumable(state, itemId)
+
+    if (!useResult.success) {
+      return {
+        newState: state,
+        actions: [
+          {
+            actor: 'player',
+            action: 'item',
+            message: useResult.message
+          }
+        ]
+      }
+    }
+
+    return {
+      newState: useResult.newState,
+      actions: [
+        {
+          actor: 'player',
+          action: 'item',
+          healAmount: useResult.healAmount,
+          success: true,
+          message: useResult.message
+        }
+      ]
+    }
   }
 
   /**
@@ -437,6 +518,12 @@ export class CombatProcessor {
       ...newState,
       currency: newState.currency + currencyGained
     }
+
+    // Add looted items to inventory
+    itemsLooted.forEach(itemId => {
+      const addResult = InventoryManager.addItem(newState, itemId, 1)
+      newState = addResult.newState
+    })
 
     // End combat
     newState = {
