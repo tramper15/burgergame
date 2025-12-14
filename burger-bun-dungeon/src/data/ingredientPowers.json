@@ -1,0 +1,38 @@
+{
+  "cheese": {
+    "def": 5,
+    "description": "Protective coating"
+  },
+  "bacon": {
+    "atk": 5,
+    "description": "Greasy aggression"
+  },
+  "lettuce": {
+    "spd": 3,
+    "description": "Lightweight"
+  },
+  "tomato": {
+    "maxHp": 10,
+    "description": "Juicy vitality"
+  },
+  "avocado": {
+    "maxHp": 15,
+    "description": "Savior's blessing"
+  },
+  "pickle": {
+    "ability": "poison_strike",
+    "description": "Poison Strike (5 dmg over 3 turns)"
+  },
+  "onion": {
+    "ability": "onion_tears",
+    "description": "Onion Tears (12 AOE damage, costs 10 HP)"
+  },
+  "special_sauce": {
+    "ability": "heal",
+    "description": "Heal 20 HP in battle (3 uses)"
+  },
+  "meat_patty": {
+    "atk": 8,
+    "description": "Hearty strength"
+  }
+}

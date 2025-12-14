@@ -6,6 +6,21 @@
     "firstVisit": "You tumble through darkness and land with a wet SPLAT. The garbage can. Your new reality. But you won't stay here forever.",
     "choices": [
       {
+        "label": "⚔️ Fight a Slime Mold (TEST)",
+        "action": "fight",
+        "enemyId": "slime_mold"
+      },
+      {
+        "label": "⚔️ Fight a Grease Glob (TEST)",
+        "action": "fight",
+        "enemyId": "grease_glob"
+      },
+      {
+        "label": "⚔️ Fight an Angry Ant (TEST)",
+        "action": "fight",
+        "enemyId": "angry_ant"
+      },
+      {
         "label": "→ Venture into Coffee Grounds Cavern",
         "next": "coffee_grounds_cavern"
       }

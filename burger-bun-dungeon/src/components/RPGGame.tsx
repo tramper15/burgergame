@@ -2,10 +2,14 @@ import { useState } from 'react'
 import type { LayoutType } from './layouts'
 import type { RPGState } from '../types/game'
 import { RPGStateManager } from '../rpg/RPGStateManager'
+import { CombatProcessor, type CombatAction } from '../rpg/CombatProcessor'
+import { BattleSceneGenerator } from '../rpg/BattleSceneGenerator'
 import { layouts } from './layouts'
 import rpgScenesData from '../data/rpgScenes.json'
+import rpgEnemiesData from '../data/rpgEnemies.json'
 
 const rpgScenes = rpgScenesData as Record<string, any>
+const rpgEnemies = rpgEnemiesData as Record<string, any>
 
 interface RPGGameProps {
   layout: LayoutType
@@ -13,16 +17,30 @@ interface RPGGameProps {
   onBackToMenu: () => void
 }
 
+type CombatPhase = 'exploration' | 'combat' | 'victory' | 'defeat' | 'fled'
+
 /**
  * RPGGame - Main component for Trash Odyssey (Act 2) RPG mode
  * Separate from BurgerGame to keep concerns separated
  */
 export default function RPGGame({ layout, ingredientsFromAct1, onBackToMenu }: RPGGameProps) {
-  const [rpgState] = useState<RPGState>(() =>
+  const [rpgState, setRpgState] = useState<RPGState>(() =>
     RPGStateManager.createInitialState(ingredientsFromAct1)
   )
 
   const [selectedChoice, setSelectedChoice] = useState<number>(-1)
+  const [combatPhase, setCombatPhase] = useState<CombatPhase>('exploration')
+  const [combatLog, setCombatLog] = useState<CombatAction[]>([])
+  const [lastEnemyName, setLastEnemyName] = useState<string>('')
+  const [victoryData, setVictoryData] = useState<{
+    enemyName: string
+    xpGained: number
+    currencyGained: number
+    itemsLooted: string[]
+    leveledUp: boolean
+    newLevel?: number
+  } | null>(null)
+
   const LayoutComponent = layouts[layout]
 
   // Get current scene from JSON data
@@ -81,6 +99,58 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
     { label: '← Back to Main Menu' }
   ]
 
+  // Start combat with a specific enemy
+  const startCombat = (enemyId: string) => {
+    const enemyData = rpgEnemies[enemyId]
+    if (!enemyData) {
+      console.error(`Enemy ${enemyId} not found`)
+      return
+    }
+
+    const newState = CombatProcessor.startCombat(rpgState, enemyData)
+    setRpgState(newState)
+    setLastEnemyName(enemyData.name)
+    setCombatPhase('combat')
+    setCombatLog([])
+    setSelectedChoice(-1)
+  }
+
+  // Handle combat action
+  const handleCombatAction = (action: 'attack' | 'defend' | 'item' | 'flee') => {
+    const result = CombatProcessor.processTurn(rpgState, action)
+
+    setRpgState(result.newState)
+    setCombatLog(result.actions)
+    setSelectedChoice(-1)
+
+    // Handle combat outcome
+    if (result.outcome === 'victory') {
+      // Capture enemy name before endCombat clears it
+      const enemyName = lastEnemyName || 'Enemy'
+      const oldLevel = rpgState.level
+      const endResult = CombatProcessor.endCombat(result.newState, true)
+      const leveledUp = endResult.newState.level > oldLevel
+
+      setRpgState(endResult.newState)
+      setVictoryData({
+        enemyName,
+        xpGained: endResult.xpGained,
+        currencyGained: endResult.currencyGained,
+        itemsLooted: endResult.itemsLooted,
+        leveledUp,
+        newLevel: endResult.newState.level
+      })
+      setCombatPhase('victory')
+    } else if (result.outcome === 'defeat') {
+      setCombatPhase('defeat')
+    } else if (result.outcome === 'fled') {
+      const endResult = CombatProcessor.endCombat(result.newState, false)
+      setRpgState(endResult.newState)
+      setCombatPhase('fled')
+    }
+  }
+
+  // Handle exploration choices
   const handleChoiceChange = (index: number) => {
     setSelectedChoice(index)
 
@@ -90,6 +160,10 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
     // Handle different choice types
     if (choice.label.includes('Back to Main Menu')) {
       onBackToMenu()
+    } else if (choice.action === 'fight') {
+      // Start combat
+      const enemyId = choice.enemyId || 'slime_mold'
+      startCombat(enemyId)
     } else if (choice.next) {
       // Will implement navigation in Phase 3
       alert(`Navigation to ${choice.next} coming in Phase 3!`)
@@ -103,12 +177,88 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
     // Auto-submit handled in handleChoiceChange for now
   }
 
+  // Determine what to display based on combat phase
+  let displayText = sceneText
+  let displayChoices = availableChoices
+  let onChoiceChange = handleChoiceChange
+
+  if (combatPhase === 'combat') {
+    // In combat - show battle scene
+    displayText = BattleSceneGenerator.generateBattleScene(rpgState, combatLog)
+    displayChoices = [
+      { label: '⚔️ Attack', action: 'attack' },
+      { label: '🛡️ Defend', action: 'defend' },
+      { label: '🎒 Use Item', action: 'item' },
+      { label: '🏃 Flee', action: 'flee' }
+    ]
+    onChoiceChange = (index: number) => {
+      setSelectedChoice(index)
+      const action = ['attack', 'defend', 'item', 'flee'][index] as 'attack' | 'defend' | 'item' | 'flee'
+      handleCombatAction(action)
+    }
+  } else if (combatPhase === 'victory' && victoryData) {
+    // Victory screen
+    displayText = BattleSceneGenerator.generateVictoryScreen(
+      victoryData.enemyName,
+      victoryData.xpGained,
+      victoryData.currencyGained,
+      victoryData.itemsLooted,
+      victoryData.leveledUp,
+      victoryData.newLevel
+    )
+    displayChoices = [
+      { label: '→ Continue', action: 'continue' }
+    ]
+    onChoiceChange = () => {
+      setCombatPhase('exploration')
+      setVictoryData(null)
+      setCombatLog([])
+      setSelectedChoice(-1)
+      setLastEnemyName('')
+    }
+  } else if (combatPhase === 'defeat') {
+    // Defeat screen
+    displayText = BattleSceneGenerator.generateDefeatScreen()
+    displayChoices = [
+      { label: '→ Respawn at Checkpoint', action: 'respawn' },
+      { label: '← Back to Main Menu', action: 'menu' }
+    ]
+    onChoiceChange = (index: number) => {
+      setSelectedChoice(index)
+      if (index === 0) {
+        // Respawn - restore HP to max
+        setRpgState({
+          ...rpgState,
+          hp: rpgState.maxHp,
+          inCombat: false,
+          currentEnemy: undefined
+        })
+        setCombatPhase('exploration')
+        setCombatLog([])
+      } else {
+        onBackToMenu()
+      }
+    }
+  } else if (combatPhase === 'fled') {
+    // Fled screen - use captured enemy name
+    displayText = BattleSceneGenerator.generateFleeScreen(lastEnemyName || 'enemy')
+    displayChoices = [
+      { label: '→ Continue', action: 'continue' }
+    ]
+    onChoiceChange = () => {
+      setCombatPhase('exploration')
+      setCombatLog([])
+      setSelectedChoice(-1)
+      setLastEnemyName('')
+    }
+  }
+
   return (
     <LayoutComponent
-      sceneText={sceneText}
-      availableChoices={availableChoices}
+      sceneText={displayText}
+      availableChoices={displayChoices}
       selectedChoice={selectedChoice}
-      onChoiceChange={handleChoiceChange}
+      onChoiceChange={onChoiceChange}
       onSubmit={handleSubmit}
     />
   )

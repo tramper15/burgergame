@@ -1,4 +1,7 @@
 import type { RPGState, StatBonus } from '../types/game'
+import ingredientPowersData from '../data/ingredientPowers.json'
+
+const ingredientPowers = ingredientPowersData as Record<string, StatBonus & { description: string }>
 
 /**
  * RPGStateManager - Manages RPG state initialization and updates
@@ -55,29 +58,18 @@ export class RPGStateManager {
 
   /**
    * Converts Act 1 ingredients to stat bonuses
-   * Based on design doc ingredient power table
+   * Loads from ingredientPowers.json for easy balancing
+   * Note: questionable_water is excluded (incompatible with Act 2 unlock)
    */
   static convertIngredientsToBonuses(ingredients: string[]): Record<string, StatBonus> {
     const bonuses: Record<string, StatBonus> = {}
 
-    // Ingredient power mappings from design doc
-    const ingredientEffects: Record<string, StatBonus> = {
-      'cheese': { def: 5 },
-      'bacon': { atk: 5 },
-      'lettuce': { spd: 3 },
-      'tomato': { maxHp: 10 },
-      'avocado': { maxHp: 15 }, // Required for unlock
-      'pickle': { ability: 'poison_strike' },
-      'onion': { ability: 'onion_tears' },
-      'special_sauce': { ability: 'heal' },
-      'meat_patty': { atk: 8 },
-      'questionable_water': { atk: 10, maxHp: -5 } // Cursed
-    }
-
     ingredients.forEach(ingredientId => {
-      const effect = ingredientEffects[ingredientId]
-      if (effect) {
-        bonuses[ingredientId] = effect
+      const power = ingredientPowers[ingredientId]
+      if (power) {
+        // Extract only StatBonus fields (exclude description)
+        const { description, ...statBonus } = power
+        bonuses[ingredientId] = statBonus
       }
     })
 
