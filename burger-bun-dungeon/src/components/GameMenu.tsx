@@ -5,9 +5,10 @@ import './GameMenu.css'
 
 interface GameMenuProps {
   showClearButton: boolean
+  onResetGame?: () => void
 }
 
-export const GameMenu = ({ showClearButton }: GameMenuProps) => {
+export const GameMenu = ({ showClearButton, onResetGame }: GameMenuProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showAchievements, setShowAchievements] = useState(false)
   const { progress, clearProgress } = useAchievements()
@@ -15,6 +16,13 @@ export const GameMenu = ({ showClearButton }: GameMenuProps) => {
   const handleClearProgress = () => {
     if (window.confirm('Are you sure you want to clear all achievement progress? This cannot be undone.')) {
       clearProgress()
+      setIsMenuOpen(false)
+    }
+  }
+
+  const handleResetGame = () => {
+    if (window.confirm('Are you sure you want to reset the game? Your current progress will be lost.')) {
+      onResetGame?.()
       setIsMenuOpen(false)
     }
   }
@@ -39,6 +47,13 @@ export const GameMenu = ({ showClearButton }: GameMenuProps) => {
               }}
             >
               🏆 Achievements
+            </button>
+
+            <button
+              className="menu-item"
+              onClick={handleResetGame}
+            >
+              🔄 Reset Game
             </button>
 
             {showClearButton && (

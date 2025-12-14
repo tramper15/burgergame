@@ -16,9 +16,10 @@ const ingredients = ingredientsData as IngredientsData
 interface BurgerGameProps {
   layout: LayoutType
   onSceneChange?: (sceneId: string) => void
+  onResetGame?: (resetFn: () => void) => void
 }
 
-const BurgerGame = ({ layout, onSceneChange }: BurgerGameProps) => {
+const BurgerGame = ({ layout, onSceneChange, onResetGame }: BurgerGameProps) => {
   const { showToast } = useToast()
   const { progress, unlockAchievement } = useAchievements()
   const [gameState, setGameState] = useState<GameState>({
@@ -68,6 +69,15 @@ const BurgerGame = ({ layout, onSceneChange }: BurgerGameProps) => {
       onSceneChange(gameState.currentSceneId)
     }
   }, [gameState.currentSceneId, onSceneChange])
+
+  // Expose reset function to parent via callback
+  useEffect(() => {
+    if (onResetGame) {
+      onResetGame(() => {
+        ChoiceProcessor.processRestart(setGameState, setSelectedChoice)
+      })
+    }
+  }, [onResetGame])
 
   // Check for achievements when ending is reached
   useEffect(() => {

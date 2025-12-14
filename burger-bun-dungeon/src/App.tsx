@@ -10,16 +10,27 @@ import './App.css'
 function App() {
   const [currentLayout, setCurrentLayout] = useState<LayoutType>('layout1')
   const [currentSceneId, setCurrentSceneId] = useState<string>(SCENE_IDS.START)
+  const [resetGameFn, setResetGameFn] = useState<(() => void) | null>(null)
 
   // Show clear button only on first and last screens
   const showClearButton = currentSceneId === SCENE_IDS.START || currentSceneId === SCENE_IDS.ENDING
+
+  const handleResetGame = () => {
+    if (resetGameFn) {
+      resetGameFn()
+    }
+  }
+
+  const handleRegisterResetFn = (fn: () => void) => {
+    setResetGameFn(() => fn)
+  }
 
   return (
     <ToastProvider>
       <AchievementProvider>
         <div className="app">
           <div className={`layout-switcher theme-${currentLayout}`}>
-            <GameMenu showClearButton={showClearButton} />
+            <GameMenu showClearButton={showClearButton} onResetGame={handleResetGame} />
 
             <button
               className={`layout-btn ${currentLayout === 'layout1' ? 'active' : ''}`}
@@ -41,7 +52,7 @@ function App() {
             </button>
           </div>
 
-          <BurgerGame layout={currentLayout} onSceneChange={setCurrentSceneId} />
+          <BurgerGame layout={currentLayout} onSceneChange={setCurrentSceneId} onResetGame={handleRegisterResetFn} />
         </div>
       </AchievementProvider>
     </ToastProvider>
