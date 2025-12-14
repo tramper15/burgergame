@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import BurgerGame from './components/BurgerGame'
 import { GameMenu } from './components/GameMenu'
 import type { LayoutType } from './components/layouts'
@@ -21,9 +21,9 @@ function App() {
     }
   }
 
-  const handleRegisterResetFn = (fn: () => void) => {
+  const handleRegisterResetFn = useCallback((fn: () => void) => {
     setResetGameFn(() => fn)
-  }
+  }, [])
 
   return (
     <ToastProvider>
