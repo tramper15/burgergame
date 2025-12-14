@@ -1,0 +1,223 @@
+{
+  "consumables": {
+    "crumbs": {
+      "id": "crumbs",
+      "name": "Crumbs",
+      "description": "Leftover breadcrumbs. Better than nothing.",
+      "type": "consumable",
+      "effect": {
+        "healHp": 10
+      },
+      "shopPrice": 15,
+      "sellPrice": 7
+    },
+
+    "soda_drop": {
+      "id": "soda_drop",
+      "name": "Soda Drop",
+      "description": "A sugary droplet from a spilled can. Refreshing and sticky.",
+      "type": "consumable",
+      "effect": {
+        "healHp": 25
+      },
+      "shopPrice": 40,
+      "sellPrice": 20
+    },
+
+    "moldy_bread": {
+      "id": "moldy_bread",
+      "name": "Moldy Bread",
+      "description": "Ironically, mold gives life. Use when defeated.",
+      "type": "consumable",
+      "effect": {
+        "revive": true,
+        "healHpPercent": 0.5
+      },
+      "shopPrice": 60,
+      "sellPrice": 30
+    }
+  },
+
+  "weapons": {
+    "toothpick_shiv": {
+      "id": "toothpick_shiv",
+      "name": "Toothpick Shiv",
+      "description": "A simple toothpick. Better than your bare... bun.",
+      "type": "equipment",
+      "slot": "weapon",
+      "stats": {
+        "atk": 0
+      },
+      "shopPrice": 0,
+      "sellPrice": 0,
+      "isStartingEquipment": true
+    },
+
+    "toothpick_spear": {
+      "id": "toothpick_spear",
+      "name": "Toothpick Spear",
+      "description": "Sharpened to a fine point. Now we're talking.",
+      "type": "equipment",
+      "slot": "weapon",
+      "stats": {
+        "atk": 8
+      },
+      "shopPrice": 120,
+      "sellPrice": 60
+    },
+
+    "fork_tine_sword": {
+      "id": "fork_tine_sword",
+      "name": "Fork Tine Sword",
+      "description": "A broken fork prong. To you, it's a legendary blade.",
+      "type": "equipment",
+      "slot": "weapon",
+      "stats": {
+        "atk": 15
+      },
+      "shopPrice": 0,
+      "sellPrice": 100,
+      "isBossDrop": true,
+      "droppedBy": "raccoon_king"
+    }
+  },
+
+  "armor": {
+    "exposed_bun": {
+      "id": "exposed_bun",
+      "name": "Exposed Bun",
+      "description": "No protection. Just you and your soft, vulnerable dough.",
+      "type": "equipment",
+      "slot": "armor",
+      "stats": {
+        "def": 0
+      },
+      "shopPrice": 0,
+      "sellPrice": 0,
+      "isStartingEquipment": true
+    },
+
+    "wrapper_armor": {
+      "id": "wrapper_armor",
+      "name": "Wrapper Armor",
+      "description": "A burger wrapper fashioned into chest armor. Crinkly but effective.",
+      "type": "equipment",
+      "slot": "armor",
+      "stats": {
+        "def": 5
+      },
+      "shopPrice": 100,
+      "sellPrice": 50
+    },
+
+    "aluminum_foil_plate": {
+      "id": "aluminum_foil_plate",
+      "name": "Aluminum Foil Plate",
+      "description": "Reflective and sturdy. You look like a knight.",
+      "type": "equipment",
+      "slot": "armor",
+      "stats": {
+        "def": 12
+      },
+      "shopPrice": 0,
+      "sellPrice": 80,
+      "isBossDrop": true,
+      "droppedBy": "spoiled_milk"
+    }
+  },
+
+  "shields": {
+    "no_shield": {
+      "id": "no_shield",
+      "name": "None",
+      "description": "No shield equipped.",
+      "type": "equipment",
+      "slot": "shield",
+      "stats": {
+        "def": 0
+      },
+      "shopPrice": 0,
+      "sellPrice": 0,
+      "isStartingEquipment": true
+    },
+
+    "foil_shield": {
+      "id": "foil_shield",
+      "name": "Foil Shield",
+      "description": "A scrap of aluminum foil. Blocks some hits.",
+      "type": "equipment",
+      "slot": "shield",
+      "stats": {
+        "def": 3
+      },
+      "shopPrice": 80,
+      "sellPrice": 40
+    },
+
+    "bottle_cap_buckler": {
+      "id": "bottle_cap_buckler",
+      "name": "Bottle Cap Buckler",
+      "description": "The Raccoon King's old shield. Heavy but reliable.",
+      "type": "equipment",
+      "slot": "shield",
+      "stats": {
+        "def": 7
+      },
+      "shopPrice": 0,
+      "sellPrice": 70,
+      "isBossDrop": true,
+      "droppedBy": "raccoon_king"
+    }
+  },
+
+  "accessories": {
+    "raccoon_crown": {
+      "id": "raccoon_crown",
+      "name": "Raccoon Crown",
+      "description": "The Raccoon King's bottle cap crown. A trophy of victory.",
+      "type": "equipment",
+      "slot": "accessory",
+      "stats": {
+        "atk": 5,
+        "def": 5,
+        "spd": 5
+      },
+      "shopPrice": 0,
+      "sellPrice": 200,
+      "isBossDrop": true,
+      "droppedBy": "raccoon_king"
+    }
+  },
+
+  "shop_inventory": {
+    "trash_bag_depths": [
+      {
+        "itemId": "crumbs",
+        "stock": "unlimited"
+      },
+      {
+        "itemId": "soda_drop",
+        "stock": "unlimited"
+      },
+      {
+        "itemId": "moldy_bread",
+        "stock": "unlimited"
+      },
+      {
+        "itemId": "wrapper_armor",
+        "stock": 1,
+        "respawns": true
+      },
+      {
+        "itemId": "toothpick_spear",
+        "stock": 1,
+        "respawns": true
+      },
+      {
+        "itemId": "foil_shield",
+        "stock": 1,
+        "respawns": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,317 @@
+{
+  "slime_mold": {
+    "id": "slime_mold",
+    "name": "Slime Mold",
+    "description": "Glistening and pulsating, it oozes toward you with malicious intent.",
+    "level": 1,
+    "maxHp": 25,
+    "atk": 4,
+    "def": 2,
+    "spd": 3,
+    "xpReward": 35,
+    "currencyDrop": { "min": 5, "max": 10 },
+    "lootTable": [
+      { "itemId": "crumbs", "chance": 0.7 }
+    ],
+    "aiPattern": "random"
+  },
+
+  "grease_glob": {
+    "id": "grease_glob",
+    "name": "Grease Glob",
+    "description": "A congealed mass of cooking oil. It leaves slippery trails as it slides closer.",
+    "level": 2,
+    "maxHp": 30,
+    "atk": 5,
+    "def": 3,
+    "spd": 2,
+    "xpReward": 45,
+    "currencyDrop": { "min": 8, "max": 15 },
+    "lootTable": [
+      { "itemId": "crumbs", "chance": 0.6 },
+      { "itemId": "soda_drop", "chance": 0.2 }
+    ],
+    "aiPattern": "defensive"
+  },
+
+  "fuzzy_growth": {
+    "id": "fuzzy_growth",
+    "name": "Fuzzy Growth",
+    "description": "Blue-green fuzz covering a forgotten sandwich. Its spores make you queasy.",
+    "level": 2,
+    "maxHp": 20,
+    "atk": 6,
+    "def": 2,
+    "spd": 4,
+    "xpReward": 50,
+    "currencyDrop": { "min": 10, "max": 18 },
+    "lootTable": [
+      { "itemId": "moldy_bread", "chance": 0.3 }
+    ],
+    "aiPattern": "aggressive",
+    "special": {
+      "type": "poison",
+      "damage": 2,
+      "duration": 2
+    }
+  },
+
+  "crumb_swarm": {
+    "id": "crumb_swarm",
+    "name": "Crumb Swarm",
+    "description": "Dozens of animated breadcrumbs skitter like insects. Strength in numbers.",
+    "level": 3,
+    "maxHp": 15,
+    "atk": 3,
+    "def": 1,
+    "spd": 6,
+    "xpReward": 40,
+    "currencyDrop": { "min": 15, "max": 25 },
+    "lootTable": [
+      { "itemId": "crumbs", "chance": 1.0 }
+    ],
+    "aiPattern": "aggressive"
+  },
+
+  "angry_ant": {
+    "id": "angry_ant",
+    "name": "Angry Ant",
+    "description": "A soldier ant, twice your size. Its mandibles click menacingly.",
+    "level": 3,
+    "maxHp": 35,
+    "atk": 7,
+    "def": 3,
+    "spd": 7,
+    "xpReward": 60,
+    "currencyDrop": { "min": 12, "max": 20 },
+    "lootTable": [
+      { "itemId": "crumbs", "chance": 0.5 }
+    ],
+    "aiPattern": "aggressive"
+  },
+
+  "roach_raider": {
+    "id": "roach_raider",
+    "name": "Roach Raider",
+    "description": "A battle-scarred cockroach. Not friendly like the merchant.",
+    "level": 4,
+    "maxHp": 40,
+    "atk": 6,
+    "def": 4,
+    "spd": 5,
+    "xpReward": 70,
+    "currencyDrop": { "min": 20, "max": 40 },
+    "lootTable": [],
+    "aiPattern": "random",
+    "special": {
+      "type": "steal_item",
+      "chance": 0.2
+    }
+  },
+
+  "fly_swarm": {
+    "id": "fly_swarm",
+    "name": "Fly Swarm",
+    "description": "Buzzing, erratic, infuriating. They land on you just to be annoying.",
+    "level": 4,
+    "maxHp": 25,
+    "atk": 5,
+    "def": 2,
+    "spd": 9,
+    "xpReward": 65,
+    "currencyDrop": { "min": 10, "max": 18 },
+    "lootTable": [
+      { "itemId": "soda_drop", "chance": 0.4 }
+    ],
+    "aiPattern": "random",
+    "special": {
+      "type": "evasion",
+      "missChance": 0.2
+    }
+  },
+
+  "beetle_brawler": {
+    "id": "beetle_brawler",
+    "name": "Beetle Brawler",
+    "description": "A rhinoceros beetle. Its horn gleams. Its shell looks impenetrable.",
+    "level": 5,
+    "maxHp": 55,
+    "atk": 8,
+    "def": 7,
+    "spd": 3,
+    "xpReward": 85,
+    "currencyDrop": { "min": 18, "max": 30 },
+    "lootTable": [
+      { "itemId": "foil_shield", "chance": 0.15 }
+    ],
+    "aiPattern": "defensive"
+  },
+
+  "scrappy_sparrow": {
+    "id": "scrappy_sparrow",
+    "name": "Scrappy Sparrow",
+    "description": "A small bird with a sharp beak. It dive-bombs from above.",
+    "level": 5,
+    "maxHp": 45,
+    "atk": 9,
+    "def": 3,
+    "spd": 8,
+    "xpReward": 90,
+    "currencyDrop": { "min": 15, "max": 25 },
+    "lootTable": [
+      { "itemId": "soda_drop", "chance": 0.5 }
+    ],
+    "aiPattern": "aggressive"
+  },
+
+  "stray_cat": {
+    "id": "stray_cat",
+    "name": "Stray Cat",
+    "description": "Feral and hungry. You're burger-sized. This is not good.",
+    "level": 6,
+    "maxHp": 60,
+    "atk": 12,
+    "def": 5,
+    "spd": 7,
+    "xpReward": 110,
+    "currencyDrop": { "min": 25, "max": 45 },
+    "lootTable": [
+      { "itemId": "wrapper_armor", "chance": 0.2 }
+    ],
+    "aiPattern": "aggressive",
+    "special": {
+      "type": "pounce",
+      "chargeTurns": 1,
+      "damageMultiplier": 2
+    }
+  },
+
+  "garden_snake": {
+    "id": "garden_snake",
+    "name": "Garden Snake",
+    "description": "It slithers through the grass. You hope it's not venomous.",
+    "level": 7,
+    "maxHp": 70,
+    "atk": 10,
+    "def": 6,
+    "spd": 6,
+    "xpReward": 130,
+    "currencyDrop": { "min": 30, "max": 50 },
+    "lootTable": [
+      { "itemId": "toothpick_spear", "chance": 0.1 }
+    ],
+    "aiPattern": "defensive",
+    "special": {
+      "type": "constrict",
+      "damage": 5,
+      "duration": 3
+    }
+  },
+
+  "aggressive_squirrel": {
+    "id": "aggressive_squirrel",
+    "name": "Aggressive Squirrel",
+    "description": "Territorial and twitchy. It chatters angrily, gathering acorns.",
+    "level": 7,
+    "maxHp": 65,
+    "atk": 11,
+    "def": 5,
+    "spd": 8,
+    "xpReward": 125,
+    "currencyDrop": { "min": 40, "max": 80 },
+    "lootTable": [],
+    "aiPattern": "random",
+    "special": {
+      "type": "nut_throw",
+      "defenseIgnore": 0.5
+    }
+  },
+
+  "spoiled_milk": {
+    "id": "spoiled_milk",
+    "name": "Spoiled Milk",
+    "description": "A curdled nightmare. The smell alone could kill.",
+    "level": 3,
+    "maxHp": 100,
+    "atk": 8,
+    "def": 4,
+    "spd": 3,
+    "xpReward": 150,
+    "currencyDrop": { "min": 50, "max": 100 },
+    "lootTable": [
+      { "itemId": "aluminum_foil_plate", "chance": 1.0 }
+    ],
+    "aiPattern": "aggressive",
+    "isBoss": true,
+    "special": {
+      "type": "splash_damage",
+      "damage": 10,
+      "cannotDefend": true
+    }
+  },
+
+  "raccoon_king": {
+    "id": "raccoon_king",
+    "name": "Raccoon King",
+    "description": "The ruler of the backyard. Wearing a bottle cap as a crown.",
+    "level": 7,
+    "maxHp": 200,
+    "atk": 14,
+    "def": 8,
+    "spd": 6,
+    "xpReward": 300,
+    "currencyDrop": { "min": 150, "max": 250 },
+    "lootTable": [
+      { "itemId": "raccoon_crown", "chance": 1.0 },
+      { "itemId": "fork_tine_sword", "chance": 1.0 },
+      { "itemId": "bottle_cap_buckler", "chance": 1.0 }
+    ],
+    "aiPattern": "aggressive",
+    "isBoss": true,
+    "special": {
+      "type": "summon_minions",
+      "summonId": "crumb_swarm",
+      "summonCount": 2,
+      "summonInterval": 3
+    }
+  },
+
+  "hungry_dog": {
+    "id": "hungry_dog",
+    "name": "The Hungry Dog",
+    "description": "A massive golden retriever. To it, you're a snack. To you, it's apocalypse.",
+    "level": 10,
+    "maxHp": 350,
+    "atk": 18,
+    "def": 10,
+    "spd": 7,
+    "xpReward": 500,
+    "currencyDrop": { "min": 500, "max": 1000 },
+    "lootTable": [],
+    "aiPattern": "aggressive",
+    "isBoss": true,
+    "isSecretBoss": true,
+    "phases": [
+      {
+        "healthThreshold": 1.0,
+        "aiPattern": "aggressive"
+      },
+      {
+        "healthThreshold": 0.5,
+        "aiPattern": "aggressive",
+        "special": {
+          "type": "bite",
+          "damageMultiplier": 2
+        }
+      },
+      {
+        "healthThreshold": 0.25,
+        "aiPattern": "aggressive",
+        "special": {
+          "type": "frenzy",
+          "attacksPerTurn": 2
+        }
+      }
+    ]
+  }
+}

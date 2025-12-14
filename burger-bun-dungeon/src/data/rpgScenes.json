@@ -1,0 +1,259 @@
+{
+  "garbage_can_start": {
+    "name": "Garbage Can",
+    "description": "The smell of decay surrounds you. Coffee grounds, banana peels, and forgotten food create a treacherous landscape. You've landed in the trash, but this is just the beginning.",
+    "type": "safe",
+    "firstVisit": "You tumble through darkness and land with a wet SPLAT. The garbage can. Your new reality. But you won't stay here forever.",
+    "choices": [
+      {
+        "label": "→ Venture into Coffee Grounds Cavern",
+        "next": "coffee_grounds_cavern"
+      }
+    ]
+  },
+
+  "coffee_grounds_cavern": {
+    "name": "Coffee Grounds Cavern",
+    "description": "Dark, damp tunnels carved through compressed coffee grounds. The bitter smell is overwhelming. Movement in the shadows catches your eye.",
+    "type": "combat",
+    "firstVisit": "You push through clumps of wet coffee grounds. This is your first real test. Something oozes toward you...",
+    "encounterTable": [
+      { "enemyId": "slime_mold", "weight": 70 },
+      { "enemyId": "grease_glob", "weight": 30 }
+    ],
+    "choices": [
+      {
+        "label": "→ Continue to Napkin Plains",
+        "next": "napkin_plains"
+      },
+      {
+        "label": "→ Risk the Banana Peel Bridge (harder)",
+        "next": "banana_peel_bridge"
+      },
+      {
+        "label": "← Return to Garbage Can",
+        "next": "garbage_can_start"
+      }
+    ]
+  },
+
+  "napkin_plains": {
+    "name": "Napkin Plains",
+    "description": "Wide open spaces covered in crumpled napkins. Safer than most routes, but more enemies patrol here.",
+    "type": "combat",
+    "firstVisit": "Napkins flutter in an unseen breeze. The safer path... but 'safe' is relative in the trash.",
+    "encounterTable": [
+      { "enemyId": "slime_mold", "weight": 40 },
+      { "enemyId": "grease_glob", "weight": 40 },
+      { "enemyId": "crumb_swarm", "weight": 20 }
+    ],
+    "choices": [
+      {
+        "label": "→ Advance to Yogurt Container Ruins",
+        "next": "yogurt_container_ruins"
+      },
+      {
+        "label": "← Back to Coffee Grounds Cavern",
+        "next": "coffee_grounds_cavern"
+      }
+    ]
+  },
+
+  "banana_peel_bridge": {
+    "name": "Banana Peel Bridge",
+    "description": "A treacherous bridge made of slippery banana peels. One wrong step could be fatal. Stronger enemies lurk here.",
+    "type": "combat",
+    "firstVisit": "The bridge stretches before you, slick and yellow. This is the hard way. Are you ready?",
+    "encounterTable": [
+      { "enemyId": "fuzzy_growth", "weight": 50 },
+      { "enemyId": "crumb_swarm", "weight": 50 }
+    ],
+    "choices": [
+      {
+        "label": "→ Cross to Yogurt Container Ruins",
+        "next": "yogurt_container_ruins"
+      },
+      {
+        "label": "← Retreat to Coffee Grounds Cavern",
+        "next": "coffee_grounds_cavern"
+      }
+    ]
+  },
+
+  "yogurt_container_ruins": {
+    "name": "Yogurt Container Ruins",
+    "description": "The remains of a yogurt container, now a fortress of hardened dairy. Something foul waits inside.",
+    "type": "boss",
+    "firstVisit": "You've reached the ruins. The smell hits you first. Sour. Rotten. Deadly. The mini-boss awaits.",
+    "boss": "spoiled_milk",
+    "choices": [
+      {
+        "label": "→ Enter the ruins (BOSS FIGHT)",
+        "next": "boss_spoiled_milk"
+      },
+      {
+        "label": "← Return to prepare",
+        "next": "napkin_plains"
+      }
+    ]
+  },
+
+  "boss_spoiled_milk": {
+    "name": "Yogurt Container Ruins - Boss Arena",
+    "description": "The curdled nightmare emerges. Spoiled Milk. Your first true test.",
+    "type": "boss_battle",
+    "boss": "spoiled_milk",
+    "onVictory": "trash_bag_depths",
+    "onDefeat": "napkin_plains"
+  },
+
+  "trash_bag_depths": {
+    "name": "Trash Bag Depths",
+    "description": "A massive black trash bag. Inside, a pocket of relative safety. And... a merchant?",
+    "type": "checkpoint",
+    "firstVisit": "You tear through the plastic and find an unlikely sanctuary. A cockroach in a tiny hat waves at you. 'Welcome, welcome! You looking good for bun!'",
+    "hasShop": true,
+    "choices": [
+      {
+        "label": "→ Talk to Cockroach Merchant",
+        "next": "cockroach_shop"
+      },
+      {
+        "label": "→ Rest and heal (saves game)",
+        "action": "rest"
+      },
+      {
+        "label": "→ Continue to Backyard Battlefield",
+        "next": "backyard_battlefield"
+      }
+    ]
+  },
+
+  "cockroach_shop": {
+    "name": "Cockroach Merchant's Shop",
+    "description": "The merchant spreads out a collection of salvaged goods on a bottle cap. His inventory is surprisingly impressive.",
+    "type": "shop",
+    "choices": [
+      {
+        "label": "→ Browse Shop",
+        "action": "open_shop"
+      },
+      {
+        "label": "← Back to Trash Bag Depths",
+        "next": "trash_bag_depths"
+      }
+    ]
+  },
+
+  "backyard_battlefield": {
+    "name": "Backyard Battlefield",
+    "description": "You've emerged into the open air. Grass towers like trees. The sky is vast. And hungry animals patrol.",
+    "type": "combat",
+    "firstVisit": "Sunlight! You've reached the backyard. But celebration is premature. Predators hunt here.",
+    "encounterTable": [
+      { "enemyId": "scrappy_sparrow", "weight": 30 },
+      { "enemyId": "stray_cat", "weight": 20 },
+      { "enemyId": "aggressive_squirrel", "weight": 30 },
+      { "enemyId": "garden_snake", "weight": 20 }
+    ],
+    "choices": [
+      {
+        "label": "→ Advance to Garden Gauntlet",
+        "next": "garden_gauntlet"
+      },
+      {
+        "label": "← Return to Trash Bag Depths",
+        "next": "trash_bag_depths"
+      }
+    ]
+  },
+
+  "garden_gauntlet": {
+    "name": "Garden Gauntlet",
+    "description": "The garden. The final natural barrier before the shed. And the domain of the Raccoon King.",
+    "type": "boss",
+    "firstVisit": "A small figure sits on a throne of trash. A bottle cap crown gleams. The Raccoon King has been expecting you.",
+    "boss": "raccoon_king",
+    "choices": [
+      {
+        "label": "→ Challenge the Raccoon King (BOSS FIGHT)",
+        "next": "boss_raccoon_king"
+      },
+      {
+        "label": "← Prepare for battle",
+        "next": "backyard_battlefield"
+      }
+    ]
+  },
+
+  "boss_raccoon_king": {
+    "name": "Garden Gauntlet - Throne of Trash",
+    "description": "The Raccoon King rises. His minions emerge. This will not be easy.",
+    "type": "boss_battle",
+    "boss": "raccoon_king",
+    "onVictory": "shed_entrance",
+    "onDefeat": "backyard_battlefield"
+  },
+
+  "shed_entrance": {
+    "name": "Shed Entrance",
+    "description": "The shed looms before you. Inside, the lunchbox awaits. Your journey's end is near.",
+    "type": "combat",
+    "firstVisit": "You've made it. The shed. Just a little further. But the final stretch is never easy.",
+    "encounterTable": [
+      { "enemyId": "beetle_brawler", "weight": 40 },
+      { "enemyId": "roach_raider", "weight": 40 },
+      { "enemyId": "fly_swarm", "weight": 20 }
+    ],
+    "specialEncounter": {
+      "condition": "has_all_ingredients",
+      "enemyId": "hungry_dog",
+      "description": "A shadow blocks the doorway. Massive. Golden. The Hungry Dog. The secret final boss."
+    },
+    "choices": [
+      {
+        "label": "⚔️ Face the Hungry Dog (Secret Boss)",
+        "next": "boss_hungry_dog",
+        "condition": "has_all_ingredients"
+      },
+      {
+        "label": "→ Enter the Lunchbox Sanctuary",
+        "next": "lunchbox_sanctuary"
+      },
+      {
+        "label": "← Retreat to Garden",
+        "next": "garden_gauntlet"
+      }
+    ]
+  },
+
+  "boss_hungry_dog": {
+    "name": "Shed Entrance - The Ultimate Challenge",
+    "description": "The dog growls. To it, you're a snack. To you, it's the apocalypse. The secret boss.",
+    "type": "boss_battle",
+    "boss": "hungry_dog",
+    "onVictory": "secret_ending",
+    "onDefeat": "game_over"
+  },
+
+  "lunchbox_sanctuary": {
+    "name": "Lunchbox Sanctuary",
+    "description": "You crawl over the lip of the lunchbox. Inside: peace. Safety. Home. You made it.",
+    "type": "ending",
+    "endingType": "victory"
+  },
+
+  "secret_ending": {
+    "name": "Lunchbox Sanctuary - Legendary Victory",
+    "description": "You defeated the impossible. The dog. The legend. You are the Legendary Bun.",
+    "type": "ending",
+    "endingType": "secret_victory"
+  },
+
+  "game_over": {
+    "name": "Defeat",
+    "description": "You fall. The darkness takes you. Some stories don't have happy endings.",
+    "type": "ending",
+    "endingType": "defeat"
+  }
+}

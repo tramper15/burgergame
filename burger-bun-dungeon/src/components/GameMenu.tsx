@@ -6,9 +6,11 @@ import './GameMenu.css'
 interface GameMenuProps {
   showClearButton: boolean
   onResetGame?: () => void
+  onStartTrashOdyssey?: () => void
+  trashOdysseyUnlocked?: boolean
 }
 
-export const GameMenu = ({ showClearButton, onResetGame }: GameMenuProps) => {
+export const GameMenu = ({ showClearButton, onResetGame, onStartTrashOdyssey, trashOdysseyUnlocked }: GameMenuProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showAchievements, setShowAchievements] = useState(false)
   const { progress, clearProgress } = useAchievements()
@@ -39,6 +41,18 @@ export const GameMenu = ({ showClearButton, onResetGame }: GameMenuProps) => {
 
         {isMenuOpen && (
           <div className="menu-dropdown">
+            {trashOdysseyUnlocked && onStartTrashOdyssey && (
+              <button
+                className="menu-item special"
+                onClick={() => {
+                  onStartTrashOdyssey()
+                  setIsMenuOpen(false)
+                }}
+              >
+                ⚔️ Start Trash Odyssey
+              </button>
+            )}
+
             <button
               className="menu-item"
               onClick={() => {

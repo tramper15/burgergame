@@ -5,7 +5,8 @@ const STORAGE_KEY = 'burger_bun_achievements'
 
 const DEFAULT_PROGRESS: AchievementProgress = {
   unlockedAchievements: [],
-  unlockedAt: {}
+  unlockedAt: {},
+  trashOdysseyUnlocked: false
 }
 
 export function useAchievementStorage() {
@@ -38,12 +39,16 @@ export function useAchievementStorage() {
         return prev
       }
 
+      // Check if this is the Avocado Savior achievement - unlocks Trash Odyssey
+      const unlockTrashOdyssey = achievementId === 'ending_good_silent'
+
       return {
         unlockedAchievements: [...prev.unlockedAchievements, achievementId],
         unlockedAt: {
           ...prev.unlockedAt,
           [achievementId]: Date.now()
-        }
+        },
+        trashOdysseyUnlocked: prev.trashOdysseyUnlocked || unlockTrashOdyssey
       }
     })
   }
