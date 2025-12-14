@@ -1,0 +1,58 @@
+{
+  "ending_default": {
+    "title": "Something Special",
+    "description": "You've become more than just a bun. Maybe.",
+    "criteria": {
+      "ending": "default"
+    }
+  },
+  "ending_good_silent": {
+    "title": "Avocado Savior",
+    "description": "Sometimes being extra really does pay off.",
+    "criteria": {
+      "ending": "good_silent"
+    }
+  },
+  "ending_bad_silent": {
+    "title": "Silent But Deadly",
+    "description": "Turns out lingering too long has consequences.",
+    "criteria": {
+      "ending": "bad_silent"
+    }
+  },
+  "ending_not_real_burger": {
+    "title": "Imposter Syndrome",
+    "description": "You tried to pass as something you're not.",
+    "criteria": {
+      "ending": "not_real_burger"
+    }
+  },
+  "ending_empty": {
+    "title": "Existential Crisis",
+    "description": "You remained pure. Empty, but pure.",
+    "criteria": {
+      "ending": "empty"
+    }
+  },
+  "ending_dysentery": {
+    "title": "Oregon Trail Veteran",
+    "description": "You have died of dysentery. Classic.",
+    "criteria": {
+      "ending": "dysentery"
+    }
+  },
+  "burger_blt": {
+    "title": "BLT Club Member",
+    "description": "Who needs meat when you've got this crispy trio?",
+    "criteria": {
+      "exactIngredients": ["bacon", "lettuce", "tomato"]
+    }
+  },
+  "burger_cheeseburger": {
+    "title": "The Classic",
+    "description": "Meat and cheese. Simple. Perfect. Timeless.",
+    "criteria": {
+      "exactIngredients": ["meat_patty", "cheese"]
+    }
+  }
+}

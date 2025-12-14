@@ -106,22 +106,31 @@ export class SceneGenerator {
   static generateEndingScene(
     gameState: GameState,
     ingredients: IngredientsData
-  ): Scene {
+  ): { scene: Scene; endingType: string } {
     // Check for empty burger first
     if (gameState.bunIngredients.length === 0) {
-      return EndingFactory.generateEmptyBurgerEnding(gameState, ingredients)
+      return {
+        scene: EndingFactory.generateEmptyBurgerEnding(gameState, ingredients),
+        endingType: 'empty'
+      }
     }
 
     // Check for dysentery (after empty check)
     const hasQuestionableWater = gameState.bunIngredients.includes('questionable_water')
     if (hasQuestionableWater) {
-      return EndingFactory.generateDysenteryEnding(gameState, ingredients)
+      return {
+        scene: EndingFactory.generateDysenteryEnding(gameState, ingredients),
+        endingType: 'dysentery'
+      }
     }
 
     // Check for no meat patty
     const hasMeatPatty = gameState.bunIngredients.includes('meat_patty')
     if (!hasMeatPatty) {
-      return EndingFactory.generateNotARealBurgerEnding(gameState, ingredients)
+      return {
+        scene: EndingFactory.generateNotARealBurgerEnding(gameState, ingredients),
+        endingType: 'not_real_burger'
+      }
     }
 
     const lingeredInAllSilences =
@@ -130,11 +139,22 @@ export class SceneGenerator {
 
     // Route to appropriate ending based on game state
     if (lingeredInAllSilences) {
-      return hasAvocado
-        ? EndingFactory.generateGoodSilentEnding(gameState, ingredients)
-        : EndingFactory.generateBadSilentEnding(gameState, ingredients)
+      if (hasAvocado) {
+        return {
+          scene: EndingFactory.generateGoodSilentEnding(gameState, ingredients),
+          endingType: 'good_silent'
+        }
+      } else {
+        return {
+          scene: EndingFactory.generateBadSilentEnding(gameState, ingredients),
+          endingType: 'bad_silent'
+        }
+      }
     }
 
-    return EndingFactory.generateDefaultEnding(gameState, ingredients)
+    return {
+      scene: EndingFactory.generateDefaultEnding(gameState, ingredients),
+      endingType: 'default'
+    }
   }
 }

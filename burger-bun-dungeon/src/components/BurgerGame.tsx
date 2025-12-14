@@ -1,22 +1,26 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import scenesData from '../data/scenes.json'
 import ingredientsData from '../data/ingredients.json'
-import type { ScenesData, IngredientsData, Scene, Choice, GameState } from '../types/game'
+import type { ScenesData, IngredientsData, Choice, GameState } from '../types/game'
 import { layouts, type LayoutType } from './layouts'
 import { SceneGenerator } from '../services/SceneGenerator'
 import { ChoiceProcessor } from '../services/ChoiceProcessor'
+import { AchievementService } from '../services/AchievementService'
 import { SCENE_IDS, NO_CHOICE_SELECTED } from '../constants/gameConstants'
 import { useToast } from './ToastProvider'
+import { useAchievements } from './AchievementProvider'
 
 const scenes = scenesData as ScenesData
 const ingredients = ingredientsData as IngredientsData
 
 interface BurgerGameProps {
   layout: LayoutType
+  onSceneChange?: (sceneId: string) => void
 }
 
-const BurgerGame = ({ layout }: BurgerGameProps) => {
+const BurgerGame = ({ layout, onSceneChange }: BurgerGameProps) => {
   const { showToast } = useToast()
+  const { progress, unlockAchievement } = useAchievements()
   const [gameState, setGameState] = useState<GameState>({
     currentSceneId: SCENE_IDS.START,
     bunIngredients: [],
@@ -24,29 +28,73 @@ const BurgerGame = ({ layout }: BurgerGameProps) => {
     seenSilenceMessages: []
   })
   const [selectedChoice, setSelectedChoice] = useState<number>(NO_CHOICE_SELECTED)
+  const [currentEndingType, setCurrentEndingType] = useState<string | null>(null)
+  const achievementsChecked = useRef(false)
 
-  // Get current scene
-  const getCurrentScene = (): Scene => {
+  // Get current scene - use useMemo to avoid recalculating on every render
+  const currentSceneData = useMemo(() => {
     // Check if we need to generate a reflection scene
     if (gameState.currentSceneId === SCENE_IDS.REFLECT) {
-      return SceneGenerator.generateReflectionScene(gameState, ingredients)
+      return { scene: SceneGenerator.generateReflectionScene(gameState, ingredients), endingType: null }
     }
 
     // Check if we need to generate a silence scene
     if (gameState.currentSceneId === SCENE_IDS.LINGER_SILENCE) {
-      return SceneGenerator.generateSilenceScene(gameState, ingredients)
+      return { scene: SceneGenerator.generateSilenceScene(gameState, ingredients), endingType: null }
     }
 
     // Check if we need to generate an ending scene
     if (gameState.currentSceneId === SCENE_IDS.ENDING) {
-      return SceneGenerator.generateEndingScene(gameState, ingredients)
+      const { scene, endingType } = SceneGenerator.generateEndingScene(gameState, ingredients)
+      return { scene, endingType }
     }
 
     // Return static scene from JSON
-    return scenes[gameState.currentSceneId]
-  }
+    return { scene: scenes[gameState.currentSceneId], endingType: null }
+  }, [gameState.currentSceneId, gameState.bunIngredients, gameState.seenSilenceMessages])
 
-  const currentScene = getCurrentScene()
+  const currentScene = currentSceneData.scene
+
+  // Update ending type when it changes
+  useEffect(() => {
+    if (currentSceneData.endingType) {
+      setCurrentEndingType(currentSceneData.endingType)
+    }
+  }, [currentSceneData.endingType])
+
+  // Notify parent component of scene changes
+  useEffect(() => {
+    if (onSceneChange) {
+      onSceneChange(gameState.currentSceneId)
+    }
+  }, [gameState.currentSceneId, onSceneChange])
+
+  // Check for achievements when ending is reached
+  useEffect(() => {
+    if (gameState.currentSceneId === SCENE_IDS.ENDING && currentEndingType && !achievementsChecked.current) {
+      achievementsChecked.current = true
+
+      const newlyUnlocked = AchievementService.checkAchievements(gameState, currentEndingType, progress)
+
+      // Show toasts for newly unlocked achievements
+      newlyUnlocked.forEach((achievementId, index) => {
+        const achievement = AchievementService.getAchievement(achievementId)
+        if (achievement) {
+          // Delay each toast slightly so they show sequentially
+          setTimeout(() => {
+            showToast(`Achievement Unlocked: ${achievement.title}`)
+            unlockAchievement(achievementId)
+          }, index * 500) // 500ms between each toast
+        }
+      })
+    }
+
+    // Reset flag when leaving ending screen
+    if (gameState.currentSceneId !== SCENE_IDS.ENDING) {
+      achievementsChecked.current = false
+      setCurrentEndingType(null)
+    }
+  }, [gameState.currentSceneId, currentEndingType, gameState, progress, unlockAchievement, showToast])
 
   // Filter out choices for ingredients already picked
   const getAvailableChoices = (): Choice[] => {

@@ -33,3 +33,19 @@ export interface GameState {
   visitedScenes: string[]
   seenSilenceMessages: number[]
 }
+
+export interface Achievement {
+  title: string
+  description: string
+  criteria: {
+    ending?: string
+    exactIngredients?: string[]
+  }
+}
+
+export type AchievementsData = Record<string, Achievement>
+
+export interface AchievementProgress {
+  unlockedAchievements: string[]
+  unlockedAt: Record<string, number>
+}
