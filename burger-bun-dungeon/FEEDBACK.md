@@ -50,3 +50,12 @@
 **Status:** Included
 
 **Implementation:** Added bathroom off hallway with questionable water ingredient. If player takes the water and completes the game, they get a dysentery death ending with Oregon Trail reference: "You have died of dysentery. You should have caulked the wagon and floated it across." Questionable water has -5 points and negative synergy with all other ingredients.
+
+---
+
+### From Sean
+**Feedback:** "might want to add a bit more to the minimal and center it a bit more like the others as it is a bit jarring from the other two (Sean) probably moving the header out into maybe a seperate box would make it more cohesive the box on that one is much higher than the other and the color difference at least for me was a bit of a shock from the other two"
+
+**Status:** Included
+
+**Implementation:** Separated the Modern Minimal layout header into its own box with centered title, matching the pattern of Classic Diner and Playful Cartoon layouts. Reduced box height and created more visual cohesion between themes.

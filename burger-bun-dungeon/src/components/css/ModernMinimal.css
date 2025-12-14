@@ -17,23 +17,34 @@
 .layout2 .minimalist-wrapper {
   max-width: 900px;
   width: 100%;
+}
+
+.layout2 .minimal-header {
   background: white;
   border-radius: 0;
-  padding: 2rem 3rem;
+  padding: 1.5rem 3rem;
   margin-bottom: 2rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   border-left: 8px solid #d4a574;
+  text-align: center;
 }
 
 .layout2 .minimal-title {
   font-size: 2rem;
   font-weight: 300;
   color: #3e2723;
-  margin: 0 0 2rem 0;
-  text-align: left;
+  margin: 0;
+  text-align: center;
   letter-spacing: -0.5px;
-  border-bottom: 1px solid #e0e0e0;
-  padding-bottom: 1rem;
+}
+
+.layout2 .minimal-content {
+  background: white;
+  border-radius: 0;
+  padding: 2rem 3rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-left: 8px solid #d4a574;
 }
 
 .layout2 .minimal-story {
@@ -51,8 +62,15 @@
 
 .layout2 .minimal-choices {
   display: flex;
-  gap: 1rem;
-  align-items: stretch;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.layout2 .minimal-label {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #3e2723;
+  letter-spacing: 0.5px;
 }
 
 .layout2 .minimal-select {
