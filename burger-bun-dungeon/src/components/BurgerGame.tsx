@@ -104,7 +104,7 @@ const BurgerGame = ({ layout, onSceneChange, onResetGame }: BurgerGameProps) => 
       achievementsChecked.current = false
       setCurrentEndingType(null)
     }
-  }, [gameState.currentSceneId, currentEndingType, gameState, progress, unlockAchievement, showToast])
+  }, [gameState.currentSceneId, currentEndingType, unlockAchievement, showToast])
 
   // Filter out choices for ingredients already picked
   const getAvailableChoices = (): Choice[] => {
