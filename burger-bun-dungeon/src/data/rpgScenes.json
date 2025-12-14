@@ -230,9 +230,9 @@
     "type": "combat",
     "firstVisit": "You've made it. The shed. Just a little further. But the final stretch is never easy.",
     "encounterTable": [
-      { "enemyId": "beetle_brawler", "weight": 40 },
-      { "enemyId": "roach_raider", "weight": 40 },
-      { "enemyId": "fly_swarm", "weight": 20 }
+      { "enemyId": "sentient_wrench", "weight": 30 },
+      { "enemyId": "feral_rat", "weight": 35 },
+      { "enemyId": "trash_golem", "weight": 35 }
     ],
     "specialEncounter": {
       "condition": "has_all_ingredients",

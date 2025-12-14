@@ -227,6 +227,75 @@
     }
   },
 
+  "sentient_wrench": {
+    "id": "sentient_wrench",
+    "name": "Sentient Wrench",
+    "description": "A wrench. Moving on its own. Clanking toward you with murderous intent. This shouldn't be possible. But here we are.",
+    "level": 8,
+    "maxHp": 80,
+    "atk": 13,
+    "def": 7,
+    "spd": 9,
+    "xpReward": 150,
+    "currencyDrop": { "min": 50, "max": 90 },
+    "lootTable": [
+      { "itemId": "moldy_bread", "chance": 0.4 },
+      { "itemId": "soda_drop", "chance": 0.6 }
+    ],
+    "aiPattern": "aggressive",
+    "special": {
+      "type": "wrench_throw",
+      "damageMultiplier": 1.5,
+      "chance": 0.3
+    }
+  },
+
+  "feral_rat": {
+    "id": "feral_rat",
+    "name": "Feral Rat",
+    "description": "Disease-ridden and desperate. Its teeth are yellow. Its eyes are wild. It wants what you have.",
+    "level": 8,
+    "maxHp": 85,
+    "atk": 14,
+    "def": 6,
+    "spd": 10,
+    "xpReward": 160,
+    "currencyDrop": { "min": 45, "max": 85 },
+    "lootTable": [
+      { "itemId": "crumbs", "chance": 0.3 }
+    ],
+    "aiPattern": "aggressive",
+    "special": {
+      "type": "rabid_bite",
+      "damageMultiplier": 1.5,
+      "chance": 0.3
+    }
+  },
+
+  "trash_golem": {
+    "id": "trash_golem",
+    "name": "Trash Golem",
+    "description": "A towering mass of compacted garbage, animated by rot and rage. The shed's final guardian.",
+    "level": 9,
+    "maxHp": 95,
+    "atk": 15,
+    "def": 9,
+    "spd": 4,
+    "xpReward": 180,
+    "currencyDrop": { "min": 60, "max": 100 },
+    "lootTable": [
+      { "itemId": "wrapper_armor", "chance": 0.15 },
+      { "itemId": "toothpick_spear", "chance": 0.15 },
+      { "itemId": "moldy_bread", "chance": 0.5 }
+    ],
+    "aiPattern": "defensive",
+    "special": {
+      "type": "crushing_blow",
+      "damageMultiplier": 2,
+      "chance": 0.25
+    }
+  },
+
   "spoiled_milk": {
     "id": "spoiled_milk",
     "name": "Spoiled Milk",

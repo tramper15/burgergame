@@ -59,11 +59,11 @@
 - [x] F6.3: Add buy/sell functionality
 - [x] F6.4: Create shop inventory and pricing
 
-### **Phase 7: Enemy Roster**
-- [ ] F7.1: Write 10+ enemy types with descriptions
-- [ ] F7.2: Balance enemy stats (HP/ATK/DEF/SPD)
-- [ ] F7.3: Implement enemy AI patterns (aggressive/defensive/random)
-- [ ] F7.4: Create enemy loot tables
+### **Phase 7: Enemy Roster** ✅ COMPLETE
+- [x] F7.1: Write 10+ enemy types with descriptions (16 total enemies)
+- [x] F7.2: Balance enemy stats (HP/ATK/DEF/SPD)
+- [x] F7.3: Implement enemy AI patterns (aggressive/defensive/random)
+- [x] F7.4: Create enemy loot tables
 
 ### **Phase 8: Boss Battles**
 - [ ] F8.1: Design Spoiled Milk mini-boss (Level 3)
@@ -71,6 +71,7 @@
 - [ ] F8.3: Design The Hungry Dog final boss (Level 10)
 - [ ] F8.4: Add boss intro cutscenes
 - [ ] F8.5: Implement boss-specific mechanics
+- [ ] F8.6: Make Sure All Enemy Special Abilities Are useable.
 
 ### **Phase 9: Content & Writing**
 - [ ] F9.1: Write opening cutscene (thrown in trash)
