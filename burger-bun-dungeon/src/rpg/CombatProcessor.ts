@@ -1,5 +1,7 @@
 import type { RPGState, Enemy } from '../types/game'
 import { InventoryManager } from './InventoryManager'
+import { RPGStateManager } from './RPGStateManager'
+import { COMBAT, PROGRESSION } from './RPGConstants'
 
 export interface CombatAction {
   actor: 'player' | 'enemy'
@@ -289,8 +291,8 @@ export class CombatProcessor {
       }
     }
 
-    // 50% chance to flee
-    const fleeSuccess = Math.random() < 0.5
+    // Check flee chance
+    const fleeSuccess = Math.random() < COMBAT.FLEE_CHANCE
 
     if (fleeSuccess) {
       return {
@@ -415,7 +417,7 @@ export class CombatProcessor {
 
   /**
    * Calculates damage with variance
-   * Formula: (ATK - DEF) + random(0-2) * defending multiplier
+   * Formula: (ATK - DEF) + random(0 to variance-1) * defending multiplier
    */
   static calculateDamage(
     attacker: { atk: number; def: number },
@@ -423,12 +425,11 @@ export class CombatProcessor {
     isDefending: boolean
   ): number {
     const baseDamage = attacker.atk - defender.def
-    const variance = Math.floor(Math.random() * 3) // 0-2
-    const defendMultiplier = isDefending ? 0.5 : 1.0
+    const variance = Math.floor(Math.random() * COMBAT.DAMAGE_VARIANCE)
+    const defendMultiplier = isDefending ? COMBAT.DEFENSE_MULTIPLIER : 1.0
     const finalDamage = Math.floor((baseDamage + variance) * defendMultiplier)
 
-    // Minimum 1 damage
-    return Math.max(1, finalDamage)
+    return Math.max(COMBAT.MIN_DAMAGE, finalDamage)
   }
 
   /**
@@ -502,15 +503,15 @@ export class CombatProcessor {
     let remainingXp = newState.xp + xpGained
 
     // Check for level up - track remaining XP correctly across multiple levels
-    while (remainingXp >= newState.maxXp && newState.level < 10) {
+    while (remainingXp >= newState.maxXp && newState.level < PROGRESSION.MAX_LEVEL) {
       remainingXp = remainingXp - newState.maxXp
-      newState = this.levelUp(newState)
+      newState = RPGStateManager.levelUp(newState)
     }
 
     // Set final XP (cap at maxXp if at max level)
     newState = {
       ...newState,
-      xp: newState.level >= 10 ? Math.min(remainingXp, newState.maxXp) : remainingXp
+      xp: newState.level >= PROGRESSION.MAX_LEVEL ? Math.min(remainingXp, newState.maxXp) : remainingXp
     }
 
     // Add currency
@@ -567,25 +568,4 @@ export class CombatProcessor {
     return loot
   }
 
-  /**
-   * Levels up the player
-   */
-  static levelUp(state: RPGState): RPGState {
-    const newLevel = state.level + 1
-    const xpRequired = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700]
-    const newMaxXp = xpRequired[newLevel] || 2700
-
-    return {
-      ...state,
-      level: newLevel,
-      maxXp: newMaxXp,
-      maxHp: state.maxHp + 10,
-      hp: Math.min(state.hp + 10, state.maxHp + 10), // Heal 10 HP on level up
-      stats: {
-        atk: state.stats.atk + 2,
-        def: state.stats.def + 1,
-        spd: state.stats.spd + 1
-      }
-    }
-  }
 }

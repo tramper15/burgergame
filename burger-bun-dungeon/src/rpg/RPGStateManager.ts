@@ -1,9 +1,9 @@
 import type { RPGState, StatBonus, Equipment } from '../types/game'
 import ingredientPowersData from '../data/ingredientPowers.json'
-import rpgItemsData from '../data/rpgItems.json'
+import { ItemDatabase } from './ItemDatabase'
+import { STARTING_STATS, STARTING_EQUIPMENT, PROGRESSION } from './RPGConstants'
 
 const ingredientPowers = ingredientPowersData as Record<string, StatBonus & { description: string }>
-const rpgItems = rpgItemsData as Record<string, any>
 
 /**
  * RPGStateManager - Manages RPG state initialization and updates
@@ -71,7 +71,7 @@ export class RPGStateManager {
       const power = ingredientPowers[ingredientId]
       if (power) {
         // Extract only StatBonus fields (exclude description)
-        const { description, ...statBonus } = power
+        const { description: _description, ...statBonus } = power
         bonuses[ingredientId] = statBonus
       }
     })
@@ -81,8 +81,7 @@ export class RPGStateManager {
 
   /**
    * Calculates base stats with ingredient bonuses applied
-   * Starting stats from design doc:
-   * HP: 50, ATK: 5, DEF: 3, SPD: 5
+   * Starting stats from RPGConstants
    */
   static calculateBaseStats(ingredientBonuses: Record<string, StatBonus>): {
     maxHp: number
@@ -90,10 +89,10 @@ export class RPGStateManager {
     def: number
     spd: number
   } {
-    let maxHp = 50
-    let atk = 5
-    let def = 3
-    let spd = 5
+    let maxHp: number = STARTING_STATS.HP
+    let atk: number = STARTING_STATS.ATK
+    let def: number = STARTING_STATS.DEF
+    let spd: number = STARTING_STATS.SPD
 
     // Apply ingredient bonuses
     Object.values(ingredientBonuses).forEach(bonus => {
@@ -188,28 +187,26 @@ export class RPGStateManager {
 
   /**
    * Levels up the player
-   * Stat growth from design doc:
-   * HP: +10, ATK: +2, DEF: +1, SPD: +1
+   * Stat growth from RPGConstants
    */
   static levelUp(state: RPGState): RPGState {
     const newLevel = state.level + 1
     const xpCarryover = state.xp - state.maxXp
 
-    // XP curve from design doc
-    const xpRequired = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700]
-    const newMaxXp = xpRequired[newLevel] || 2700
+    // XP curve from constants
+    const newMaxXp = PROGRESSION.XP_CURVE[newLevel] ?? PROGRESSION.XP_CURVE[PROGRESSION.XP_CURVE.length - 1]
 
     return {
       ...state,
       level: newLevel,
       xp: xpCarryover,
       maxXp: newMaxXp,
-      maxHp: state.maxHp + 10,
-      hp: state.hp + 10, // Heal on level up
+      maxHp: state.maxHp + PROGRESSION.LEVEL_UP_HP_GAIN,
+      hp: state.hp + PROGRESSION.LEVEL_UP_HP_GAIN, // Heal on level up
       stats: {
-        atk: state.stats.atk + 2,
-        def: state.stats.def + 1,
-        spd: state.stats.spd + 1
+        atk: state.stats.atk + PROGRESSION.LEVEL_UP_ATK_GAIN,
+        def: state.stats.def + PROGRESSION.LEVEL_UP_DEF_GAIN,
+        spd: state.stats.spd + PROGRESSION.LEVEL_UP_SPD_GAIN
       }
     }
   }
@@ -272,13 +269,13 @@ export class RPGStateManager {
    */
   private static createStartingEquipment(slot: 'weapon' | 'armor' | 'shield'): Equipment {
     const startingIds = {
-      weapon: 'toothpick_shiv',
-      armor: 'exposed_bun',
-      shield: 'no_shield'
+      weapon: STARTING_EQUIPMENT.WEAPON,
+      armor: STARTING_EQUIPMENT.ARMOR,
+      shield: STARTING_EQUIPMENT.SHIELD
     }
 
     const itemId = startingIds[slot]
-    const itemDef = this.getItemDefinition(itemId)
+    const itemDef = ItemDatabase.getItem(itemId)
 
     if (!itemDef) {
       throw new Error(`Starting equipment definition not found for ${slot} (${itemId})`)
@@ -290,20 +287,8 @@ export class RPGStateManager {
       description: itemDef.description,
       type: 'equipment',
       slot,
-      stats: itemDef.stats,
+      stats: itemDef.stats || {},
       quantity: 1
     }
-  }
-
-  /**
-   * Gets item definition from JSON data
-   */
-  private static getItemDefinition(itemId: string): any {
-    for (const category of Object.values(rpgItems)) {
-      if (typeof category === 'object' && category !== null && itemId in category) {
-        return category[itemId]
-      }
-    }
-    return null
   }
 }

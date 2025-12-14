@@ -1,13 +1,11 @@
 import type { RPGState, InventoryItem, Equipment } from '../types/game'
-import rpgItemsData from '../data/rpgItems.json'
-
-const rpgItems = rpgItemsData as Record<string, any>
+import { ItemDatabase } from './ItemDatabase'
+import { INVENTORY, STARTING_EQUIPMENT } from './RPGConstants'
 
 /**
  * InventoryManager - Handles inventory operations, item usage, and equipment management
  */
 export class InventoryManager {
-  private static readonly MAX_INVENTORY_SIZE = 10
 
   /**
    * Add an item to the inventory
@@ -15,7 +13,7 @@ export class InventoryManager {
    */
   static addItem(state: RPGState, itemId: string, quantity: number = 1): { newState: RPGState; success: boolean; message: string } {
     // Find the item definition
-    const itemDef = this.getItemDefinition(itemId)
+    const itemDef = ItemDatabase.getItem(itemId)
     if (!itemDef) {
       return { newState: state, success: false, message: `Item ${itemId} not found` }
     }
@@ -38,7 +36,7 @@ export class InventoryManager {
       }
     } else {
       // Check inventory space
-      if (state.inventory.length >= this.MAX_INVENTORY_SIZE) {
+      if (state.inventory.length >= INVENTORY.MAX_SIZE) {
         return { newState: state, success: false, message: 'Inventory is full!' }
       }
 
@@ -47,7 +45,7 @@ export class InventoryManager {
         id: itemId,
         name: itemDef.name,
         description: itemDef.description,
-        type: itemDef.type,
+        type: itemDef.type as 'consumable' | 'equipment' | 'key',
         effect: itemDef.effect,
         quantity
       }
@@ -136,7 +134,7 @@ export class InventoryManager {
    * Equip an item to the appropriate slot
    */
   static equipItem(state: RPGState, itemId: string): { newState: RPGState; success: boolean; message: string } {
-    const itemDef = this.getItemDefinition(itemId)
+    const itemDef = ItemDatabase.getItem(itemId)
 
     if (!itemDef || itemDef.type !== 'equipment') {
       return { newState: state, success: false, message: 'Item cannot be equipped' }
@@ -147,7 +145,7 @@ export class InventoryManager {
 
     // Unequip current item (if any and not a starting item)
     let newState = { ...state }
-    if (currentEquipment && !this.isStartingEquipment(currentEquipment.id)) {
+    if (currentEquipment && !ItemDatabase.isStartingEquipment(currentEquipment.id)) {
       const addResult = this.addItem(newState, currentEquipment.id, 1)
       newState = addResult.newState
     }
@@ -166,8 +164,8 @@ export class InventoryManager {
       name: itemDef.name,
       description: itemDef.description,
       type: 'equipment',
-      slot: itemDef.slot,
-      stats: itemDef.stats,
+      slot: itemDef.slot as 'weapon' | 'armor' | 'shield',
+      stats: itemDef.stats || {},
       quantity: 1
     }
 
@@ -200,7 +198,7 @@ export class InventoryManager {
     }
 
     // Don't allow unequipping starting equipment
-    if (this.isStartingEquipment(currentEquipment.id)) {
+    if (ItemDatabase.isStartingEquipment(currentEquipment.id)) {
       return { newState: state, success: false, message: 'Cannot unequip starting equipment' }
     }
 
@@ -212,7 +210,7 @@ export class InventoryManager {
 
     // Get the starting equipment for this slot
     const startingEquipmentId = this.getStartingEquipmentId(slot)
-    const startingEquipmentDef = this.getItemDefinition(startingEquipmentId)
+    const startingEquipmentDef = ItemDatabase.getItem(startingEquipmentId)
 
     if (!startingEquipmentDef) {
       throw new Error(`Starting equipment definition not found for ${slot} (${startingEquipmentId})`)
@@ -224,7 +222,7 @@ export class InventoryManager {
       description: startingEquipmentDef.description,
       type: 'equipment',
       slot,
-      stats: startingEquipmentDef.stats,
+      stats: startingEquipmentDef.stats || {},
       quantity: 1
     }
 
@@ -298,34 +296,13 @@ export class InventoryManager {
   }
 
   /**
-   * Get item definition from JSON data
-   */
-  private static getItemDefinition(itemId: string): any {
-    // Search through all categories
-    for (const category of Object.values(rpgItems)) {
-      if (typeof category === 'object' && category !== null && itemId in category) {
-        return category[itemId]
-      }
-    }
-    return null
-  }
-
-  /**
-   * Check if an item is starting equipment
-   */
-  private static isStartingEquipment(itemId: string): boolean {
-    const itemDef = this.getItemDefinition(itemId)
-    return itemDef?.isStartingEquipment === true
-  }
-
-  /**
    * Get starting equipment ID for a slot
    */
   private static getStartingEquipmentId(slot: 'weapon' | 'armor' | 'shield'): string {
     const startingEquipment = {
-      weapon: 'toothpick_shiv',
-      armor: 'exposed_bun',
-      shield: 'no_shield'
+      weapon: STARTING_EQUIPMENT.WEAPON,
+      armor: STARTING_EQUIPMENT.ARMOR,
+      shield: STARTING_EQUIPMENT.SHIELD
     }
     return startingEquipment[slot]
   }
