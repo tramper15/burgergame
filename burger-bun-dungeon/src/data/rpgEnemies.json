@@ -43,10 +43,11 @@
     "atk": 6,
     "def": 2,
     "spd": 4,
-    "xpReward": 50,
-    "currencyDrop": { "min": 10, "max": 18 },
+    "xpReward": 65,
+    "currencyDrop": { "min": 15, "max": 25 },
     "lootTable": [
-      { "itemId": "moldy_bread", "chance": 0.3 }
+      { "itemId": "moldy_bread", "chance": 0.4 },
+      { "itemId": "soda_drop", "chance": 0.2 }
     ],
     "aiPattern": "aggressive",
     "special": {
@@ -65,10 +66,11 @@
     "atk": 3,
     "def": 1,
     "spd": 6,
-    "xpReward": 40,
-    "currencyDrop": { "min": 15, "max": 25 },
+    "xpReward": 55,
+    "currencyDrop": { "min": 20, "max": 35 },
     "lootTable": [
-      { "itemId": "crumbs", "chance": 1.0 }
+      { "itemId": "crumbs", "chance": 1.0 },
+      { "itemId": "soda_drop", "chance": 0.3 }
     ],
     "aiPattern": "aggressive"
   },

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import type { LayoutType } from './layouts'
-import type { RPGState } from '../types/game'
+import type { RPGState, Equipment } from '../types/game'
 import { RPGStateManager } from '../rpg/RPGStateManager'
 import { CombatProcessor, type CombatAction } from '../rpg/CombatProcessor'
 import { BattleSceneGenerator } from '../rpg/BattleSceneGenerator'
 import { InventoryManager } from '../rpg/InventoryManager'
 import { ShopProcessor } from '../rpg/ShopProcessor'
+import { ItemDatabase } from '../rpg/ItemDatabase'
 import { layouts } from './layouts'
 import rpgScenesData from '../data/rpgScenes.json'
 import rpgEnemiesData from '../data/rpgEnemies.json'
@@ -20,7 +21,7 @@ interface RPGGameProps {
   onResetGame?: (resetFn: () => void) => void
 }
 
-type CombatPhase = 'exploration' | 'combat' | 'item_menu' | 'ability_menu' | 'inventory_view' | 'victory' | 'defeat' | 'fled' | 'shop_buy' | 'shop_sell'
+type CombatPhase = 'exploration' | 'combat' | 'item_menu' | 'ability_menu' | 'inventory_view' | 'unequip_menu' | 'victory' | 'defeat' | 'fled' | 'shop_buy' | 'shop_sell'
 
 /**
  * RPGGame - Main component for Trash Odyssey (Act 2) RPG mode
@@ -361,11 +362,14 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
     }
   }
 
-  // Check if a random encounter should trigger (30% chance in combat zones)
+  // Check if a random encounter should trigger (30% default, or custom rate for risky routes)
   const checkRandomEncounter = (sceneData: any): boolean => {
     if (sceneData.type !== 'combat') return false
     if (!sceneData.encounterTable || sceneData.encounterTable.length === 0) return false
-    return Math.random() < 0.3 // 30% encounter rate
+
+    // Use custom encounter rate if specified (for risky routes), otherwise default 30%
+    const encounterRate = sceneData.encounterRate ?? 0.3
+    return Math.random() < encounterRate
   }
 
   // Select a random enemy from the encounter table based on weights
@@ -396,7 +400,7 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
     // Show inventory and equipment
     const usableItems = InventoryManager.getUsableConsumables(rpgState)
     const equippableItems = InventoryManager.getEquippableItems(rpgState)
-    const { weapon, armor, shield, accessory } = rpgState.equipment
+    const { weapon, armor, shield, accessory, accessory2 } = rpgState.equipment
 
     // Build ingredient bonuses display
     const ingredientBonusesText = Object.keys(rpgState.ingredientBonuses).length > 0
@@ -419,7 +423,8 @@ INVENTORY & EQUIPMENT
 Weapon: ${weapon?.name || 'None'} (ATK +${weapon?.stats.atk || 0})
 Armor: ${armor?.name || 'None'} (DEF +${armor?.stats.def || 0})
 Shield: ${shield?.name || 'None'} (DEF +${shield?.stats.def || 0})
-Accessory: ${accessory?.name || 'None'}${accessory?.stats ? ` (ATK +${accessory.stats.atk || 0}, DEF +${accessory.stats.def || 0}, SPD +${accessory.stats.spd || 0})` : ''}
+Accessory 1: ${accessory?.name || 'None'}${accessory?.stats ? ` (ATK +${accessory.stats.atk || 0}, DEF +${accessory.stats.def || 0}, SPD +${accessory.stats.spd || 0})` : ''}
+Accessory 2: ${accessory2?.name || 'None'}${accessory2?.stats ? ` (ATK +${accessory2.stats.atk || 0}, DEF +${accessory2.stats.def || 0}, SPD +${accessory2.stats.spd || 0})` : ''}
 
 --- INGREDIENT BONUSES (from Act 1) ---
 ${ingredientBonusesText}
@@ -448,10 +453,11 @@ XP: ${rpgState.xp}/${rpgState.maxXp}
         action: 'equip'
       })),
       ...usableItems.map(item => ({
-        label: `Use ${item.name} (heal ${item.effect?.healHp || 0} HP)`,
+        label: `💊 Use ${item.name} (heal ${item.effect?.healHp || 0} HP)`,
         itemId: item.id,
         action: 'use'
       })),
+      { label: '🗑️ Unequip Items', action: 'unequip_menu' },
       { label: '← Back', action: 'back' }
     ]
 
@@ -462,11 +468,17 @@ XP: ${rpgState.xp}/${rpgState.maxXp}
       if (choice.action === 'back') {
         setCombatPhase('exploration')
         setSelectedChoice(-1)
+      } else if (choice.action === 'unequip_menu') {
+        setCombatPhase('unequip_menu')
+        setSelectedChoice(-1)
       } else if (choice.action === 'equip' && choice.itemId) {
         // Equip item
         const equipResult = InventoryManager.equipItem(rpgState, choice.itemId)
         if (equipResult.success) {
           setRpgState(equipResult.newState)
+        } else {
+          // Show error message if equipping failed
+          alert(equipResult.message)
         }
         setSelectedChoice(-1)
       } else if (choice.action === 'use' && choice.itemId) {
@@ -474,6 +486,68 @@ XP: ${rpgState.xp}/${rpgState.maxXp}
         const useResult = InventoryManager.useConsumable(rpgState, choice.itemId)
         if (useResult.success) {
           setRpgState(useResult.newState)
+        }
+        setSelectedChoice(-1)
+      }
+    }
+  } else if (combatPhase === 'unequip_menu') {
+    // Unequip menu - show all equipped items that can be unequipped
+    const { weapon, armor, shield, accessory, accessory2 } = rpgState.equipment
+    const unequippableItems: Array<{ slot: string; item: Equipment }> = []
+
+    if (weapon && !ItemDatabase.isStartingEquipment(weapon.id)) {
+      unequippableItems.push({ slot: 'weapon', item: weapon })
+    }
+    if (armor && !ItemDatabase.isStartingEquipment(armor.id)) {
+      unequippableItems.push({ slot: 'armor', item: armor })
+    }
+    if (shield && !ItemDatabase.isStartingEquipment(shield.id)) {
+      unequippableItems.push({ slot: 'shield', item: shield })
+    }
+    if (accessory) {
+      unequippableItems.push({ slot: 'accessory', item: accessory })
+    }
+    if (accessory2) {
+      unequippableItems.push({ slot: 'accessory2', item: accessory2 })
+    }
+
+    displayText = `═══════════════════════════════════════════
+UNEQUIP ITEMS
+═══════════════════════════════════════════
+
+Select an item to unequip:
+
+${unequippableItems.length > 0
+  ? unequippableItems.map(({ slot, item }) => {
+      const slotName = slot === 'accessory' ? 'Accessory 1' : slot === 'accessory2' ? 'Accessory 2' : slot.charAt(0).toUpperCase() + slot.slice(1)
+      return `${slotName}: ${item.name}`
+    }).join('\n')
+  : 'No items can be unequipped (starting equipment cannot be removed)'}
+`
+
+    displayChoices = [
+      ...unequippableItems.map(({ slot, item }) => ({
+        label: `🗑️ Unequip ${item.name}`,
+        slot: slot,
+        action: 'unequip'
+      })),
+      { label: '← Back to Inventory', action: 'back' }
+    ]
+
+    onChoiceChange = (index: number) => {
+      setSelectedChoice(index)
+      const choice = displayChoices[index]
+
+      if (choice.action === 'back') {
+        setCombatPhase('inventory_view')
+        setSelectedChoice(-1)
+      } else if (choice.action === 'unequip' && choice.slot) {
+        // Unequip item from the selected slot
+        const unequipResult = InventoryManager.unequipItem(rpgState, choice.slot as any)
+        if (unequipResult.success) {
+          setRpgState(unequipResult.newState)
+        } else {
+          alert(unequipResult.message)
         }
         setSelectedChoice(-1)
       }
@@ -654,7 +728,7 @@ XP: ${rpgState.xp}/${rpgState.maxXp}
   } else if (combatPhase === 'shop_buy') {
     // Shop Buy Interface
     const shopLocation = 'trash_bag_depths'
-    const availableItems = ShopProcessor.getAvailableItemsForPlayer(shopLocation, rpgState.currency)
+    const availableItems = ShopProcessor.getAvailableItemsForPlayer(shopLocation, rpgState.currency, rpgState.defeatedBosses)
 
     displayText = `═══════════════════════════════════════════
 COCKROACH MERCHANT'S SHOP

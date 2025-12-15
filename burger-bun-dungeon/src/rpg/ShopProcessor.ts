@@ -10,6 +10,7 @@ interface ShopInventoryItem {
   itemId: string
   stock: number | 'unlimited'
   respawns?: boolean
+  requiresBossDefeated?: string
 }
 
 /**
@@ -67,19 +68,36 @@ export class ShopProcessor {
   /**
    * Get available items with player context
    */
-  static getAvailableItemsForPlayer(locationId: string, playerCurrency: number): Array<{
+  static getAvailableItemsForPlayer(locationId: string, playerCurrency: number, defeatedBosses: string[] = []): Array<{
     item: ItemDefinition
     stock: number | 'unlimited'
     canAfford: boolean
     playerCurrency: number
   }> {
-    const items = this.getAvailableItems(locationId)
+    const inventory = this.getShopInventory(locationId)
 
-    return items.map(shopItem => ({
-      ...shopItem,
-      canAfford: (shopItem.item.shopPrice || 0) <= playerCurrency,
-      playerCurrency
-    }))
+    // Filter items based on defeated bosses
+    const availableInventory = inventory.filter(shopItem => {
+      // If item requires a boss to be defeated, check if it is
+      if (shopItem.requiresBossDefeated) {
+        return defeatedBosses.includes(shopItem.requiresBossDefeated)
+      }
+      return true
+    })
+
+    return availableInventory
+      .map(shopItem => {
+        const item = ItemDatabase.getItem(shopItem.itemId)
+        if (!item) return null
+
+        return {
+          item,
+          stock: shopItem.stock,
+          canAfford: (item.shopPrice || 0) <= playerCurrency,
+          playerCurrency
+        }
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null)
   }
 
   /**
@@ -185,8 +203,8 @@ export class ShopProcessor {
 
     // Check if item is currently equipped
     if (item.type === 'equipment') {
-      const { weapon, armor, shield } = state.equipment
-      const equippedItems = [weapon?.id, armor?.id, shield?.id]
+      const { weapon, armor, shield, accessory, accessory2 } = state.equipment
+      const equippedItems = [weapon?.id, armor?.id, shield?.id, accessory?.id, accessory2?.id]
 
       if (equippedItems.includes(itemId)) {
         return {
@@ -239,8 +257,8 @@ export class ShopProcessor {
     quantity: number
     sellPrice: number
   }> {
-    const { weapon, armor, shield } = state.equipment
-    const equippedItemIds = [weapon?.id, armor?.id, shield?.id]
+    const { weapon, armor, shield, accessory, accessory2 } = state.equipment
+    const equippedItemIds = [weapon?.id, armor?.id, shield?.id, accessory?.id, accessory2?.id]
 
     return state.inventory
       .map(invItem => {

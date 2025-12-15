@@ -40,7 +40,8 @@ export class RPGStateManager {
         weapon: this.createStartingEquipment('weapon'),
         armor: this.createStartingEquipment('armor'),
         shield: this.createStartingEquipment('shield'),
-        accessory: null
+        accessory: null,
+        accessory2: null
       },
       currency: 0,
 

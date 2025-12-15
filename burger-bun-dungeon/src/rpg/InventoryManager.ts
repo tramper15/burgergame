@@ -140,7 +140,24 @@ export class InventoryManager {
       return { newState: state, success: false, message: 'Item cannot be equipped' }
     }
 
-    const slot = itemDef.slot as 'weapon' | 'armor' | 'shield' | 'accessory'
+    let slot = itemDef.slot as 'weapon' | 'armor' | 'shield' | 'accessory' | 'accessory2'
+
+    // Special handling for accessories - try to fill an empty slot first
+    if (itemDef.slot === 'accessory') {
+      if (!state.equipment.accessory) {
+        slot = 'accessory'
+      } else if (!state.equipment.accessory2) {
+        slot = 'accessory2'
+      } else {
+        // Both accessory slots are full - cannot equip
+        return {
+          newState: state,
+          success: false,
+          message: 'Both accessory slots are full! Unequip an accessory first.'
+        }
+      }
+    }
+
     const currentEquipment = state.equipment[slot]
 
     // Unequip current item (if any and not a starting item)
@@ -190,7 +207,7 @@ export class InventoryManager {
   /**
    * Unequip an item from a slot
    */
-  static unequipItem(state: RPGState, slot: 'weapon' | 'armor' | 'shield' | 'accessory'): { newState: RPGState; success: boolean; message: string } {
+  static unequipItem(state: RPGState, slot: 'weapon' | 'armor' | 'shield' | 'accessory' | 'accessory2'): { newState: RPGState; success: boolean; message: string } {
     const currentEquipment = state.equipment[slot]
 
     if (!currentEquipment) {
@@ -211,7 +228,7 @@ export class InventoryManager {
     let newState: RPGState
 
     // Accessories have no starting equipment - set to null
-    if (slot === 'accessory') {
+    if (slot === 'accessory' || slot === 'accessory2') {
       newState = {
         ...addResult.newState,
         equipment: {
@@ -271,7 +288,7 @@ export class InventoryManager {
     let totalSpd = baseSpd
 
     // Add equipment bonuses
-    const { weapon, armor, shield, accessory } = state.equipment
+    const { weapon, armor, shield, accessory, accessory2 } = state.equipment
 
     if (weapon?.stats) {
       totalAtk += weapon.stats.atk || 0
@@ -295,6 +312,12 @@ export class InventoryManager {
       totalAtk += accessory.stats.atk || 0
       totalDef += accessory.stats.def || 0
       totalSpd += accessory.stats.spd || 0
+    }
+
+    if (accessory2?.stats) {
+      totalAtk += accessory2.stats.atk || 0
+      totalDef += accessory2.stats.def || 0
+      totalSpd += accessory2.stats.spd || 0
     }
 
     // Add ingredient bonuses

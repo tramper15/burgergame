@@ -186,6 +186,50 @@
       "sellPrice": 200,
       "isBossDrop": true,
       "droppedBy": "raccoon_king"
+    },
+
+    "rubber_band_ring": {
+      "id": "rubber_band_ring",
+      "name": "Rubber Band Ring",
+      "description": "Elastic and snug. Increases your reaction time.",
+      "type": "equipment",
+      "slot": "accessory",
+      "stats": {
+        "spd": 8
+      },
+      "shopPrice": 180,
+      "sellPrice": 90,
+      "requiresBossDefeated": "spoiled_milk"
+    },
+
+    "paper_clip_charm": {
+      "id": "paper_clip_charm",
+      "name": "Paper Clip Charm",
+      "description": "A twisted paper clip. Surprisingly sharp edges.",
+      "type": "equipment",
+      "slot": "accessory",
+      "stats": {
+        "atk": 10
+      },
+      "shopPrice": 200,
+      "sellPrice": 100,
+      "requiresBossDefeated": "spoiled_milk"
+    },
+
+    "bottle_cap_medallion": {
+      "id": "bottle_cap_medallion",
+      "name": "Bottle Cap Medallion",
+      "description": "Forged from the finest trash. Ultimate protection and power.",
+      "type": "equipment",
+      "slot": "accessory",
+      "stats": {
+        "atk": 7,
+        "def": 10,
+        "spd": 3
+      },
+      "shopPrice": 350,
+      "sellPrice": 175,
+      "requiresBossDefeated": "raccoon_king"
     }
   },
 
@@ -217,6 +261,24 @@
         "itemId": "foil_shield",
         "stock": 1,
         "respawns": true
+      },
+      {
+        "itemId": "rubber_band_ring",
+        "stock": 1,
+        "respawns": false,
+        "requiresBossDefeated": "spoiled_milk"
+      },
+      {
+        "itemId": "paper_clip_charm",
+        "stock": 1,
+        "respawns": false,
+        "requiresBossDefeated": "spoiled_milk"
+      },
+      {
+        "itemId": "bottle_cap_medallion",
+        "stock": 1,
+        "respawns": false,
+        "requiresBossDefeated": "raccoon_king"
       }
     ]
   }

@@ -76,6 +76,7 @@ export interface RPGState {
     armor: Equipment | null
     shield: Equipment | null
     accessory: Equipment | null
+    accessory2: Equipment | null
   }
   currency: number
 

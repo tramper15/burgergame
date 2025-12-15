@@ -90,7 +90,7 @@
         "next": "napkin_plains"
       },
       {
-        "label": "→ Risk the Banana Peel Bridge (harder)",
+        "label": "⚔️ Risk the Banana Peel Bridge (60% encounter rate, better rewards)",
         "next": "banana_peel_bridge"
       },
       {
@@ -126,6 +126,8 @@
     "name": "Banana Peel Bridge",
     "description": "A treacherous bridge made of slippery banana peels. One wrong step could be fatal. Stronger enemies lurk here.",
     "type": "combat",
+    "risky": true,
+    "encounterRate": 0.6,
     "firstVisit": "The bridge stretches before you, slick and yellow. This is the hard way. Are you ready?",
     "encounterTable": [
       { "enemyId": "fuzzy_growth", "weight": 50 },
