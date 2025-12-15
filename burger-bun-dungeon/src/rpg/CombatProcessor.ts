@@ -477,8 +477,7 @@ export class CombatProcessor {
         break
 
       case 'heal':
-        // Heal - Restore 20 HP (3 uses per battle)
-        // TODO: Need to track uses per battle - for now, allow unlimited
+        // Heal - Restore 20 HP (unlimited uses)
         const healAmount = 20
         const oldHp = state.hp
         const newHp = Math.min(state.maxHp, state.hp + healAmount)

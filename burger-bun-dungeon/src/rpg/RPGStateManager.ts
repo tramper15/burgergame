@@ -2,6 +2,9 @@ import type { RPGState, StatBonus, Equipment } from '../types/game'
 import ingredientPowersData from '../data/ingredientPowers.json'
 import { ItemDatabase } from './ItemDatabase'
 import { STARTING_STATS, STARTING_EQUIPMENT, PROGRESSION } from './RPGConstants'
+import { isDevelopment, isTest } from '../utils/environment'
+import { errorTracker } from '../utils/errorTracking'
+import { createFallbackEquipment, validateEquipmentStats, assertEquipmentValid } from './EquipmentValidator'
 
 const ingredientPowers = ingredientPowersData as Record<string, StatBonus & { description: string }>
 
@@ -296,10 +299,54 @@ export class RPGStateManager {
     const itemDef = ItemDatabase.getItem(itemId)
 
     if (!itemDef) {
-      throw new Error(`Starting equipment definition not found for ${slot} (${itemId})`)
+      // Environment-aware error handling
+      const errorContext = {
+        slot,
+        itemId,
+        startingIds,
+        stackTrace: new Error().stack
+      }
+
+      // In development/test: fail fast with descriptive error
+      if (isDevelopment() || isTest()) {
+        throw new Error(
+          `Starting equipment definition not found for ${slot} (${itemId}). ` +
+          `This indicates a data integrity issue. Check ItemDatabase and STARTING_EQUIPMENT constants. ` +
+          `Context: ${JSON.stringify(errorContext, null, 2)}`
+        )
+      }
+
+      // In production: log error with full context and use safe fallback
+      errorTracker.logError(
+        `Starting equipment definition not found for ${slot} (${itemId})`,
+        errorContext
+      )
+
+      // Return combat-safe fallback equipment with validated stats
+      const fallbackEquipment = createFallbackEquipment(slot, itemId)
+
+      // Validate fallback equipment, but don't throw in production
+      // (graceful degradation takes priority over validation)
+      try {
+        assertEquipmentValid(fallbackEquipment, `fallback for ${slot}`)
+      } catch (validationError) {
+        // Log validation failure but continue with fallback
+        errorTracker.logError(
+          `Fallback equipment validation failed for ${slot} (${itemId})`,
+          {
+            slot,
+            itemId,
+            fallbackEquipment,
+            validationError: validationError instanceof Error ? validationError.message : String(validationError)
+          }
+        )
+      }
+
+      return fallbackEquipment
     }
 
-    return {
+    // Validate and normalize stats to ensure combat safety
+    const equipment: Equipment = {
       id: itemId,
       name: itemDef.name,
       description: itemDef.description,
@@ -308,5 +355,7 @@ export class RPGStateManager {
       stats: itemDef.stats || {},
       quantity: 1
     }
+
+    return validateEquipmentStats(equipment)
   }
 }

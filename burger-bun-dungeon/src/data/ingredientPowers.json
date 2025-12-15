@@ -29,7 +29,7 @@
   },
   "special_sauce": {
     "ability": "heal",
-    "description": "Heal 20 HP in battle (3 uses)"
+    "description": "Heal 20 HP in battle (unlimited)"
   },
   "meat_patty": {
     "atk": 8,

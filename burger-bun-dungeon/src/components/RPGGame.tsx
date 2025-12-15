@@ -244,7 +244,8 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
   const startCombat = (enemyId: string) => {
     const enemyData = rpgEnemies[enemyId]
     if (!enemyData) {
-      console.error(`Enemy ${enemyId} not found`)
+      showToast('Combat error! Returning to safety...')
+      setCombatPhase('exploration')
       return
     }
 
@@ -354,7 +355,7 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
       const nextSceneData = rpgScenes[nextLocation]
 
       if (!nextSceneData) {
-        console.error(`Location ${nextLocation} not found`)
+        showToast('Location not found! Staying here...')
         return
       }
 
@@ -366,7 +367,6 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
 
         // Set pending navigation to where we go after beating the boss
         if (nextSceneData.onVictory) {
-          console.log('Boss battle! Setting pending navigation to victory location:', nextSceneData.onVictory)
           setPendingNavigation(nextSceneData.onVictory)
         }
 
@@ -384,7 +384,6 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
           const enemyId = selectRandomEnemy(nextSceneData.encounterTable)
           if (enemyId) {
             // Store where we want to go after this fight
-            console.log('Random encounter triggered! Setting pending navigation to:', nextLocation)
             setPendingNavigation(nextLocation)
             startCombat(enemyId)
             return
@@ -677,7 +676,7 @@ ${unequippableItems.length > 0
     const abilityDescriptions: Record<string, string> = {
       poison_strike: 'Poison Strike - 5 damage over 3 turns',
       onion_tears: 'Onion Tears - 12 AOE damage (costs 10 HP)',
-      heal: 'Heal - Restore 20 HP (3 uses per battle)'
+      heal: 'Heal - Restore 20 HP (unlimited)'
     }
 
     displayText = BattleSceneGenerator.generateBattleScene(rpgState, combatLog) + '\n\n--- ABILITIES ---\n\nSelect an ability to use:\n'
@@ -715,18 +714,10 @@ ${unequippableItems.length > 0
       { label: '→ Continue', action: 'continue' }
     ]
     onChoiceChange = () => {
-      console.log('Victory continue clicked:', {
-        currentLocation: rpgState.currentLocation,
-        hasPendingNav: !!pendingNavigation,
-        pendingNav: pendingNavigation,
-        defeatedBosses: rpgState.defeatedBosses
-      })
-
       // Check if we just defeated a boss by looking at defeated bosses list
       // If we defeated a boss, use pending navigation (which was set during boss battle setup)
       if (pendingNavigation) {
         // Navigate to the pending location (either after random encounter or boss battle)
-        console.log('Navigating to pending location:', pendingNavigation)
         setRpgState(prev => RPGStateManager.changeLocation(prev, pendingNavigation))
         setPendingNavigation(null)
       }
