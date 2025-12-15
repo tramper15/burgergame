@@ -1,5 +1,5 @@
 import achievementsData from '../data/achievements.json'
-import type { AchievementsData, AchievementProgress, GameState } from '../types/game'
+import type { AchievementsData, AchievementProgress, GameState, RPGState } from '../types/game'
 
 export class AchievementService {
   private static achievements: AchievementsData = achievementsData
@@ -80,5 +80,76 @@ export class AchievementService {
    */
   static getTotalCount(): number {
     return Object.keys(this.achievements).length
+  }
+
+  /**
+   * Check which achievements are newly unlocked based on RPG state and ending type
+   * @param rpgState Current RPG game state
+   * @param endingType The type of ending reached (e.g., "victory", "secret_victory", etc.)
+   * @param currentProgress Player's current achievement progress
+   * @returns Array of newly unlocked achievement IDs
+   */
+  static checkRPGAchievements(
+    rpgState: RPGState,
+    endingType: string | null,
+    currentProgress: AchievementProgress
+  ): string[] {
+    const newlyUnlocked: string[] = []
+
+    Object.entries(this.achievements).forEach(([achievementId, achievement]) => {
+      // Skip if already unlocked
+      if (currentProgress.unlockedAchievements.includes(achievementId)) {
+        return
+      }
+
+      // Check if achievement criteria are met
+      let criteriaMatches = false
+
+      // Check ending criteria
+      if (achievement.criteria.ending && endingType) {
+        criteriaMatches = criteriaMatches || achievement.criteria.ending === endingType
+      }
+
+      // Check boss defeated criteria
+      if (achievement.criteria.bossDefeated) {
+        criteriaMatches = criteriaMatches || rpgState.defeatedBosses.includes(achievement.criteria.bossDefeated)
+      }
+
+      // Check level criteria
+      if (achievement.criteria.minLevel) {
+        criteriaMatches = criteriaMatches || rpgState.level >= achievement.criteria.minLevel
+      }
+
+      // Check stat criteria
+      if (achievement.criteria.minAtk) {
+        criteriaMatches = criteriaMatches || rpgState.stats.atk >= achievement.criteria.minAtk
+      }
+
+      if (achievement.criteria.minHp) {
+        criteriaMatches = criteriaMatches || rpgState.maxHp >= achievement.criteria.minHp
+      }
+
+      if (achievement.criteria.minSpd) {
+        criteriaMatches = criteriaMatches || rpgState.stats.spd >= achievement.criteria.minSpd
+      }
+
+      // Check currency criteria
+      if (achievement.criteria.minCurrency) {
+        criteriaMatches = criteriaMatches || rpgState.currency >= achievement.criteria.minCurrency
+      }
+
+      // Check ingredient count criteria
+      if (achievement.criteria.minIngredients) {
+        const ingredientCount = Object.keys(rpgState.ingredientBonuses).length
+        criteriaMatches = criteriaMatches || ingredientCount >= achievement.criteria.minIngredients
+      }
+
+      // Achievement unlocks if ANY criterion is met (OR logic)
+      if (criteriaMatches) {
+        newlyUnlocked.push(achievementId)
+      }
+    })
+
+    return newlyUnlocked
   }
 }

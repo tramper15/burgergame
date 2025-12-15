@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { LayoutType } from './layouts'
 import type { RPGState, Equipment } from '../types/game'
 import { RPGStateManager } from '../rpg/RPGStateManager'
@@ -7,6 +7,9 @@ import { BattleSceneGenerator } from '../rpg/BattleSceneGenerator'
 import { InventoryManager } from '../rpg/InventoryManager'
 import { ShopProcessor } from '../rpg/ShopProcessor'
 import { ItemDatabase } from '../rpg/ItemDatabase'
+import { AchievementService } from '../services/AchievementService'
+import { useAchievements } from './AchievementProvider'
+import { useToast } from './ToastProvider'
 import { layouts } from './layouts'
 import rpgScenesData from '../data/rpgScenes.json'
 import rpgEnemiesData from '../data/rpgEnemies.json'
@@ -28,6 +31,10 @@ type CombatPhase = 'exploration' | 'combat' | 'item_menu' | 'ability_menu' | 'in
  * Separate from BurgerGame to keep concerns separated
  */
 export default function RPGGame({ layout, ingredientsFromAct1, onBackToMenu, onResetGame }: RPGGameProps) {
+  const { showToast } = useToast()
+  const { progress, unlockAchievement } = useAchievements()
+  const achievementsChecked = useRef(false)
+
   const [rpgState, setRpgState] = useState<RPGState>(() =>
     RPGStateManager.createInitialState(ingredientsFromAct1)
   )
@@ -49,6 +56,23 @@ export default function RPGGame({ layout, ingredientsFromAct1, onBackToMenu, onR
 
   const LayoutComponent = layouts[layout]
 
+  // Check for achievements when reaching endings or achieving milestones
+  const checkAchievements = (endingType: string | null = null) => {
+    const newlyUnlocked = AchievementService.checkRPGAchievements(rpgState, endingType, progress)
+
+    // Show toasts for newly unlocked achievements
+    newlyUnlocked.forEach((achievementId, index) => {
+      const achievement = AchievementService.getAchievement(achievementId)
+      if (achievement) {
+        // Delay each toast slightly so they show sequentially
+        setTimeout(() => {
+          showToast(`Achievement Unlocked: ${achievement.title}`)
+          unlockAchievement(achievementId)
+        }, index * 500) // 500ms between each toast
+      }
+    })
+  }
+
   // Register reset function with parent component
   useEffect(() => {
     if (onResetGame) {
@@ -61,9 +85,36 @@ export default function RPGGame({ layout, ingredientsFromAct1, onBackToMenu, onR
         setPendingNavigation(null)
         setVictoryData(null)
         setShopMessage('')
+        achievementsChecked.current = false
       })
     }
   }, [onResetGame, ingredientsFromAct1])
+
+  // Check achievements when reaching ending scenes
+  useEffect(() => {
+    const currentScene = rpgScenes[rpgState.currentLocation]
+
+    if (currentScene && currentScene.type === 'ending' && !achievementsChecked.current) {
+      achievementsChecked.current = true
+      const endingType = currentScene.endingType
+      checkAchievements(endingType)
+    }
+
+    // Reset achievement check flag when leaving ending scenes
+    if (currentScene && currentScene.type !== 'ending') {
+      achievementsChecked.current = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpgState.currentLocation])
+
+  // Check milestone achievements whenever rpgState changes (level, stats, bosses, currency)
+  useEffect(() => {
+    // Only check milestones during exploration phase (not during combat)
+    if (combatPhase === 'exploration') {
+      checkAchievements(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpgState.level, rpgState.stats, rpgState.defeatedBosses, rpgState.currency, combatPhase])
 
   // Get current scene from JSON data
   const currentSceneData = rpgScenes[rpgState.currentLocation]

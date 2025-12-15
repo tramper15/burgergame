@@ -54,5 +54,82 @@
     "criteria": {
       "exactIngredients": ["meat_patty", "cheese"]
     }
+  },
+  "rpg_victory": {
+    "title": "Trash Odyssey Champion",
+    "description": "You survived the trash can and reached the lunchbox.",
+    "criteria": {
+      "ending": "victory"
+    }
+  },
+  "rpg_secret_victory": {
+    "title": "Legendary Bun",
+    "description": "You defeated the Hungry Dog. You are legend.",
+    "criteria": {
+      "ending": "secret_victory"
+    }
+  },
+  "rpg_defeat_spoiled_milk": {
+    "title": "Dairy Destroyer",
+    "description": "The curdled nightmare fell before you.",
+    "criteria": {
+      "bossDefeated": "spoiled_milk"
+    }
+  },
+  "rpg_defeat_raccoon_king": {
+    "title": "Throne Usurper",
+    "description": "You dethroned the ruler of the backyard.",
+    "criteria": {
+      "bossDefeated": "raccoon_king"
+    }
+  },
+  "rpg_defeat_hungry_dog": {
+    "title": "Giant Slayer",
+    "description": "You defeated a creature 10,000 times your size.",
+    "criteria": {
+      "bossDefeated": "hungry_dog"
+    }
+  },
+  "rpg_level_10": {
+    "title": "Maximum Power",
+    "description": "You've reached level 10. The ultimate bun.",
+    "criteria": {
+      "minLevel": 10
+    }
+  },
+  "rpg_high_attack": {
+    "title": "Power Overwhelming",
+    "description": "Your attack stat reached 30 or higher.",
+    "criteria": {
+      "minAtk": 30
+    }
+  },
+  "rpg_tank_build": {
+    "title": "Immovable Object",
+    "description": "Your HP reached 150 or higher.",
+    "criteria": {
+      "minHp": 150
+    }
+  },
+  "rpg_speedster": {
+    "title": "Lightning Bun",
+    "description": "Your speed stat reached 20 or higher.",
+    "criteria": {
+      "minSpd": 20
+    }
+  },
+  "rpg_rich": {
+    "title": "Scrap Baron",
+    "description": "You accumulated 1000 Scraps.",
+    "criteria": {
+      "minCurrency": 1000
+    }
+  },
+  "rpg_all_ingredients": {
+    "title": "Complete Collection",
+    "description": "You brought all 9 ingredients from Act 1 into Act 2.",
+    "criteria": {
+      "minIngredients": 9
+    }
   }
 }

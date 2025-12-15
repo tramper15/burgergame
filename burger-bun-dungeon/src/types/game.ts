@@ -40,6 +40,13 @@ export interface Achievement {
   criteria: {
     ending?: string
     exactIngredients?: string[]
+    bossDefeated?: string
+    minLevel?: number
+    minAtk?: number
+    minHp?: number
+    minSpd?: number
+    minCurrency?: number
+    minIngredients?: number
   }
 }
 
