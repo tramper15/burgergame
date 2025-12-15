@@ -39,7 +39,8 @@ export class RPGStateManager {
       equipment: {
         weapon: this.createStartingEquipment('weapon'),
         armor: this.createStartingEquipment('armor'),
-        shield: this.createStartingEquipment('shield')
+        shield: this.createStartingEquipment('shield'),
+        accessory: null
       },
       currency: 0,
 
@@ -77,6 +78,22 @@ export class RPGStateManager {
     })
 
     return bonuses
+  }
+
+  /**
+   * Gets available player abilities from ingredient bonuses
+   * Returns array of ability IDs that the player can use in combat
+   */
+  static getPlayerAbilities(state: RPGState): string[] {
+    const abilities: string[] = []
+
+    Object.values(state.ingredientBonuses).forEach(bonus => {
+      if (bonus.ability) {
+        abilities.push(bonus.ability)
+      }
+    })
+
+    return abilities
   }
 
   /**

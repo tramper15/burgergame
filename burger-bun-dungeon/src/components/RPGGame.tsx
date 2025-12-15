@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { LayoutType } from './layouts'
 import type { RPGState } from '../types/game'
 import { RPGStateManager } from '../rpg/RPGStateManager'
@@ -17,15 +17,16 @@ interface RPGGameProps {
   layout: LayoutType
   ingredientsFromAct1: string[]
   onBackToMenu: () => void
+  onResetGame?: (resetFn: () => void) => void
 }
 
-type CombatPhase = 'exploration' | 'combat' | 'item_menu' | 'inventory_view' | 'victory' | 'defeat' | 'fled' | 'shop_buy' | 'shop_sell'
+type CombatPhase = 'exploration' | 'combat' | 'item_menu' | 'ability_menu' | 'inventory_view' | 'victory' | 'defeat' | 'fled' | 'shop_buy' | 'shop_sell'
 
 /**
  * RPGGame - Main component for Trash Odyssey (Act 2) RPG mode
  * Separate from BurgerGame to keep concerns separated
  */
-export default function RPGGame({ layout, ingredientsFromAct1, onBackToMenu }: RPGGameProps) {
+export default function RPGGame({ layout, ingredientsFromAct1, onBackToMenu, onResetGame }: RPGGameProps) {
   const [rpgState, setRpgState] = useState<RPGState>(() =>
     RPGStateManager.createInitialState(ingredientsFromAct1)
   )
@@ -46,6 +47,22 @@ export default function RPGGame({ layout, ingredientsFromAct1, onBackToMenu }: R
   const [shopMessage, setShopMessage] = useState<string>('')
 
   const LayoutComponent = layouts[layout]
+
+  // Register reset function with parent component
+  useEffect(() => {
+    if (onResetGame) {
+      onResetGame(() => {
+        setRpgState(RPGStateManager.createInitialState(ingredientsFromAct1))
+        setCombatPhase('exploration')
+        setSelectedChoice(-1)
+        setCombatLog([])
+        setLastEnemyName('')
+        setPendingNavigation(null)
+        setVictoryData(null)
+        setShopMessage('')
+      })
+    }
+  }, [onResetGame, ingredientsFromAct1])
 
   // Get current scene from JSON data
   const currentSceneData = rpgScenes[rpgState.currentLocation]
@@ -99,7 +116,7 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
   const isFirstVisit = !rpgState.visitedLocations.includes(rpgState.currentLocation)
   let sceneText = 'Location not found'
 
-  if (rpgState.currentLocation === 'garbage_can_start') {
+  if (rpgState.currentLocation === 'garbage_can_start' && isFirstVisit) {
     sceneText = openingCutsceneText
   } else if (currentSceneData) {
     // Check if current location is a checkpoint
@@ -108,9 +125,9 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
 
     // Show first visit text if available and this is the first visit
     if (isFirstVisit && currentSceneData.firstVisit) {
-      sceneText = `${currentSceneData.name}${checkpointMarker}\n\n${currentSceneData.firstVisit}\n\n---\n\nLevel: ${rpgState.level} | HP: ${rpgState.hp}/${rpgState.maxHp}\nATK: ${rpgState.stats.atk} | DEF: ${rpgState.stats.def} | SPD: ${rpgState.stats.spd}\nCurrency: ${rpgState.currency} Crumbs`
+      sceneText = `${currentSceneData.name}${checkpointMarker}\n\n${currentSceneData.firstVisit}\n\n---\n\nLevel: ${rpgState.level} | HP: ${rpgState.hp}/${rpgState.maxHp}\nATK: ${rpgState.stats.atk} | DEF: ${rpgState.stats.def} | SPD: ${rpgState.stats.spd}\nCurrency: ${rpgState.currency} Scraps`
     } else {
-      sceneText = `${currentSceneData.name}${checkpointMarker}\n\n${currentSceneData.description}\n\n---\n\nLevel: ${rpgState.level} | HP: ${rpgState.hp}/${rpgState.maxHp}\nATK: ${rpgState.stats.atk} | DEF: ${rpgState.stats.def} | SPD: ${rpgState.stats.spd}\nCurrency: ${rpgState.currency} Crumbs`
+      sceneText = `${currentSceneData.name}${checkpointMarker}\n\n${currentSceneData.description}\n\n---\n\nLevel: ${rpgState.level} | HP: ${rpgState.hp}/${rpgState.maxHp}\nATK: ${rpgState.stats.atk} | DEF: ${rpgState.stats.def} | SPD: ${rpgState.stats.spd}\nCurrency: ${rpgState.currency} Scraps`
     }
   }
 
@@ -142,6 +159,23 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
         return rpgState.defeatedBosses.includes(choice.requiresBossDefeated)
       }
 
+      // If this choice has a condition, check if it's met
+      if (choice.condition) {
+        // Check for visited location condition (e.g., "visited_trash_bag_depths")
+        if (choice.condition.startsWith('visited_')) {
+          const locationId = choice.condition.replace('visited_', '')
+          return rpgState.visitedLocations.includes(locationId)
+        }
+        // Check if player has all ingredients from Act 1
+        if (choice.condition === 'has_all_ingredients') {
+          const ingredientCount = Object.keys(rpgState.ingredientBonuses).length
+          // Check if player has at least 5 ingredients (configurable threshold)
+          return ingredientCount >= 5
+        }
+        // Add more condition types here if needed
+        return false
+      }
+
       // If this choice leads to a boss battle, check if boss is defeated
       if (choice.next) {
         const nextScene = rpgScenes[choice.next]
@@ -171,15 +205,22 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
   }
 
   // Handle combat action
-  const handleCombatAction = (action: 'attack' | 'defend' | 'item' | 'flee', itemId?: string) => {
+  const handleCombatAction = (action: 'attack' | 'defend' | 'item' | 'flee' | 'ability', itemOrAbilityId?: string) => {
     // If action is 'item' but no itemId, show item menu
-    if (action === 'item' && !itemId) {
+    if (action === 'item' && !itemOrAbilityId) {
       setCombatPhase('item_menu')
       setSelectedChoice(-1)
       return
     }
 
-    const result = CombatProcessor.processTurn(rpgState, action, itemId)
+    // If action is 'ability' but no abilityId, show ability menu
+    if (action === 'ability' && !itemOrAbilityId) {
+      setCombatPhase('ability_menu')
+      setSelectedChoice(-1)
+      return
+    }
+
+    const result = CombatProcessor.processTurn(rpgState, action, itemOrAbilityId)
 
     setRpgState(result.newState)
     setCombatLog(result.actions)
@@ -354,16 +395,39 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
   if (combatPhase === 'inventory_view') {
     // Show inventory and equipment
     const usableItems = InventoryManager.getUsableConsumables(rpgState)
-    const { weapon, armor, shield } = rpgState.equipment
+    const equippableItems = InventoryManager.getEquippableItems(rpgState)
+    const { weapon, armor, shield, accessory } = rpgState.equipment
+
+    // Build ingredient bonuses display
+    const ingredientBonusesText = Object.keys(rpgState.ingredientBonuses).length > 0
+      ? Object.entries(rpgState.ingredientBonuses).map(([ingredientId, bonus]) => {
+          const bonusParts: string[] = []
+          if (bonus.atk) bonusParts.push(`ATK +${bonus.atk}`)
+          if (bonus.def) bonusParts.push(`DEF +${bonus.def}`)
+          if (bonus.spd) bonusParts.push(`SPD +${bonus.spd}`)
+          if (bonus.maxHp) bonusParts.push(`MaxHP +${bonus.maxHp}`)
+          if (bonus.ability) bonusParts.push(`Ability: ${bonus.ability}`)
+          return `${ingredientId}: ${bonusParts.length > 0 ? bonusParts.join(', ') : 'Unknown bonus'}`
+        }).join('\n')
+      : 'None'
 
     displayText = `═══════════════════════════════════════════
 INVENTORY & EQUIPMENT
 ═══════════════════════════════════════════
 
---- EQUIPMENT ---
+--- EQUIPPED ---
 Weapon: ${weapon?.name || 'None'} (ATK +${weapon?.stats.atk || 0})
 Armor: ${armor?.name || 'None'} (DEF +${armor?.stats.def || 0})
 Shield: ${shield?.name || 'None'} (DEF +${shield?.stats.def || 0})
+Accessory: ${accessory?.name || 'None'}${accessory?.stats ? ` (ATK +${accessory.stats.atk || 0}, DEF +${accessory.stats.def || 0}, SPD +${accessory.stats.spd || 0})` : ''}
+
+--- INGREDIENT BONUSES (from Act 1) ---
+${ingredientBonusesText}
+
+--- EQUIPMENT IN INVENTORY ---
+${equippableItems.length > 0
+  ? equippableItems.map(item => `${item.name} x${item.quantity} - ${item.description}`).join('\n')
+  : 'No equipment in inventory'}
 
 --- CONSUMABLES ---
 ${usableItems.length > 0
@@ -373,14 +437,20 @@ ${usableItems.length > 0
 --- STATS ---
 Level: ${rpgState.level} | HP: ${rpgState.hp}/${rpgState.maxHp}
 ATK: ${rpgState.stats.atk} | DEF: ${rpgState.stats.def} | SPD: ${rpgState.stats.spd}
-Currency: ${rpgState.currency} Crumbs
+Currency: ${rpgState.currency} Scraps
 XP: ${rpgState.xp}/${rpgState.maxXp}
 `
 
     displayChoices = [
+      ...equippableItems.map(item => ({
+        label: `⚔️ Equip ${item.name}`,
+        itemId: item.id,
+        action: 'equip'
+      })),
       ...usableItems.map(item => ({
         label: `Use ${item.name} (heal ${item.effect?.healHp || 0} HP)`,
-        itemId: item.id
+        itemId: item.id,
+        action: 'use'
       })),
       { label: '← Back', action: 'back' }
     ]
@@ -392,7 +462,14 @@ XP: ${rpgState.xp}/${rpgState.maxXp}
       if (choice.action === 'back') {
         setCombatPhase('exploration')
         setSelectedChoice(-1)
-      } else if (choice.itemId) {
+      } else if (choice.action === 'equip' && choice.itemId) {
+        // Equip item
+        const equipResult = InventoryManager.equipItem(rpgState, choice.itemId)
+        if (equipResult.success) {
+          setRpgState(equipResult.newState)
+        }
+        setSelectedChoice(-1)
+      } else if (choice.action === 'use' && choice.itemId) {
         // Use item outside of combat
         const useResult = InventoryManager.useConsumable(rpgState, choice.itemId)
         if (useResult.success) {
@@ -404,16 +481,32 @@ XP: ${rpgState.xp}/${rpgState.maxXp}
   } else if (combatPhase === 'combat') {
     // In combat - show battle scene
     displayText = BattleSceneGenerator.generateBattleScene(rpgState, combatLog)
+
+    // Check if player has abilities
+    const playerAbilities = RPGStateManager.getPlayerAbilities(rpgState)
+    const hasAbilities = playerAbilities.length > 0
+
     displayChoices = [
       { label: '⚔️ Attack', action: 'attack' },
       { label: '🛡️ Defend', action: 'defend' },
+      ...(hasAbilities ? [{ label: '✨ Abilities', action: 'abilities' }] : []),
       { label: '🎒 Use Item', action: 'item' },
       { label: '🏃 Flee', action: 'flee' }
     ]
     onChoiceChange = (index: number) => {
       setSelectedChoice(index)
-      const action = ['attack', 'defend', 'item', 'flee'][index] as 'attack' | 'defend' | 'item' | 'flee'
-      handleCombatAction(action)
+      const choice = displayChoices[index]
+
+      if (choice.action === 'abilities') {
+        setCombatPhase('ability_menu')
+        setSelectedChoice(-1)
+      } else if (choice.action === 'item') {
+        setCombatPhase('item_menu')
+        setSelectedChoice(-1)
+      } else {
+        const action = choice.action as 'attack' | 'defend' | 'flee'
+        handleCombatAction(action)
+      }
     }
   } else if (combatPhase === 'item_menu') {
     // Item selection menu
@@ -449,6 +542,38 @@ XP: ${rpgState.xp}/${rpgState.maxXp}
           handleCombatAction('item', choice.itemId)
           setCombatPhase('combat')
         }
+      }
+    }
+  } else if (combatPhase === 'ability_menu') {
+    // Ability selection menu
+    const playerAbilities = RPGStateManager.getPlayerAbilities(rpgState)
+
+    // Define ability descriptions
+    const abilityDescriptions: Record<string, string> = {
+      poison_strike: 'Poison Strike - 5 damage over 3 turns',
+      onion_tears: 'Onion Tears - 12 AOE damage (costs 10 HP)',
+      heal: 'Heal - Restore 20 HP (3 uses per battle)'
+    }
+
+    displayText = BattleSceneGenerator.generateBattleScene(rpgState, combatLog) + '\n\n--- ABILITIES ---\n\nSelect an ability to use:\n'
+    displayChoices = [
+      ...playerAbilities.map(abilityId => ({
+        label: abilityDescriptions[abilityId] || abilityId,
+        abilityId: abilityId
+      })),
+      { label: '← Back to Combat', action: 'back' }
+    ]
+    onChoiceChange = (index: number) => {
+      setSelectedChoice(index)
+      const choice = displayChoices[index]
+
+      if (choice.action === 'back') {
+        setCombatPhase('combat')
+        setSelectedChoice(-1)
+      } else if (choice.abilityId) {
+        // Use the selected ability
+        handleCombatAction('ability' as any, choice.abilityId)
+        setCombatPhase('combat')
       }
     }
   } else if (combatPhase === 'victory' && victoryData) {
@@ -538,13 +663,13 @@ COCKROACH MERCHANT'S SHOP
 "Hehehe, welcome, welcome! You look hungry, yes?
 I have finest goods in all trash can!"
 
-Your Crumbs: ${rpgState.currency}
+Your Scraps: ${rpgState.currency}
 
 --- AVAILABLE ITEMS ---
 
 ${availableItems.map((shopItem, idx) => {
   const affordSymbol = shopItem.canAfford ? '✓' : '✗'
-  return `${idx + 1}. ${shopItem.item.name} - ${shopItem.item.shopPrice} Crumbs ${affordSymbol}
+  return `${idx + 1}. ${shopItem.item.name} - ${shopItem.item.shopPrice} Scraps ${affordSymbol}
    ${shopItem.item.description}`
 }).join('\n\n')}
 
@@ -552,7 +677,7 @@ ${shopMessage ? `\n${shopMessage}\n` : ''}`
 
     displayChoices = [
       ...availableItems.map(shopItem => ({
-        label: `Buy ${shopItem.item.name} (${shopItem.item.shopPrice} Crumbs)`,
+        label: `Buy ${shopItem.item.name} (${shopItem.item.shopPrice} Scraps)`,
         itemId: shopItem.item.id,
         canAfford: shopItem.canAfford
       })),
@@ -594,13 +719,13 @@ COCKROACH MERCHANT'S SHOP - SELL ITEMS
 
 "You want to sell? Let me see what you have!"
 
-Your Crumbs: ${rpgState.currency}
+Your Scraps: ${rpgState.currency}
 
 --- YOUR SELLABLE ITEMS ---
 
 ${sellableItems.length > 0
   ? sellableItems.map((sellItem, idx) => {
-      return `${idx + 1}. ${sellItem.item.name} x${sellItem.quantity} - ${sellItem.sellPrice} Crumbs each
+      return `${idx + 1}. ${sellItem.item.name} x${sellItem.quantity} - ${sellItem.sellPrice} Scraps each
    ${sellItem.item.description}`
     }).join('\n\n')
   : 'You have nothing to sell!'}
@@ -609,7 +734,7 @@ ${shopMessage ? `\n${shopMessage}\n` : ''}`
 
     displayChoices = [
       ...sellableItems.map(sellItem => ({
-        label: `Sell ${sellItem.item.name} (${sellItem.sellPrice} Crumbs)`,
+        label: `Sell ${sellItem.item.name} (${sellItem.sellPrice} Scraps)`,
         itemId: sellItem.item.id
       })),
       { label: '→ Buy Items', action: 'switch_to_buy' },

@@ -140,7 +140,7 @@ export class InventoryManager {
       return { newState: state, success: false, message: 'Item cannot be equipped' }
     }
 
-    const slot = itemDef.slot as 'weapon' | 'armor' | 'shield'
+    const slot = itemDef.slot as 'weapon' | 'armor' | 'shield' | 'accessory'
     const currentEquipment = state.equipment[slot]
 
     // Unequip current item (if any and not a starting item)
@@ -164,7 +164,7 @@ export class InventoryManager {
       name: itemDef.name,
       description: itemDef.description,
       type: 'equipment',
-      slot: itemDef.slot as 'weapon' | 'armor' | 'shield',
+      slot: itemDef.slot as 'weapon' | 'armor' | 'shield' | 'accessory',
       stats: itemDef.stats || {},
       quantity: 1
     }
@@ -190,7 +190,7 @@ export class InventoryManager {
   /**
    * Unequip an item from a slot
    */
-  static unequipItem(state: RPGState, slot: 'weapon' | 'armor' | 'shield'): { newState: RPGState; success: boolean; message: string } {
+  static unequipItem(state: RPGState, slot: 'weapon' | 'armor' | 'shield' | 'accessory'): { newState: RPGState; success: boolean; message: string } {
     const currentEquipment = state.equipment[slot]
 
     if (!currentEquipment) {
@@ -208,29 +208,42 @@ export class InventoryManager {
       return { newState: state, success: false, message: 'Inventory is full' }
     }
 
-    // Get the starting equipment for this slot
-    const startingEquipmentId = this.getStartingEquipmentId(slot)
-    const startingEquipmentDef = ItemDatabase.getItem(startingEquipmentId)
+    let newState: RPGState
 
-    if (!startingEquipmentDef) {
-      throw new Error(`Starting equipment definition not found for ${slot} (${startingEquipmentId})`)
-    }
+    // Accessories have no starting equipment - set to null
+    if (slot === 'accessory') {
+      newState = {
+        ...addResult.newState,
+        equipment: {
+          ...addResult.newState.equipment,
+          [slot]: null
+        }
+      }
+    } else {
+      // Get the starting equipment for this slot (weapon, armor, shield)
+      const startingEquipmentId = this.getStartingEquipmentId(slot)
+      const startingEquipmentDef = ItemDatabase.getItem(startingEquipmentId)
 
-    const startingEquipment: Equipment = {
-      id: startingEquipmentId,
-      name: startingEquipmentDef.name,
-      description: startingEquipmentDef.description,
-      type: 'equipment',
-      slot,
-      stats: startingEquipmentDef.stats || {},
-      quantity: 1
-    }
+      if (!startingEquipmentDef) {
+        throw new Error(`Starting equipment definition not found for ${slot} (${startingEquipmentId})`)
+      }
 
-    let newState = {
-      ...addResult.newState,
-      equipment: {
-        ...addResult.newState.equipment,
-        [slot]: startingEquipment
+      const startingEquipment: Equipment = {
+        id: startingEquipmentId,
+        name: startingEquipmentDef.name,
+        description: startingEquipmentDef.description,
+        type: 'equipment',
+        slot,
+        stats: startingEquipmentDef.stats || {},
+        quantity: 1
+      }
+
+      newState = {
+        ...addResult.newState,
+        equipment: {
+          ...addResult.newState.equipment,
+          [slot]: startingEquipment
+        }
       }
     }
 
@@ -258,7 +271,7 @@ export class InventoryManager {
     let totalSpd = baseSpd
 
     // Add equipment bonuses
-    const { weapon, armor, shield } = state.equipment
+    const { weapon, armor, shield, accessory } = state.equipment
 
     if (weapon?.stats) {
       totalAtk += weapon.stats.atk || 0
@@ -276,6 +289,12 @@ export class InventoryManager {
       totalAtk += shield.stats.atk || 0
       totalDef += shield.stats.def || 0
       totalSpd += shield.stats.spd || 0
+    }
+
+    if (accessory?.stats) {
+      totalAtk += accessory.stats.atk || 0
+      totalDef += accessory.stats.def || 0
+      totalSpd += accessory.stats.spd || 0
     }
 
     // Add ingredient bonuses

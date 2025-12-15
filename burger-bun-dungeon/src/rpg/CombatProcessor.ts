@@ -3,10 +3,11 @@ import { InventoryManager } from './InventoryManager'
 import { RPGStateManager } from './RPGStateManager'
 import { COMBAT, PROGRESSION } from './RPGConstants'
 import { SpecialAbilities } from './SpecialAbilities'
+import rpgEnemiesData from '../data/rpgEnemies.json'
 
 export interface CombatAction {
   actor: 'player' | 'enemy'
-  action: 'attack' | 'defend' | 'item' | 'flee' | 'revive'
+  action: 'attack' | 'defend' | 'item' | 'flee' | 'revive' | 'ability'
   damage?: number        // HP lost (attacks, enemy actions)
   healAmount?: number    // HP gained (healing items, revives)
   success?: boolean
@@ -30,8 +31,8 @@ export class CombatProcessor {
    */
   static processTurn(
     state: RPGState,
-    playerAction: 'attack' | 'defend' | 'item' | 'flee',
-    itemId?: string
+    playerAction: 'attack' | 'defend' | 'item' | 'flee' | 'ability',
+    itemOrAbilityId?: string
   ): CombatResult {
     if (!state.currentEnemy) {
       return {
@@ -59,16 +60,30 @@ export class CombatProcessor {
         break
 
       case 'item':
-        if (!itemId) {
+        if (!itemOrAbilityId) {
           actions.push({
             actor: 'player',
             action: 'item',
             message: 'No item specified to use!'
           })
         } else {
-          const itemResult = this.playerUseItem(currentState, itemId)
+          const itemResult = this.playerUseItem(currentState, itemOrAbilityId)
           currentState = itemResult.newState
           actions.push(...itemResult.actions)
+        }
+        break
+
+      case 'ability':
+        if (!itemOrAbilityId) {
+          actions.push({
+            actor: 'player',
+            action: 'ability',
+            message: 'No ability specified to use!'
+          })
+        } else {
+          const abilityResult = this.playerUseAbility(currentState, itemOrAbilityId)
+          currentState = abilityResult.newState
+          actions.push(...abilityResult.actions)
         }
         break
 
@@ -97,11 +112,39 @@ export class CombatProcessor {
 
     // Enemy turn (only if player didn't flee successfully)
     if (currentState.currentEnemy) {
+      const wasDefending = currentState.playerDefending
       const enemyResult = this.enemyTurn(currentState)
       currentState = enemyResult.newState
       actions.push(...enemyResult.actions)
 
-      // Reset defending state after enemy attacks
+      // Counter-attack if player was defending and survived
+      if (wasDefending && currentState.hp > 0 && currentState.currentEnemy && currentState.currentEnemy.hp > 0) {
+        const counterDamage = Math.floor(
+          this.calculateDamage(
+            { atk: currentState.stats.atk, def: 0 },
+            { atk: 0, def: currentState.currentEnemy.def },
+            false
+          ) * COMBAT.COUNTER_MULTIPLIER
+        )
+
+        const newEnemyHp = Math.max(0, currentState.currentEnemy.hp - counterDamage)
+        currentState = {
+          ...currentState,
+          currentEnemy: {
+            ...currentState.currentEnemy,
+            hp: newEnemyHp
+          }
+        }
+
+        actions.push({
+          actor: 'player',
+          action: 'attack',
+          damage: counterDamage,
+          message: `You counter-attack for ${counterDamage} damage!`
+        })
+      }
+
+      // Reset defending state after enemy attacks and counter
       currentState = { ...currentState, playerDefending: false }
     }
 
@@ -172,8 +215,20 @@ export class CombatProcessor {
       }
     }
 
+    // Priority: Attack minions first, then boss
+    let target = state.currentEnemy
+    let targetIsMinion = false
+    let minionIndex = -1
+
+    if (state.currentEnemy.minions && state.currentEnemy.minions.length > 0) {
+      // Attack the first alive minion
+      target = state.currentEnemy.minions[0]
+      targetIsMinion = true
+      minionIndex = 0
+    }
+
     // Check for evasion
-    if (SpecialAbilities.checkEvasion(state.currentEnemy)) {
+    if (SpecialAbilities.checkEvasion(target)) {
       return {
         newState: state,
         actions: [
@@ -181,7 +236,7 @@ export class CombatProcessor {
             actor: 'player',
             action: 'attack',
             damage: 0,
-            message: `You attack the ${state.currentEnemy.name}, but it dodges!`
+            message: `You attack the ${target.name}, but it dodges!`
           }
         ]
       }
@@ -189,38 +244,76 @@ export class CombatProcessor {
 
     const damage = this.calculateDamage(
       { atk: state.stats.atk, def: 0 },
-      { atk: 0, def: state.currentEnemy.def },
+      { atk: 0, def: target.def },
       false
     )
 
-    const newEnemyHp = Math.max(0, state.currentEnemy.hp - damage)
+    const newTargetHp = Math.max(0, target.hp - damage)
 
-    let newState: RPGState = {
-      ...state,
-      currentEnemy: {
-        ...state.currentEnemy,
-        hp: newEnemyHp
+    let newState: RPGState = { ...state }
+    const actions: CombatAction[] = []
+
+    if (targetIsMinion && state.currentEnemy.minions) {
+      // Update minion HP
+      const updatedMinions = [...state.currentEnemy.minions]
+      updatedMinions[minionIndex] = {
+        ...updatedMinions[minionIndex],
+        hp: newTargetHp
       }
-    }
 
-    const actions: CombatAction[] = [
-      {
+      // Remove dead minions
+      const aliveMinions = updatedMinions.filter(m => m.hp > 0)
+
+      if (newTargetHp <= 0) {
+        actions.push({
+          actor: 'player',
+          action: 'attack',
+          damage,
+          message: `You attack the ${target.name} for ${damage} damage and defeat it!`
+        })
+      } else {
+        actions.push({
+          actor: 'player',
+          action: 'attack',
+          damage,
+          message: `You attack the ${target.name} for ${damage} damage!`
+        })
+      }
+
+      newState = {
+        ...state,
+        currentEnemy: {
+          ...state.currentEnemy,
+          minions: aliveMinions
+        }
+      }
+    } else {
+      // Attack main enemy
+      newState = {
+        ...state,
+        currentEnemy: {
+          ...state.currentEnemy,
+          hp: newTargetHp
+        }
+      }
+
+      actions.push({
         actor: 'player',
         action: 'attack',
         damage,
         message: `You attack the ${state.currentEnemy.name} for ${damage} damage!`
-      }
-    ]
+      })
 
-    // Check for boss phase transitions after damage
-    if (newState.currentEnemy) {
-      const phaseResult = SpecialAbilities.updateBossPhase(newState.currentEnemy)
-      if (phaseResult.phaseChanged && phaseResult.phaseMessage) {
-        actions.push({
-          actor: 'enemy',
-          action: 'attack',
-          message: `⚠️ ${phaseResult.phaseMessage}`
-        })
+      // Check for boss phase transitions after damage
+      if (newState.currentEnemy) {
+        const phaseResult = SpecialAbilities.updateBossPhase(newState.currentEnemy)
+        if (phaseResult.phaseChanged && phaseResult.phaseMessage) {
+          actions.push({
+            actor: 'enemy',
+            action: 'attack',
+            message: `⚠️ ${phaseResult.phaseMessage}`
+          })
+        }
       }
     }
 
@@ -228,7 +321,7 @@ export class CombatProcessor {
   }
 
   /**
-   * Player defends (reduces incoming damage by 50% next turn)
+   * Player defends (reduces incoming damage by 75% and counter-attacks)
    */
   static playerDefend(state: RPGState): {
     newState: RPGState
@@ -243,7 +336,7 @@ export class CombatProcessor {
       {
         actor: 'player',
         action: 'defend',
-        message: 'You brace yourself. Incoming damage will be reduced by 50%.'
+        message: 'You take a defensive stance, ready to counter-attack! Incoming damage reduced by 75%.'
       }
     ]
 
@@ -284,6 +377,137 @@ export class CombatProcessor {
         }
       ]
     }
+  }
+
+  /**
+   * Player uses a special ability from ingredients
+   */
+  static playerUseAbility(state: RPGState, abilityId: string): {
+    newState: RPGState
+    actions: CombatAction[]
+  } {
+    if (!state.currentEnemy) {
+      return {
+        newState: state,
+        actions: [
+          {
+            actor: 'player',
+            action: 'ability',
+            message: 'No enemy to target!'
+          }
+        ]
+      }
+    }
+
+    const actions: CombatAction[] = []
+    let newState = { ...state }
+
+    switch (abilityId) {
+      case 'poison_strike':
+        // Poison Strike - 5 damage over 3 turns
+        const poisonDamage = 5
+        actions.push({
+          actor: 'player',
+          action: 'ability',
+          message: `You use Poison Strike! The ${state.currentEnemy.name} is poisoned and will take ${poisonDamage} damage for 3 turns!`
+        })
+        // Apply poison effect
+        newState = {
+          ...newState,
+          currentEnemy: {
+            ...newState.currentEnemy!,
+            poisonTurns: 3
+          }
+        }
+        break
+
+      case 'onion_tears':
+        // Onion Tears - 12 AOE damage (costs 10 HP)
+        const hpCost = 10
+        const aoeDamage = 12
+
+        if (state.hp <= hpCost) {
+          actions.push({
+            actor: 'player',
+            action: 'ability',
+            success: false,
+            message: 'Not enough HP to use Onion Tears! (Costs 10 HP)'
+          })
+        } else {
+          // Pay HP cost
+          newState = {
+            ...newState,
+            hp: Math.max(0, state.hp - hpCost)
+          }
+
+          // Deal AOE damage to enemy
+          const newEnemyHp = Math.max(0, state.currentEnemy.hp - aoeDamage)
+          newState = {
+            ...newState,
+            currentEnemy: {
+              ...newState.currentEnemy!,
+              hp: newEnemyHp
+            }
+          }
+
+          // Also damage all minions if present
+          if (state.currentEnemy.minions && state.currentEnemy.minions.length > 0) {
+            const damagedMinions = state.currentEnemy.minions.map(minion => ({
+              ...minion,
+              hp: Math.max(0, minion.hp - aoeDamage)
+            })).filter(m => m.hp > 0) // Remove defeated minions
+
+            newState = {
+              ...newState,
+              currentEnemy: {
+                ...newState.currentEnemy!,
+                minions: damagedMinions
+              }
+            }
+          }
+
+          actions.push({
+            actor: 'player',
+            action: 'ability',
+            damage: aoeDamage,
+            success: true,
+            message: `You cry tears of onion! ${aoeDamage} AOE damage dealt! (Cost ${hpCost} HP)`
+          })
+        }
+        break
+
+      case 'heal':
+        // Heal - Restore 20 HP (3 uses per battle)
+        // TODO: Need to track uses per battle - for now, allow unlimited
+        const healAmount = 20
+        const oldHp = state.hp
+        const newHp = Math.min(state.maxHp, state.hp + healAmount)
+        const actualHeal = newHp - oldHp
+
+        newState = {
+          ...newState,
+          hp: newHp
+        }
+
+        actions.push({
+          actor: 'player',
+          action: 'ability',
+          healAmount: actualHeal,
+          success: true,
+          message: `You use Special Sauce to heal! Restored ${actualHeal} HP!`
+        })
+        break
+
+      default:
+        actions.push({
+          actor: 'player',
+          action: 'ability',
+          message: `Unknown ability: ${abilityId}`
+        })
+        break
+    }
+
+    return { newState, actions }
   }
 
   /**
@@ -367,6 +591,33 @@ export class CombatProcessor {
   }
 
   /**
+   * Creates a minion enemy from enemy data
+   */
+  static createMinion(enemyData: any): Enemy {
+    return {
+      id: enemyData.id,
+      name: enemyData.name,
+      description: enemyData.description,
+      level: enemyData.level,
+      hp: enemyData.maxHp,
+      maxHp: enemyData.maxHp,
+      atk: enemyData.atk,
+      def: enemyData.def,
+      spd: enemyData.spd,
+      xpReward: enemyData.xpReward,
+      currencyDrop: enemyData.currencyDrop,
+      lootTable: enemyData.lootTable || [],
+      aiPattern: enemyData.aiPattern,
+      special: enemyData.special,
+      currentPhase: 0,
+      turnCounter: 0,
+      charging: false,
+      poisonTurns: 0,
+      constrictTurns: 0
+    }
+  }
+
+  /**
    * Enemy takes their turn based on AI pattern
    */
   static enemyTurn(state: RPGState): {
@@ -387,50 +638,103 @@ export class CombatProcessor {
       state.currentEnemy.turnCounter = 1
     }
 
-    const enemyAction = this.determineEnemyAction(state.currentEnemy)
+    const actions: CombatAction[] = []
+    let currentState = state
+
+    // Apply poison damage at start of enemy turn
+    if (state.currentEnemy.poisonTurns && state.currentEnemy.poisonTurns > 0) {
+      const poisonDamage = 5
+      const newEnemyHp = Math.max(0, state.currentEnemy.hp - poisonDamage)
+      const newPoisonTurns = (state.currentEnemy.poisonTurns || 0) - 1
+
+      currentState = {
+        ...currentState,
+        currentEnemy: {
+          ...currentState.currentEnemy!,
+          hp: newEnemyHp,
+          poisonTurns: newPoisonTurns
+        }
+      }
+
+      actions.push({
+        actor: 'enemy',
+        action: 'attack',
+        damage: poisonDamage,
+        message: `The ${state.currentEnemy.name} takes ${poisonDamage} poison damage! (${newPoisonTurns} turns remaining)`
+      })
+
+      // Check if poison killed the enemy
+      if (newEnemyHp <= 0) {
+        return { newState: currentState, actions }
+      }
+    }
+
+    const enemyAction = this.determineEnemyAction(currentState.currentEnemy!)
 
     if (enemyAction === 'defend') {
       // Enemy defends
+      actions.push({
+        actor: 'enemy',
+        action: 'defend',
+        message: `The ${currentState.currentEnemy!.name} takes a defensive stance.`
+      })
       return {
-        newState: state,
-        actions: [
-          {
-            actor: 'enemy',
-            action: 'defend',
-            message: `The ${state.currentEnemy.name} takes a defensive stance.`
-          }
-        ]
+        newState: currentState,
+        actions
       }
     }
 
     // Calculate base damage
     let baseDamage = this.calculateDamage(
-      { atk: state.currentEnemy.atk, def: 0 },
-      { atk: 0, def: state.stats.def },
-      state.playerDefending
+      { atk: currentState.currentEnemy!.atk, def: 0 },
+      { atk: 0, def: currentState.stats.def },
+      currentState.playerDefending
     )
 
-    let actions: CombatAction[] = []
     let finalDamage = baseDamage
-    let currentState = state
 
     // Process special abilities
-    if (state.currentEnemy.special) {
+    if (currentState.currentEnemy!.special) {
       const specialResult = SpecialAbilities.processSpecialAbility(
-        state,
-        state.currentEnemy,
+        currentState,
+        currentState.currentEnemy!,
         baseDamage
       )
 
       actions.push(...specialResult.actions)
       finalDamage = specialResult.modifiedDamage
 
+      // Handle summon minions - actually create the minions
+      if (currentState.currentEnemy!.special.type === 'summon_minions' &&
+          currentState.currentEnemy!.turnCounter === 0) {
+        const special = currentState.currentEnemy!.special
+        const currentMinionCount = currentState.currentEnemy!.minions?.length || 0
+
+        if (currentMinionCount < special.summonCount) {
+          // Load minion enemy data
+          const rpgEnemies = rpgEnemiesData as Record<string, any>
+          const minionData = rpgEnemies[special.summonId]
+
+          if (minionData) {
+            const newMinion = this.createMinion(minionData)
+            const newMinions = [...(currentState.currentEnemy!.minions || []), newMinion]
+            currentState = {
+              ...currentState,
+              currentEnemy: {
+                ...currentState.currentEnemy!,
+                minions: newMinions
+              }
+            }
+          }
+        }
+      }
+
       // Handle item stealing
       if (specialResult.stolenItemIndex !== undefined) {
-        const itemToRemove = state.inventory[specialResult.stolenItemIndex]
+        const itemToRemove = currentState.inventory[specialResult.stolenItemIndex]
         if (itemToRemove) {
           const removeResult = InventoryManager.removeItem(
-            state,
+            currentState,
             itemToRemove.id,
             1
           )
@@ -445,24 +749,42 @@ export class CombatProcessor {
         actor: 'enemy',
         action: 'attack',
         damage: finalDamage,
-        message: `The ${state.currentEnemy.name} attacks you for ${finalDamage} damage!`
+        message: `The ${currentState.currentEnemy!.name} attacks you for ${finalDamage} damage!`
       })
     }
 
     // Check for frenzy (attacks twice per turn)
-    const isFrenzy = state.currentEnemy.special?.type === 'frenzy'
+    const isFrenzy = currentState.currentEnemy!.special?.type === 'frenzy'
     if (isFrenzy) {
       const secondAttackDamage = this.calculateDamage(
-        { atk: state.currentEnemy.atk, def: 0 },
-        { atk: 0, def: state.stats.def },
-        state.playerDefending
+        { atk: currentState.currentEnemy!.atk, def: 0 },
+        { atk: 0, def: currentState.stats.def },
+        currentState.playerDefending
       )
       finalDamage += secondAttackDamage
       actions.push({
         actor: 'enemy',
         action: 'attack',
         damage: secondAttackDamage,
-        message: `The ${state.currentEnemy.name} attacks AGAIN! ${secondAttackDamage} damage!`
+        message: `The ${currentState.currentEnemy!.name} attacks AGAIN! ${secondAttackDamage} damage!`
+      })
+    }
+
+    // Minions attack
+    if (currentState.currentEnemy!.minions && currentState.currentEnemy!.minions.length > 0) {
+      currentState.currentEnemy!.minions.forEach(minion => {
+        const minionDamage = this.calculateDamage(
+          { atk: minion.atk, def: 0 },
+          { atk: 0, def: currentState.stats.def },
+          currentState.playerDefending
+        )
+        finalDamage += minionDamage
+        actions.push({
+          actor: 'enemy',
+          action: 'attack',
+          damage: minionDamage,
+          message: `${minion.name} attacks for ${minionDamage} damage!`
+        })
       })
     }
 
@@ -530,6 +852,7 @@ export class CombatProcessor {
       def: enemyData.def,
       spd: enemyData.spd,
       xpReward: enemyData.xpReward,
+      currencyDrop: enemyData.currencyDrop,
       lootTable: enemyData.lootTable || [],
       aiPattern: enemyData.aiPattern,
       // Boss-specific data

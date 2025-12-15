@@ -65,20 +65,20 @@
 - [x] F7.3: Implement enemy AI patterns (aggressive/defensive/random)
 - [x] F7.4: Create enemy loot tables
 
-### **Phase 8: Boss Battles**
-- [ ] F8.1: Design Spoiled Milk mini-boss (Level 3)
-- [ ] F8.2: Design Raccoon King boss (Level 7)
-- [ ] F8.3: Design The Hungry Dog final boss (Level 10)
-- [ ] F8.4: Add boss intro cutscenes
-- [ ] F8.5: Implement boss-specific mechanics
-- [ ] F8.6: Make Sure All Enemy Special Abilities Are useable.
+### **Phase 8: Boss Battles** ✅ COMPLETE
+- [x] F8.1: Design Spoiled Milk mini-boss (Level 3)
+- [x] F8.2: Design Raccoon King boss (Level 7)
+- [x] F8.3: Design The Hungry Dog final boss (Level 10)
+- [x] F8.4: Add boss intro cutscenes
+- [x] F8.5: Implement boss-specific mechanics
+- [x] F8.6: Make Sure All Enemy Special Abilities Are useable.
 
-### **Phase 9: Content & Writing**
-- [ ] F9.1: Write opening cutscene (thrown in trash)
-- [ ] F9.2: Write all location descriptions
-- [ ] F9.3: Write combat flavor text
-- [ ] F9.4: Create victory ending scene
-- [ ] F9.5: Add optional bad/secret endings
+### **Phase 9: Content & Writing** ✅ COMPLETE
+- [x] F9.1: Write opening cutscene (thrown in trash)
+- [x] F9.2: Write all location descriptions
+- [x] F9.3: Write combat flavor text
+- [x] F9.4: Create victory ending scene
+- [x] F9.5: Add optional bad/secret endings
 
 ### **Phase 10: Polish & Balance**
 - [ ] F10.1: Balance XP curve and difficulty

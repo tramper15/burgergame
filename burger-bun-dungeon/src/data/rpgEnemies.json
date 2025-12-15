@@ -381,10 +381,10 @@
     "name": "The Hungry Dog",
     "description": "A massive golden retriever. To it, you're a snack. To you, it's apocalypse.",
     "level": 10,
-    "maxHp": 350,
-    "atk": 18,
-    "def": 10,
-    "spd": 7,
+    "maxHp": 500,
+    "atk": 30,
+    "def": 15,
+    "spd": 10,
     "xpReward": 500,
     "currencyDrop": { "min": 500, "max": 1000 },
     "lootTable": [],
@@ -421,7 +421,7 @@
         "phaseMessage": "The dog snarls! Its attacks become more vicious!",
         "special": {
           "type": "bite",
-          "damageMultiplier": 2
+          "damageMultiplier": 2.5
         }
       },
       {

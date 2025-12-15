@@ -65,13 +65,17 @@ export class SpecialAbilities {
         // Check turn counter for interval-based summoning
         const currentTurn = enemy.turnCounter || 0
         if (currentTurn >= special.summonInterval) {
-          actions.push({
-            actor: 'enemy',
-            action: 'attack',
-            message: `${enemy.name} summons ${special.summonCount} ${special.summonId.replace(/_/g, ' ')}s to aid in battle!`
-          })
-          // Reset turn counter
-          enemy.turnCounter = 0
+          // Cap total minions at summonCount
+          const currentMinionCount = enemy.minions?.length || 0
+          if (currentMinionCount < special.summonCount) {
+            actions.push({
+              actor: 'enemy',
+              action: 'attack',
+              message: `${enemy.name} summons ${special.summonId.replace(/_/g, ' ')}s to aid in battle!`
+            })
+            // Mark that summon happened (actual minion creation in CombatProcessor)
+            enemy.turnCounter = 0
+          }
         } else {
           // Persist turn counter increment (actual increment happens in enemyTurn)
           enemy.turnCounter = currentTurn

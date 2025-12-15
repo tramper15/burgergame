@@ -6,7 +6,8 @@
 // Combat Constants
 export const COMBAT = {
   DAMAGE_VARIANCE: 3,           // Random variance added to damage (0 to DAMAGE_VARIANCE-1)
-  DEFENSE_MULTIPLIER: 0.5,      // Damage reduction when defending
+  DEFENSE_MULTIPLIER: 0.25,     // Damage reduction when defending (75% reduction)
+  COUNTER_MULTIPLIER: 0.5,      // Counter-attack damage multiplier (50% of normal attack)
   FLEE_CHANCE: 0.5,             // Base chance to flee from combat (50%)
   MIN_DAMAGE: 1,                // Minimum damage dealt by any attack
 } as const

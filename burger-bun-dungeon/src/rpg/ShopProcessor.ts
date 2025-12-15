@@ -122,7 +122,7 @@ export class ShopProcessor {
       return {
         success: false,
         newState: state,
-        message: `Not enough Crumbs! Need ${item.shopPrice}, have ${state.currency}.`
+        message: `Not enough Scraps! Need ${item.shopPrice}, have ${state.currency}.`
       }
     }
 
@@ -146,7 +146,7 @@ export class ShopProcessor {
     return {
       success: true,
       newState,
-      message: `Purchased ${item.name} for ${item.shopPrice} Crumbs!`
+      message: `Purchased ${item.name} for ${item.shopPrice} Scraps!`
     }
   }
 
@@ -227,7 +227,7 @@ export class ShopProcessor {
     return {
       success: true,
       newState,
-      message: `Sold ${item.name} for ${item.sellPrice} Crumbs!`
+      message: `Sold ${item.name} for ${item.sellPrice} Scraps!`
     }
   }
 

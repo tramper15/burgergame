@@ -1,32 +1,76 @@
 {
+  "rpg_opening": {
+    "name": "Act 2: Trash Odyssey - Opening",
+    "description": "Your journey begins here, in the darkness.",
+    "type": "cutscene",
+    "cutsceneText": [
+      "═══════════════════════════════════════════",
+      "ACT 2: TRASH ODYSSEY",
+      "═══════════════════════════════════════════",
+      "",
+      "You've found meaning. You've collected ingredients.",
+      "You've lingered in silence and found peace.",
+      "",
+      "The person lifts you to their mouth...",
+      "",
+      "\"Ugh, too much avocado.\"",
+      "",
+      "THUNK.",
+      "",
+      "You tumble through darkness. Land in wetness.",
+      "Coffee grounds. Banana peels. The stench of decay.",
+      "",
+      "The garbage can.",
+      "",
+      "For a moment, you despair.",
+      "",
+      "But then you remember: You have PURPOSE now.",
+      "You're not just a bun. You're a COMPLETE bun.",
+      "",
+      "And complete buns don't give up.",
+      "",
+      "Somewhere beyond this trash, beyond the backyard,",
+      "there's a shed. And in that shed, a lunchbox.",
+      "",
+      "A place where forgotten foods rest in peace.",
+      "",
+      "You will reach it.",
+      "",
+      "No matter how many monsters stand in your way.",
+      "",
+      "═══════════════════════════════════════════"
+    ],
+    "choices": [
+      {
+        "label": "→ Begin your journey",
+        "next": "garbage_can_start"
+      }
+    ]
+  },
+
   "garbage_can_start": {
     "name": "Garbage Can",
     "description": "The smell of decay surrounds you. Coffee grounds, banana peels, and forgotten food create a treacherous landscape. You've landed in the trash, but this is just the beginning.",
     "type": "safe",
-    "firstVisit": "You tumble through darkness and land with a wet SPLAT. The garbage can. Your new reality. But you won't stay here forever.",
+    "firstVisit": "You stand at the bottom of the garbage can. Wet, sticky, but alive. The walls rise high above you. This is where your odyssey truly begins.",
     "choices": [
       {
         "label": "→ Rest and heal (saves game)",
         "action": "rest"
       },
       {
-        "label": "⚔️ Fight a Slime Mold (TEST)",
-        "action": "fight",
-        "enemyId": "slime_mold"
-      },
-      {
-        "label": "⚔️ Fight a Grease Glob (TEST)",
-        "action": "fight",
-        "enemyId": "grease_glob"
-      },
-      {
-        "label": "⚔️ Fight an Angry Ant (TEST)",
-        "action": "fight",
-        "enemyId": "angry_ant"
-      },
-      {
         "label": "→ Venture into Coffee Grounds Cavern",
         "next": "coffee_grounds_cavern"
+      },
+      {
+        "label": "🚀 Fast Travel to Trash Bag Depths (Shop)",
+        "next": "trash_bag_depths",
+        "condition": "visited_trash_bag_depths"
+      },
+      {
+        "label": "🚀 Fast Travel to Shed Entrance",
+        "next": "shed_entrance",
+        "condition": "visited_shed_entrance"
       }
     ]
   },
@@ -149,6 +193,15 @@
       {
         "label": "→ Continue to Backyard Battlefield",
         "next": "backyard_battlefield"
+      },
+      {
+        "label": "🚀 Fast Travel to Garbage Can",
+        "next": "garbage_can_start"
+      },
+      {
+        "label": "🚀 Fast Travel to Shed Entrance",
+        "next": "shed_entrance",
+        "condition": "visited_shed_entrance"
       }
     ]
   },
@@ -227,7 +280,7 @@
   "shed_entrance": {
     "name": "Shed Entrance",
     "description": "The shed looms before you. Inside, the lunchbox awaits. Your journey's end is near.",
-    "type": "combat",
+    "type": "checkpoint",
     "firstVisit": "You've made it. The shed. Just a little further. But the final stretch is never easy.",
     "encounterTable": [
       { "enemyId": "sentient_wrench", "weight": 30 },
@@ -246,8 +299,20 @@
         "condition": "has_all_ingredients"
       },
       {
+        "label": "→ Rest and heal (saves game)",
+        "action": "rest"
+      },
+      {
         "label": "→ Enter the Lunchbox Sanctuary",
         "next": "lunchbox_sanctuary"
+      },
+      {
+        "label": "🚀 Fast Travel to Garbage Can",
+        "next": "garbage_can_start"
+      },
+      {
+        "label": "🚀 Fast Travel to Trash Bag Depths",
+        "next": "trash_bag_depths"
       },
       {
         "label": "← Retreat to Garden",
@@ -269,20 +334,110 @@
     "name": "Lunchbox Sanctuary",
     "description": "You crawl over the lip of the lunchbox. Inside: peace. Safety. Home. You made it.",
     "type": "ending",
-    "endingType": "victory"
+    "endingType": "victory",
+    "endingText": [
+      "═══════════════════════════════════════════",
+      "LUNCHBOX SANCTUARY",
+      "═══════════════════════════════════════════",
+      "",
+      "You crawl over the lip of the lunchbox.",
+      "",
+      "Inside: A bruised apple. Stale crackers. A juice box,",
+      "long since drained. The faint smell of peanut butter.",
+      "",
+      "It's quiet here. Safe.",
+      "",
+      "You nestle between the crackers. They don't judge.",
+      "They don't throw you away.",
+      "",
+      "This is home now.",
+      "",
+      "You made it.",
+      "",
+      "Through slime and grease and raccoons and fear,",
+      "you survived.",
+      "",
+      "You are more than ingredients.",
+      "You are more than purpose.",
+      "",
+      "You are a bun who CHOSE to live.",
+      "",
+      "═══════════════════════════════════════════",
+      "",
+      "Achievement Unlocked: Trash Odyssey Champion",
+      "",
+      "THE END"
+    ]
   },
 
   "secret_ending": {
     "name": "Lunchbox Sanctuary - Legendary Victory",
     "description": "You defeated the impossible. The dog. The legend. You are the Legendary Bun.",
     "type": "ending",
-    "endingType": "secret_victory"
+    "endingType": "secret_victory",
+    "endingText": [
+      "═══════════════════════════════════════════",
+      "LUNCHBOX SANCTUARY - LEGENDARY VICTORY",
+      "═══════════════════════════════════════════",
+      "",
+      "The dog whimpers and retreats.",
+      "",
+      "You stand victorious.",
+      "",
+      "A bun who conquered the kitchen.",
+      "A bun who survived the trash.",
+      "A bun who defeated a DOG.",
+      "",
+      "You crawl into the lunchbox, battle-scarred but alive.",
+      "",
+      "The crackers look at you with awe.",
+      "The apple shifts to make room.",
+      "Even the drained juice box seems impressed.",
+      "",
+      "Legends will be told of you.",
+      "(By the crackers, mostly.)",
+      "",
+      "You are not just a survivor.",
+      "You are a LEGEND.",
+      "",
+      "═══════════════════════════════════════════",
+      "",
+      "Achievement Unlocked: Legendary Bun",
+      "Achievement Unlocked: Trash Odyssey Champion",
+      "",
+      "THE END",
+      "",
+      "(You are the greatest bun who ever lived.)"
+    ]
   },
 
   "game_over": {
     "name": "Defeat",
     "description": "You fall. The darkness takes you. Some stories don't have happy endings.",
     "type": "ending",
-    "endingType": "defeat"
+    "endingType": "defeat",
+    "endingText": [
+      "═══════════════════════════════════════════",
+      "DEFEAT",
+      "═══════════════════════════════════════════",
+      "",
+      "You fall.",
+      "",
+      "The darkness takes you.",
+      "",
+      "You tried. You fought.",
+      "You had purpose. You had hope.",
+      "",
+      "But in the end, you were just a bun in a trash can.",
+      "",
+      "Some stories don't have happy endings.",
+      "",
+      "═══════════════════════════════════════════",
+      "",
+      "GAME OVER",
+      "",
+      "But you can try again.",
+      "Buns are resilient like that."
+    ]
   }
 }

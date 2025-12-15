@@ -5,64 +5,6 @@
   overflow: hidden;
 }
 
-.layout-switcher {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 20px;
-  z-index: 1000;
-  transition: all 0.3s ease;
-}
-
-/* Theme-specific menu bar styling */
-.layout-switcher.theme-layout1 {
-  background: linear-gradient(180deg, #8B0000 0%, #DC143C 100%);
-  border-bottom: 3px solid #FFD700;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-}
-
-.layout-switcher.theme-layout2 {
-  background: linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 100%);
-  border-bottom: 2px solid #4a9eff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.layout-switcher.theme-layout3 {
-  background: linear-gradient(180deg, #FF69B4 0%, #FF1493 100%);
-  border-bottom: 3px solid #FFD700;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-}
-
-.layout-btn {
-  padding: 0.6rem 1.2rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  background: #333;
-  color: #f0f0f0;
-  border: 2px solid #555;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: system-ui, -apple-system, sans-serif;
-}
-
-.layout-btn:hover {
-  background: #444;
-  border-color: #666;
-}
-
-.layout-btn.active {
-  background: #4a9eff;
-  border-color: #3a8edf;
-  color: white;
-  font-weight: bold;
-}
-
 /* Remove default styles that might conflict */
 * {
   box-sizing: border-box;

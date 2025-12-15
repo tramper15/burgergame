@@ -20,6 +20,16 @@ export class BattleSceneGenerator {
     const playerHpBar = this.generateHpBar(state.hp, state.maxHp)
     const enemyHpBar = this.generateHpBar(enemy.hp, enemy.maxHp)
 
+    // Build minion display
+    let minionText = ''
+    if (enemy.minions && enemy.minions.length > 0) {
+      const minionLines = enemy.minions.map(minion => {
+        const minionHpBar = this.generateHpBar(minion.hp, minion.maxHp)
+        return `  ${minion.name}: ${minionHpBar} ${minion.hp}/${minion.maxHp}`
+      }).join('\n')
+      minionText = `\n\nMinions:\n${minionLines}`
+    }
+
     // Build combat log
     const logText = combatLog.length > 0
       ? '\n' + combatLog.map(action => `→ ${action.message}`).join('\n')
@@ -32,7 +42,7 @@ BATTLE
 ${enemy.name} (Level ${enemy.level})
 ${enemy.description}
 
-Enemy HP: ${enemyHpBar} ${enemy.hp}/${enemy.maxHp}
+Enemy HP: ${enemyHpBar} ${enemy.hp}/${enemy.maxHp}${minionText}
 
 ───────────────────────────────────────────
 
@@ -72,7 +82,7 @@ VICTORY!
 You defeated the ${enemyName}!
 
 XP Gained: +${xpGained}
-Crumb Currency: +${currencyGained}${itemText}${levelUpText}
+Scraps: +${currencyGained}${itemText}${levelUpText}
 
 ═══════════════════════════════════════════`
   }
@@ -223,7 +233,7 @@ Stats:
   DEF: ${state.stats.def}
   SPD: ${state.stats.spd}
 
-Crumb Currency: ${state.currency}
+Scraps: ${state.currency}
 
 Ingredient Powers Active:
 ${powersList}

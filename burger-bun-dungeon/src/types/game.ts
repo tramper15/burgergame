@@ -75,6 +75,7 @@ export interface RPGState {
     weapon: Equipment | null
     armor: Equipment | null
     shield: Equipment | null
+    accessory: Equipment | null
   }
   currency: number
 
@@ -104,6 +105,7 @@ export interface Enemy {
   def: number
   spd: number
   xpReward: number
+  currencyDrop?: { min: number; max: number } // Currency drop range
   lootTable: LootDrop[]
   aiPattern: 'aggressive' | 'defensive' | 'random'
   special?: any // Special abilities data from enemy JSON
@@ -115,6 +117,7 @@ export interface Enemy {
   charging?: boolean // For charge-up abilities like Pounce
   poisonTurns?: number // For poison effects
   constrictTurns?: number // For constrict effects
+  minions?: Enemy[] // Summoned minions fighting alongside this enemy
 }
 
 export interface InventoryItem {
@@ -132,7 +135,7 @@ export interface InventoryItem {
 
 export interface Equipment extends InventoryItem {
   type: 'equipment'
-  slot: 'weapon' | 'armor' | 'shield'
+  slot: 'weapon' | 'armor' | 'shield' | 'accessory'
   stats: {
     atk?: number
     def?: number

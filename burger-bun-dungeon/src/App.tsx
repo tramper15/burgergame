@@ -5,21 +5,14 @@ import { GameMenu } from './components/GameMenu'
 import type { LayoutType } from './components/layouts'
 import { ToastProvider } from './components/ToastProvider'
 import { AchievementProvider, useAchievements } from './components/AchievementProvider'
-import { SCENE_IDS } from './constants/gameConstants'
 import './App.css'
-
-type GameMode = 'adventure' | 'rpg' | null
 
 function AppContent() {
   const [currentLayout, setCurrentLayout] = useState<LayoutType>('layout1')
-  const [currentSceneId, setCurrentSceneId] = useState<string>(SCENE_IDS.START)
   const [resetGameFn, setResetGameFn] = useState<(() => void) | null>(null)
-  const [gameMode, setGameMode] = useState<GameMode>('adventure')
+  const [gameMode, setGameMode] = useState<'adventure' | 'rpg'>('adventure')
   const [act1Ingredients, setAct1Ingredients] = useState<string[]>([])
   const { progress } = useAchievements()
-
-  // Show clear button only on first and last screens
-  const showClearButton = currentSceneId === SCENE_IDS.START || currentSceneId === SCENE_IDS.ENDING
 
   const handleResetGame = () => {
     if (resetGameFn) {
@@ -31,56 +24,44 @@ function AppContent() {
     setResetGameFn(() => () => fn())
   }, [])
 
-  const handleStartTrashOdyssey = () => {
-    setGameMode('rpg')
+  const handleSwitchToAct1 = () => {
+    setGameMode('adventure')
+  }
+
+  const handleSwitchToAct2 = () => {
+    if (progress.trashOdysseyUnlocked) {
+      setGameMode('rpg')
+    }
   }
 
   return (
     <div className="app">
-      <div className={`layout-switcher theme-${currentLayout}`}>
-        <GameMenu
-          showClearButton={showClearButton}
-          onResetGame={handleResetGame}
-          onStartTrashOdyssey={handleStartTrashOdyssey}
-          trashOdysseyUnlocked={progress.trashOdysseyUnlocked}
-        />
-
-        <button
-          className={`layout-btn ${currentLayout === 'layout1' ? 'active' : ''}`}
-          onClick={() => setCurrentLayout('layout1')}
-        >
-          Classic Diner
-        </button>
-        <button
-          className={`layout-btn ${currentLayout === 'layout2' ? 'active' : ''}`}
-          onClick={() => setCurrentLayout('layout2')}
-        >
-          Modern Minimal
-        </button>
-        <button
-          className={`layout-btn ${currentLayout === 'layout3' ? 'active' : ''}`}
-          onClick={() => setCurrentLayout('layout3')}
-        >
-          Playful Cartoon
-        </button>
-      </div>
+      <GameMenu
+        gameMode={gameMode}
+        currentLayout={currentLayout}
+        onSwitchToAct1={handleSwitchToAct1}
+        onSwitchToAct2={handleSwitchToAct2}
+        onResetGame={handleResetGame}
+        onLayoutChange={setCurrentLayout}
+        trashOdysseyUnlocked={progress.trashOdysseyUnlocked || false}
+      />
 
       {gameMode === 'adventure' ? (
         <BurgerGame
           layout={currentLayout}
-          onSceneChange={setCurrentSceneId}
           onResetGame={handleRegisterResetFn}
-          onStartTrashOdyssey={handleStartTrashOdyssey}
+          onStartTrashOdyssey={handleSwitchToAct2}
           trashOdysseyUnlocked={progress.trashOdysseyUnlocked}
           onGameEnd={setAct1Ingredients}
         />
-      ) : gameMode === 'rpg' ? (
+      ) : (
         <RPGGame
           layout={currentLayout}
           ingredientsFromAct1={act1Ingredients}
-          onBackToMenu={() => setGameMode('adventure')}
+          onBackToMenu={handleSwitchToAct1}
+          onResetGame={handleRegisterResetFn}
         />
-      ) : null}
+      )}
     </div>
   )
 }
