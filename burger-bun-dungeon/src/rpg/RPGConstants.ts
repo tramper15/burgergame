@@ -10,6 +10,8 @@ export const COMBAT = {
   COUNTER_MULTIPLIER: 0.5,      // Counter-attack damage multiplier (50% of normal attack)
   FLEE_CHANCE: 0.5,             // Base chance to flee from combat (50%)
   MIN_DAMAGE: 1,                // Minimum damage dealt by any attack
+  BOSS_DAMAGE_MULTIPLIER: 1.5,  // Boss attacks deal 50% more damage to make them threatening
+  BOSS_MIN_DAMAGE: 5,           // Minimum damage bosses deal (higher than normal MIN_DAMAGE)
 } as const
 
 // Progression Constants

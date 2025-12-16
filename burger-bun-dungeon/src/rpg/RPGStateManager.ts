@@ -1,4 +1,4 @@
-import type { RPGState, StatBonus, Equipment } from '../types/game'
+import type { RPGState, StatBonus, Equipment, Enemy } from '../types/game'
 import ingredientPowersData from '../data/ingredientPowers.json'
 import { ItemDatabase } from './ItemDatabase'
 import { STARTING_STATS, STARTING_EQUIPMENT, PROGRESSION } from './RPGConstants'
@@ -135,7 +135,7 @@ export class RPGStateManager {
   /**
    * Starts combat with an enemy
    */
-  static startCombat(state: RPGState, enemy: any): RPGState {
+  static startCombat(state: RPGState, enemy: Enemy): RPGState {
     return {
       ...state,
       inCombat: true,

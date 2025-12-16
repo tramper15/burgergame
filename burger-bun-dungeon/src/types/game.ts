@@ -102,6 +102,44 @@ export interface RPGState {
   ingredientBonuses: Record<string, StatBonus>
 }
 
+// Base special ability with common properties
+interface BaseSpecialAbility {
+  target?: 'self' | 'player' | 'all'
+  chance?: number // Chance for ability to trigger
+}
+
+// Discriminated union for special abilities
+export type EnemySpecialAbility =
+  | (BaseSpecialAbility & { type: 'summon'; minions?: string[]; maxMinions?: number })
+  | (BaseSpecialAbility & { type: 'summon_minions'; summonCount: number; summonId: string; summonInterval?: number })
+  | (BaseSpecialAbility & { type: 'multi_attack'; attacksPerTurn?: number })
+  | (BaseSpecialAbility & { type: 'charge'; damageMultiplier?: number })
+  | (BaseSpecialAbility & { type: 'poison'; damage?: number; duration?: number })
+  | (BaseSpecialAbility & { type: 'constrict'; damage?: number; duration?: number })
+  | (BaseSpecialAbility & { type: 'status_effect'; statusEffect?: string; duration?: number })
+  | (BaseSpecialAbility & { type: 'frenzy'; attacksPerTurn?: number; damageMultiplier?: number })
+  | (BaseSpecialAbility & { type: 'splash_damage'; damage: number })
+  | (BaseSpecialAbility & { type: 'pounce'; damageMultiplier: number })
+  | (BaseSpecialAbility & { type: 'nut_throw'; defenseIgnore: number })
+  | (BaseSpecialAbility & { type: 'wrench_throw'; damageMultiplier: number })
+  | (BaseSpecialAbility & { type: 'rabid_bite'; damageMultiplier: number })
+  | (BaseSpecialAbility & { type: 'crushing_blow'; damageMultiplier: number })
+  | (BaseSpecialAbility & { type: 'bite'; damageMultiplier: number })
+  | (BaseSpecialAbility & { type: 'evasion'; missChance: number })
+  | (BaseSpecialAbility & { type: 'steal_item' })
+
+export interface EnemyPhase {
+  healthThreshold: number // Percentage of HP when this phase triggers
+  aiPattern?: string
+  phaseMessage?: string
+  special?: EnemySpecialAbility
+  statChanges?: {
+    atk?: number
+    def?: number
+    spd?: number
+  }
+}
+
 export interface Enemy {
   id: string
   name: string
@@ -116,10 +154,10 @@ export interface Enemy {
   currencyDrop?: { min: number; max: number } // Currency drop range
   lootTable: LootDrop[]
   aiPattern: 'aggressive' | 'defensive' | 'random'
-  special?: any // Special abilities data from enemy JSON
+  special?: EnemySpecialAbility // Special abilities data from enemy JSON
   isBoss?: boolean
   isSecretBoss?: boolean
-  phases?: any[] // For multi-phase bosses like Hungry Dog
+  phases?: EnemyPhase[] // For multi-phase bosses like Hungry Dog
   currentPhase?: number // Track current phase
   turnCounter?: number // For abilities that trigger every N turns
   charging?: boolean // For charge-up abilities like Pounce
@@ -163,3 +201,62 @@ export interface StatBonus {
   maxHp?: number
   ability?: string
 }
+
+// RPG Scene and Choice Types (Act 2)
+
+export interface EncounterEntry {
+  enemyId: string
+  weight: number
+}
+
+export interface RPGChoice {
+  label: string
+  next?: string
+  action?: string
+  enemyId?: string
+  requiresBossDefeated?: string
+  condition?: string
+  itemId?: string
+  slot?: 'weapon' | 'armor' | 'shield' | 'accessory' | 'accessory2'
+  abilityId?: string
+}
+
+export interface RPGScene {
+  name: string
+  description?: string
+  firstVisit?: string
+  type: 'exploration' | 'combat' | 'boss_battle' | 'boss' | 'safe' | 'ending' | 'checkpoint' | 'shop' | 'cutscene'
+  boss?: string
+  onVictory?: string
+  onDefeat?: string
+  encounterTable?: EncounterEntry[]
+  encounterRate?: number
+  choices?: RPGChoice[]
+  endingType?: string
+  isCheckpoint?: boolean
+  cutsceneText?: string[]
+  bossIntro?: string[]
+}
+
+export interface EnemyData {
+  id: string
+  name: string
+  description: string
+  level: number
+  maxHp: number
+  atk: number
+  def: number
+  spd: number
+  xpReward: number
+  currencyDrop?: { min: number; max: number }
+  lootTable?: LootDrop[]
+  aiPattern: 'aggressive' | 'defensive' | 'random'
+  special?: EnemySpecialAbility
+  isBoss?: boolean
+  isSecretBoss?: boolean
+  phases?: EnemyPhase[]
+  bossIntro?: string[]
+}
+
+export type RPGScenesData = Record<string, RPGScene>
+export type RPGEnemiesData = Record<string, EnemyData>

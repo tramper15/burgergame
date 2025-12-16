@@ -64,7 +64,8 @@ export class SpecialAbilities {
       case 'summon_minions':
         // Check turn counter for interval-based summoning
         const currentTurn = enemy.turnCounter || 0
-        if (currentTurn >= special.summonInterval) {
+        const summonInterval = special.summonInterval || 0
+        if (currentTurn >= summonInterval) {
           // Cap total minions at summonCount
           const currentMinionCount = enemy.minions?.length || 0
           if (currentMinionCount < special.summonCount) {

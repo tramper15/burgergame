@@ -7,6 +7,7 @@ import { SceneGenerator } from '../services/SceneGenerator'
 import { ChoiceProcessor } from '../services/ChoiceProcessor'
 import { AchievementService } from '../services/AchievementService'
 import { SCENE_IDS, NO_CHOICE_SELECTED } from '../constants/gameConstants'
+import { UI } from '../constants/UIConstants'
 import { useToast } from './ToastProvider'
 import { useAchievements } from './AchievementProvider'
 
@@ -97,7 +98,7 @@ const BurgerGame = ({ layout, onSceneChange, onResetGame, onStartTrashOdyssey, t
           setTimeout(() => {
             showToast(`Achievement Unlocked: ${achievement.title}`)
             unlockAchievement(achievementId)
-          }, index * 500) // 500ms between each toast
+          }, index * UI.ACHIEVEMENT_TOAST_DELAY_MS)
         }
       })
 

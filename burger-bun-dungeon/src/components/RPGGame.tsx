@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import type { LayoutType } from './layouts'
-import type { RPGState, Equipment } from '../types/game'
+import type { RPGState, Equipment, RPGScenesData, RPGEnemiesData, RPGChoice, RPGScene, EncounterEntry } from '../types/game'
 import { RPGStateManager } from '../rpg/RPGStateManager'
 import { CombatProcessor, type CombatAction } from '../rpg/CombatProcessor'
 import { BattleSceneGenerator } from '../rpg/BattleSceneGenerator'
@@ -11,11 +11,13 @@ import { AchievementService } from '../services/AchievementService'
 import { useAchievements } from './AchievementProvider'
 import { useToast } from './ToastProvider'
 import { layouts } from './layouts'
+import { ABILITIES } from '../rpg/AbilityConstants'
+import { UI } from '../constants/UIConstants'
 import rpgScenesData from '../data/rpgScenes.json'
 import rpgEnemiesData from '../data/rpgEnemies.json'
 
-const rpgScenes = rpgScenesData as Record<string, any>
-const rpgEnemies = rpgEnemiesData as Record<string, any>
+const rpgScenes = rpgScenesData as RPGScenesData
+const rpgEnemies = rpgEnemiesData as RPGEnemiesData
 
 interface RPGGameProps {
   layout: LayoutType
@@ -68,7 +70,7 @@ export default function RPGGame({ layout, ingredientsFromAct1, onBackToMenu, onR
         setTimeout(() => {
           showToast(`Achievement Unlocked: ${achievement.title}`)
           unlockAchievement(achievementId)
-        }, index * 500) // 500ms between each toast
+        }, index * UI.ACHIEVEMENT_TOAST_DELAY_MS)
       }
     })
   }
@@ -184,7 +186,7 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
   }
 
   // Add restart option to all scenes
-  const addRestartOption = (choices: any[]) => {
+  const addRestartOption = (choices: RPGChoice[]): RPGChoice[] => {
     return [
       ...choices,
       { label: '🔄 Restart Act 2 (Fresh Start)', action: 'restart_act2' }
@@ -192,7 +194,7 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
   }
 
   // Add inventory/equipment option to all exploration scenes
-  const explorationChoicesWithInventory = (choices: any[]) => {
+  const explorationChoicesWithInventory = (choices: RPGChoice[]): RPGChoice[] => {
     return [
       { label: '📦 View Inventory & Equipment', action: 'view_inventory' },
       ...addRestartOption(choices)
@@ -200,12 +202,12 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
   }
 
   // Filter out boss battles if the boss has already been defeated
-  let availableChoices = currentSceneData?.choices || [
+  let availableChoices: RPGChoice[] = currentSceneData?.choices || [
     { label: '← Back to Main Menu' }
   ]
 
   if (currentSceneData) {
-    availableChoices = availableChoices.filter((choice: any) => {
+    availableChoices = availableChoices.filter((choice) => {
       // If this choice requires a boss to be defeated, check if it is
       if (choice.requiresBossDefeated) {
         return rpgState.defeatedBosses.includes(choice.requiresBossDefeated)
@@ -291,15 +293,23 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
       const currentScene = rpgScenes[rpgState.currentLocation]
       let nextStateAfterVictory = endResult.newState
 
-      if (currentScene && currentScene.type === 'boss_battle' && currentScene.onVictory) {
+      console.log('[Boss Debug] Current Location:', rpgState.currentLocation)
+      console.log('[Boss Debug] Current Scene:', currentScene)
+      console.log('[Boss Debug] Scene Type:', currentScene?.type)
+      console.log('[Boss Debug] Scene Boss:', currentScene?.boss)
+
+      // Check for both 'boss' and 'boss_battle' scene types (both indicate boss fights)
+      if (currentScene && (currentScene.type === 'boss_battle' || currentScene.type === 'boss') && currentScene.boss) {
         // Boss defeated - mark it and prepare to navigate to victory location
         const bossId = currentScene.boss
+        console.log('[Boss Debug] Adding boss to defeated list:', bossId)
         nextStateAfterVictory = {
           ...endResult.newState,
           defeatedBosses: endResult.newState.defeatedBosses.includes(bossId)
             ? endResult.newState.defeatedBosses
             : [...endResult.newState.defeatedBosses, bossId]
         }
+        console.log('[Boss Debug] Updated defeated bosses:', nextStateAfterVictory.defeatedBosses)
       }
 
       setRpgState(nextStateAfterVictory)
@@ -379,7 +389,7 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
         // Check for random encounters
         const shouldTriggerEncounter = checkRandomEncounter(nextSceneData)
 
-        if (shouldTriggerEncounter) {
+        if (shouldTriggerEncounter && nextSceneData.encounterTable) {
           // Trigger random encounter BEFORE navigating to location
           const enemyId = selectRandomEnemy(nextSceneData.encounterTable)
           if (enemyId) {
@@ -413,7 +423,7 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
   }
 
   // Check if a random encounter should trigger (30% default, or custom rate for risky routes)
-  const checkRandomEncounter = (sceneData: any): boolean => {
+  const checkRandomEncounter = (sceneData: RPGScene): boolean => {
     if (sceneData.type !== 'combat') return false
     if (!sceneData.encounterTable || sceneData.encounterTable.length === 0) return false
 
@@ -423,7 +433,7 @@ Ingredient Powers Active: ${Object.keys(rpgState.ingredientBonuses).length}
   }
 
   // Select a random enemy from the encounter table based on weights
-  const selectRandomEnemy = (encounterTable: any[]): string | null => {
+  const selectRandomEnemy = (encounterTable: EncounterEntry[]): string | null => {
     if (!encounterTable || encounterTable.length === 0) return null
 
     const totalWeight = encounterTable.reduce((sum, entry) => sum + entry.weight, 0)
@@ -578,7 +588,7 @@ ${unequippableItems.length > 0
     displayChoices = [
       ...unequippableItems.map(({ slot, item }) => ({
         label: `🗑️ Unequip ${item.name}`,
-        slot: slot,
+        slot: slot as 'weapon' | 'armor' | 'shield' | 'accessory' | 'accessory2',
         action: 'unequip'
       })),
       { label: '← Back to Inventory', action: 'back' }
@@ -674,9 +684,9 @@ ${unequippableItems.length > 0
 
     // Define ability descriptions
     const abilityDescriptions: Record<string, string> = {
-      poison_strike: 'Poison Strike - 5 damage over 3 turns',
-      onion_tears: 'Onion Tears - 12 AOE damage (costs 10 HP)',
-      heal: 'Heal - Restore 20 HP (unlimited)'
+      [ABILITIES.POISON_STRIKE.ID]: `${ABILITIES.POISON_STRIKE.NAME} - ${ABILITIES.POISON_STRIKE.DESCRIPTION}`,
+      [ABILITIES.ONION_TEARS.ID]: `${ABILITIES.ONION_TEARS.NAME} - ${ABILITIES.ONION_TEARS.DESCRIPTION}`,
+      [ABILITIES.HEAL.ID]: `${ABILITIES.HEAL.NAME} - ${ABILITIES.HEAL.DESCRIPTION}`
     }
 
     displayText = BattleSceneGenerator.generateBattleScene(rpgState, combatLog) + '\n\n--- ABILITIES ---\n\nSelect an ability to use:\n'
@@ -718,7 +728,14 @@ ${unequippableItems.length > 0
       // If we defeated a boss, use pending navigation (which was set during boss battle setup)
       if (pendingNavigation) {
         // Navigate to the pending location (either after random encounter or boss battle)
-        setRpgState(prev => RPGStateManager.changeLocation(prev, pendingNavigation))
+        console.log('[Victory Debug] Navigating to pending location:', pendingNavigation)
+        console.log('[Victory Debug] Current defeated bosses before navigation:', rpgState.defeatedBosses)
+        setRpgState(prev => {
+          console.log('[Victory Debug] Prev state defeated bosses:', prev.defeatedBosses)
+          const newState = RPGStateManager.changeLocation(prev, pendingNavigation)
+          console.log('[Victory Debug] New state defeated bosses:', newState.defeatedBosses)
+          return newState
+        })
         setPendingNavigation(null)
       }
 
@@ -772,6 +789,10 @@ ${unequippableItems.length > 0
     const shopLocation = 'trash_bag_depths'
     const availableItems = ShopProcessor.getAvailableItemsForPlayer(shopLocation, rpgState.currency, rpgState.defeatedBosses)
 
+    // Debug: Log defeated bosses to help diagnose shop inventory issues
+    console.log('[Shop Debug] Defeated Bosses:', rpgState.defeatedBosses)
+    console.log('[Shop Debug] Available Items Count:', availableItems.length)
+
     displayText = `═══════════════════════════════════════════
 COCKROACH MERCHANT'S SHOP
 ═══════════════════════════════════════════
@@ -780,6 +801,7 @@ COCKROACH MERCHANT'S SHOP
 I have finest goods in all trash can!"
 
 Your Scraps: ${rpgState.currency}
+Bosses Defeated: ${rpgState.defeatedBosses.join(', ') || 'None'}
 
 --- AVAILABLE ITEMS ---
 

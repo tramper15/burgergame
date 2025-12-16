@@ -1,9 +1,12 @@
-import type { RPGState, Enemy } from '../types/game'
+import type { RPGState, Enemy, EnemyData, RPGEnemiesData } from '../types/game'
 import { InventoryManager } from './InventoryManager'
 import { RPGStateManager } from './RPGStateManager'
 import { COMBAT, PROGRESSION } from './RPGConstants'
+import { ABILITIES } from './AbilityConstants'
 import { SpecialAbilities } from './SpecialAbilities'
 import rpgEnemiesData from '../data/rpgEnemies.json'
+
+const rpgEnemies = rpgEnemiesData as RPGEnemiesData
 
 export interface CombatAction {
   actor: 'player' | 'enemy'
@@ -403,45 +406,41 @@ export class CombatProcessor {
     let newState = { ...state }
 
     switch (abilityId) {
-      case 'poison_strike':
-        // Poison Strike - 5 damage over 3 turns
-        const poisonDamage = 5
+      case ABILITIES.POISON_STRIKE.ID:
+        // Poison Strike
         actions.push({
           actor: 'player',
           action: 'ability',
-          message: `You use Poison Strike! The ${state.currentEnemy.name} is poisoned and will take ${poisonDamage} damage for 3 turns!`
+          message: `You use ${ABILITIES.POISON_STRIKE.NAME}! The ${state.currentEnemy.name} is poisoned and will take ${ABILITIES.POISON_STRIKE.DAMAGE} damage for ${ABILITIES.POISON_STRIKE.DURATION} turns!`
         })
         // Apply poison effect
         newState = {
           ...newState,
           currentEnemy: {
             ...newState.currentEnemy!,
-            poisonTurns: 3
+            poisonTurns: ABILITIES.POISON_STRIKE.DURATION
           }
         }
         break
 
-      case 'onion_tears':
-        // Onion Tears - 12 AOE damage (costs 10 HP)
-        const hpCost = 10
-        const aoeDamage = 12
-
-        if (state.hp <= hpCost) {
+      case ABILITIES.ONION_TEARS.ID:
+        // Onion Tears - AOE damage with HP cost
+        if (state.hp <= ABILITIES.ONION_TEARS.HP_COST) {
           actions.push({
             actor: 'player',
             action: 'ability',
             success: false,
-            message: 'Not enough HP to use Onion Tears! (Costs 10 HP)'
+            message: `Not enough HP to use ${ABILITIES.ONION_TEARS.NAME}! (Costs ${ABILITIES.ONION_TEARS.HP_COST} HP)`
           })
         } else {
           // Pay HP cost
           newState = {
             ...newState,
-            hp: Math.max(0, state.hp - hpCost)
+            hp: Math.max(0, state.hp - ABILITIES.ONION_TEARS.HP_COST)
           }
 
           // Deal AOE damage to enemy
-          const newEnemyHp = Math.max(0, state.currentEnemy.hp - aoeDamage)
+          const newEnemyHp = Math.max(0, state.currentEnemy.hp - ABILITIES.ONION_TEARS.AOE_DAMAGE)
           newState = {
             ...newState,
             currentEnemy: {
@@ -454,7 +453,7 @@ export class CombatProcessor {
           if (state.currentEnemy.minions && state.currentEnemy.minions.length > 0) {
             const damagedMinions = state.currentEnemy.minions.map(minion => ({
               ...minion,
-              hp: Math.max(0, minion.hp - aoeDamage)
+              hp: Math.max(0, minion.hp - ABILITIES.ONION_TEARS.AOE_DAMAGE)
             })).filter(m => m.hp > 0) // Remove defeated minions
 
             newState = {
@@ -469,18 +468,17 @@ export class CombatProcessor {
           actions.push({
             actor: 'player',
             action: 'ability',
-            damage: aoeDamage,
+            damage: ABILITIES.ONION_TEARS.AOE_DAMAGE,
             success: true,
-            message: `You cry tears of onion! ${aoeDamage} AOE damage dealt! (Cost ${hpCost} HP)`
+            message: `You cry tears of onion! ${ABILITIES.ONION_TEARS.AOE_DAMAGE} AOE damage dealt! (Cost ${ABILITIES.ONION_TEARS.HP_COST} HP)`
           })
         }
         break
 
-      case 'heal':
-        // Heal - Restore 20 HP (unlimited uses)
-        const healAmount = 20
+      case ABILITIES.HEAL.ID:
+        // Heal - Restore HP
         const oldHp = state.hp
-        const newHp = Math.min(state.maxHp, state.hp + healAmount)
+        const newHp = Math.min(state.maxHp, state.hp + ABILITIES.HEAL.HP_RESTORED)
         const actualHeal = newHp - oldHp
 
         newState = {
@@ -493,7 +491,7 @@ export class CombatProcessor {
           action: 'ability',
           healAmount: actualHeal,
           success: true,
-          message: `You use Special Sauce to heal! Restored ${actualHeal} HP!`
+          message: `You use ${ABILITIES.HEAL.NAME} to heal! Restored ${actualHeal} HP!`
         })
         break
 
@@ -592,7 +590,7 @@ export class CombatProcessor {
   /**
    * Creates a minion enemy from enemy data
    */
-  static createMinion(enemyData: any): Enemy {
+  static createMinion(enemyData: EnemyData): Enemy {
     return {
       id: enemyData.id,
       name: enemyData.name,
@@ -642,8 +640,7 @@ export class CombatProcessor {
 
     // Apply poison damage at start of enemy turn
     if (state.currentEnemy.poisonTurns && state.currentEnemy.poisonTurns > 0) {
-      const poisonDamage = 5
-      const newEnemyHp = Math.max(0, state.currentEnemy.hp - poisonDamage)
+      const newEnemyHp = Math.max(0, state.currentEnemy.hp - ABILITIES.POISON_STRIKE.DAMAGE)
       const newPoisonTurns = (state.currentEnemy.poisonTurns || 0) - 1
 
       currentState = {
@@ -658,8 +655,8 @@ export class CombatProcessor {
       actions.push({
         actor: 'enemy',
         action: 'attack',
-        damage: poisonDamage,
-        message: `The ${state.currentEnemy.name} takes ${poisonDamage} poison damage! (${newPoisonTurns} turns remaining)`
+        damage: ABILITIES.POISON_STRIKE.DAMAGE,
+        message: `The ${state.currentEnemy.name} takes ${ABILITIES.POISON_STRIKE.DAMAGE} poison damage! (${newPoisonTurns} turns remaining)`
       })
 
       // Check if poison killed the enemy
@@ -690,6 +687,14 @@ export class CombatProcessor {
       currentState.playerDefending
     )
 
+    // Bosses deal increased damage to remain threatening against high-DEF players
+    const isBoss = currentState.currentEnemy!.isBoss || currentState.currentEnemy!.isSecretBoss
+    if (isBoss) {
+      baseDamage = Math.floor(baseDamage * COMBAT.BOSS_DAMAGE_MULTIPLIER)
+      baseDamage = Math.max(COMBAT.BOSS_MIN_DAMAGE, baseDamage)
+      console.log('[Boss Damage] Applied boss multiplier. New damage:', baseDamage)
+    }
+
     let finalDamage = baseDamage
 
     // Process special abilities
@@ -709,9 +714,8 @@ export class CombatProcessor {
         const special = currentState.currentEnemy!.special
         const currentMinionCount = currentState.currentEnemy!.minions?.length || 0
 
-        if (currentMinionCount < special.summonCount) {
+        if (special.summonCount && special.summonId && currentMinionCount < special.summonCount) {
           // Load minion enemy data
-          const rpgEnemies = rpgEnemiesData as Record<string, any>
           const minionData = rpgEnemies[special.summonId]
 
           if (minionData) {
@@ -742,8 +746,11 @@ export class CombatProcessor {
           }
         }
       }
-    } else {
-      // Normal attack without special ability
+    }
+
+    // Add boss/enemy attack message if they're dealing damage
+    // (Special abilities may add their own messages, but we still need the basic attack)
+    if (finalDamage > 0) {
       actions.push({
         actor: 'enemy',
         action: 'attack',
@@ -831,14 +838,18 @@ export class CombatProcessor {
     const variance = Math.floor(Math.random() * COMBAT.DAMAGE_VARIANCE)
     const defendMultiplier = isDefending ? COMBAT.DEFENSE_MULTIPLIER : 1.0
     const finalDamage = Math.floor((baseDamage + variance) * defendMultiplier)
+    const actualDamage = Math.max(COMBAT.MIN_DAMAGE, finalDamage)
 
-    return Math.max(COMBAT.MIN_DAMAGE, finalDamage)
+    // Debug logging for damage calculation
+    console.log('[Damage Debug] ATK:', attacker.atk, 'DEF:', defender.def, 'Base:', baseDamage, 'Variance:', variance, 'Defending:', isDefending, 'Final:', actualDamage)
+
+    return actualDamage
   }
 
   /**
    * Starts combat with an enemy (loads from enemy data)
    */
-  static startCombat(state: RPGState, enemyData: any): RPGState {
+  static startCombat(state: RPGState, enemyData: EnemyData): RPGState {
     // Create a fresh enemy instance with full HP
     const enemy: Enemy = {
       id: enemyData.id,
@@ -959,7 +970,7 @@ export class CombatProcessor {
   /**
    * Rolls for currency drop
    */
-  static rollCurrency(enemy: any): number {
+  static rollCurrency(enemy: Enemy | EnemyData): number {
     if (!enemy.currencyDrop) return 0
 
     const min = enemy.currencyDrop.min || 0
